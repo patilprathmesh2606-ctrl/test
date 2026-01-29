@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MenuPro | Affordable Digital Menu Solution</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            --secondary: #10b981;
+            --secondary-light: #34d399;
+            --trial-color: #8b5cf6;
+            --dark: #111827;
+            --dark-light: #1f2937;
+            --light: #f9fafb;
+            --light-gray: #f3f4f6;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --white: #ffffff;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: var(--dark);
+            background-color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Enhanced Header */
+        header {
+            padding: 16px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--light-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.98);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-icon i {
+            font-size: 20px;
+            color: var(--white);
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 26px;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark-light);
+            font-weight: 500;
+            font-size: 15px;
+            transition: var(--transition);
+            position: relative;
+            padding: 6px 0;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+            z-index: 1001;
+        }
+
+        .mobile-menu-btn:hover {
+            background-color: var(--light-gray);
+        }
+
+        /* Enhanced Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.03) 100%);
+            border-bottom-left-radius: 100px;
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--dark);
+            line-height: 1.1;
+        }
+
+        .hero-text h1 span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .hero-text h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: rgba(79, 70, 229, 0.15);
+            border-radius: 4px;
+            z-index: -1;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 32px;
+            max-width: 540px;
+        }
+
+        .highlight {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-gradient);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
+
+        .highlight i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .hero-image {
+            position: relative;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--light-gray);
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: var(--transition-slow);
+        }
+
+        .hero-image img:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-lg);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        /* Enhanced Buttons */
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            min-height: 52px;
+            touch-action: manipulation;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: var(--white);
+            border: 1px solid var(--primary-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 2px solid var(--primary-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--light-gray);
+            transform: translateY(-3px);
+        }
+
+        .btn-trial {
+            background: linear-gradient(135deg, var(--trial-color) 0%, #a78bfa 100%);
+            color: var(--white);
+            border: 1px solid #7c3aed;
+        }
+
+        .btn-trial:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--dark);
+            border: 2px solid var(--gray-light);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: var(--white);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--light), var(--white));
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-title h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background-color: var(--white);
+            padding: 40px 32px;
+            border-radius: var(--radius-lg);
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.05);
+            background: var(--primary-gradient);
+        }
+
+        .feature-icon i {
+            font-size: 28px;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon i {
+            color: var(--white);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            font-size: 15.5px;
+        }
+
+        /* Enhanced Pricing Section */
+        .pricing {
+            padding: 80px 0;
+            background-color: var(--light-gray);
+            position: relative;
+        }
+
+        .pricing::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--white), var(--light-gray));
+        }
+
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background-color: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--light-gray);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .trial-card {
+            border-top: 6px solid var(--trial-color);
+        }
+
+        .pro-card {
+            border-top: 6px solid var(--primary);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 40px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .trial-card .plan-badge {
+            background: var(--trial-color);
+        }
+
+        .price {
+            font-family: 'Poppins', sans-serif;
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 24px 0;
+            line-height: 1;
+        }
+
+        .price span {
+            font-size: 24px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .trial-price {
+            color: var(--trial-color);
+        }
+
+        .price-note {
+            color: var(--secondary);
+            font-weight: 700;
+            margin-bottom: 32px;
+            display: block;
+            font-size: 18px;
+            background-color: rgba(16, 185, 129, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .trial-note {
+            color: var(--trial-color);
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .pricing-features {
+            text-align: left;
+            margin-bottom: 40px;
+            padding-left: 0;
+            flex-grow: 1;
+        }
+
+        .pricing-features li {
+            list-style: none;
+            margin-bottom: 16px;
+            padding-left: 32px;
+            position: relative;
+            font-size: 16px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .trial-card .pricing-features li::before {
+            color: var(--trial-color);
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        /* Enhanced Login Options */
+        .login-options {
+            padding: 80px 0;
+            background-color: var(--white);
+            position: relative;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .option-card {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 50px 32px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-5px);
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .option-card:hover::before {
+            opacity: 1;
+        }
+
+        .option-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 28px;
+            transition: var(--transition);
+        }
+
+        .option-card:hover .option-icon {
+            transform: scale(1.05);
+            background: var(--primary-gradient);
+        }
+
+        .option-icon i {
+            font-size: 36px;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .option-card:hover .option-icon i {
+            color: var(--white);
+        }
+
+        .option-card h3 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .option-card p {
+            color: var(--gray);
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        /* Enhanced Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 60px 0 30px;
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        .footer-logo span {
+            color: var(--primary-light);
+        }
+
+        .footer-about p {
+            color: #9ca3af;
+            margin-bottom: 24px;
+            font-size: 15.5px;
+        }
+
+        .footer-links h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            margin-bottom: 24px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .footer-links h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 14px;
+        }
+
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 15px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* Enhanced Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            animation: modalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            border: 1px solid var(--light-gray);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary-gradient);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--white);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: var(--light);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: var(--white);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .plan-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .plan-option {
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+        }
+
+        .plan-option:hover {
+            border-color: var(--primary-light);
+        }
+
+        .plan-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+
+        .trial-plan.selected {
+            border-color: var(--trial-color);
+            background-color: rgba(139, 92, 246, 0.05);
+        }
+
+        .plan-option h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .plan-option .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        .trial-plan .price {
+            color: var(--trial-color);
+        }
+
+        .plan-option .period {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* =========================================== */
+        /* MOBILE OPTIMIZATIONS BELOW */
+        /* =========================================== */
+
+        @media (max-width: 1100px) {
+            .hero-content {
+                gap: 60px;
+            }
+            
+            .hero-text h1 {
+                font-size: 46px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .hero-text {
+                text-align: center;
+                order: 1;
+            }
+
+            .hero-text p {
+                margin: 0 auto 32px;
+            }
+
+            .btn-group {
+                justify-content: center;
+            }
+            
+            .hero-image {
+                order: 2;
+            }
+            
+            .hero-image img {
+                max-width: 90%;
+                transform: none;
+            }
+            
+            .hero-image::before {
+                display: none;
+            }
+            
+            .pricing-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+        }
+
+        /* Tablet Optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            /* Mobile Header */
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 85%;
+                max-width: 350px;
+                height: 100vh;
+                background-color: var(--white);
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 100px;
+                padding-left: 30px;
+                transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                gap: 0;
+                z-index: 999;
+                border-left: 1px solid var(--light-gray);
+            }
+            
+            .nav-links.active {
+                display: flex;
+                right: 0;
+            }
+            
+            .nav-link {
+                padding: 18px 0;
+                width: 100%;
+                font-size: 18px;
+                border-bottom: 1px solid var(--light-gray);
+            }
+            
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+            
+            .nav-link::after {
+                display: none;
+            }
+            
+            .nav-links .btn-outline {
+                margin-top: 30px;
+                width: 90%;
+                font-size: 17px;
+                padding: 18px 24px;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            /* Mobile Hero Section */
+            .hero {
+                padding: 60px 0 40px;
+            }
+            
+            .hero-text h1 {
+                font-size: 36px;
+                margin-bottom: 20px;
+            }
+            
+            .hero-text p {
+                font-size: 17px;
+                margin-bottom: 28px;
+                line-height: 1.6;
+            }
+            
+            .highlight {
+                font-size: 14px;
+                padding: 10px 18px;
+                margin-bottom: 24px;
+            }
+            
+            .hero-image img {
+                max-width: 100%;
+                border-radius: var(--radius);
+            }
+            
+            /* Mobile Buttons */
+            .btn-group {
+                flex-direction: column;
+                gap: 14px;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 18px 24px;
+                font-size: 17px;
+                min-height: 56px;
+                justify-content: center;
+            }
+            
+            /* Mobile Features */
+            .features {
+                padding: 60px 0;
+            }
+            
+            .section-title {
+                margin-bottom: 48px;
+            }
+            
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .section-title p {
+                font-size: 16px;
+                padding: 0 10px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .feature-card {
+                padding: 32px 24px;
+                border-radius: var(--radius);
+            }
+            
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 22px;
+            }
+            
+            .feature-icon i {
+                font-size: 24px;
+            }
+            
+            .feature-card h3 {
+                font-size: 20px;
+                margin-bottom: 14px;
+            }
+            
+            .feature-card p {
+                font-size: 15px;
+            }
+            
+            /* Mobile Pricing */
+            .pricing {
+                padding: 60px 0;
+            }
+            
+            .pricing-card {
+                padding: 40px 28px;
+                border-radius: var(--radius-lg);
+            }
+            
+            .price {
+                font-size: 52px;
+                margin: 20px 0;
+            }
+            
+            .price span {
+                font-size: 22px;
+            }
+            
+            .price-note {
+                font-size: 16px;
+                padding: 8px 18px;
+                margin-bottom: 28px;
+            }
+            
+            .pricing-features li {
+                font-size: 15px;
+                margin-bottom: 14px;
+                padding-left: 28px;
+            }
+            
+            /* Mobile Login Options */
+            .login-options {
+                padding: 60px 0;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .option-card {
+                padding: 40px 28px;
+                border-radius: var(--radius);
+            }
+            
+            .option-icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 24px;
+            }
+            
+            .option-icon i {
+                font-size: 32px;
+            }
+            
+            .option-card h3 {
+                font-size: 24px;
+                margin-bottom: 14px;
+            }
+            
+            .option-card p {
+                font-size: 15.5px;
+                margin-bottom: 28px;
+            }
+            
+            /* Plan Selector Mobile */
+            .plan-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Mobile Footer */
+            footer {
+                padding: 50px 0 24px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 36px;
+                text-align: center;
+            }
+            
+            .footer-logo {
+                font-size: 26px;
+            }
+            
+            .footer-about p {
+                font-size: 15px;
+            }
+            
+            .footer-links h4 {
+                font-size: 18px;
+            }
+            
+            .footer-links h4::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .footer-links ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+            
+            .footer-links li {
+                margin-bottom: 0;
+            }
+            
+            .footer-links a:hover {
+                padding-left: 0;
+            }
+            
+            .copyright {
+                font-size: 13px;
+                padding-top: 24px;
+            }
+            
+            /* Mobile Modal */
+            .modal {
+                padding: 16px;
+                align-items: flex-start;
+                padding-top: 60px;
+            }
+            
+            .modal-content {
+                max-height: 85vh;
+                border-radius: var(--radius);
+            }
+            
+            .modal-header {
+                padding: 20px 24px;
+            }
+            
+            .modal-header h3 {
+                font-size: 18px;
+            }
+            
+            .modal-body {
+                padding: 24px;
+            }
+            
+            .form-control {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+
+        /* Small Mobile Optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            /* Small Mobile Header */
+            .logo-text {
+                font-size: 22px;
+            }
+            
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .logo-icon i {
+                font-size: 18px;
+            }
+            
+            /* Small Mobile Hero */
+            .hero {
+                padding: 50px 0 36px;
+            }
+            
+            .hero-text h1 {
+                font-size: 30px;
+            }
+            
+            .hero-text p {
+                font-size: 16px;
+            }
+            
+            .highlight {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+            
+            /* Small Mobile Sections */
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .section-title p {
+                font-size: 15px;
+            }
+            
+            .features, .pricing, .login-options {
+                padding: 50px 0;
+            }
+            
+            /* Small Mobile Cards */
+            .feature-card, .option-card {
+                padding: 28px 20px;
+            }
+            
+            .feature-icon, .option-icon {
+                width: 56px;
+                height: 56px;
+            }
+            
+            .feature-icon i, .option-icon i {
+                font-size: 22px;
+            }
+            
+            /* Small Mobile Pricing */
+            .pricing-card {
+                padding: 36px 24px;
+            }
+            
+            .price {
+                font-size: 48px;
+            }
+            
+            .price span {
+                font-size: 20px;
+            }
+            
+            /* Small Mobile Footer */
+            footer {
+                padding: 40px 0 20px;
+            }
+            
+            .footer-links ul {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            /* Mobile Menu Overlay */
+            .nav-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+            }
+            
+            .nav-overlay.active {
+                display: block;
+            }
+        }
+
+        /* Landscape Mobile Optimizations */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .hero {
+                padding: 40px 0 30px;
+            }
+            
+            .hero-text h1 {
+                font-size: 32px;
+                margin-bottom: 16px;
+            }
+            
+            .modal {
+                padding-top: 20px;
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                max-height: 80vh;
+            }
+            
+            .nav-links {
+                padding-top: 80px;
+            }
+            
+            .nav-link {
+                padding: 12px 0;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .hero::before {
+                background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(99, 102, 241, 0.07) 100%);
+            }
+            
+            .feature-card, .option-card, .pricing-card {
+                background-color: #1f2937;
+                border-color: #374151;
+                color: #f9fafb;
+            }
+            
+            .feature-card h3, .option-card h3, .pricing-card h3 {
+                color: #f9fafb;
+            }
+            
+            .feature-card p, .option-card p, .pricing-card p {
+                color: #d1d5db;
+            }
+            
+            .form-control {
+                background-color: #374151;
+                border-color: #4b5563;
+                color: #f9fafb;
+            }
+            
+            .form-control:focus {
+                background-color: #4b5563;
+            }
+        }
+
+        /* Prevent zoom on iOS input focus */
+        @media screen and (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Smooth scrolling for iOS */
+        @supports (-webkit-overflow-scrolling: touch) {
+            html {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="logo-text">Menu<span>Pro</span></div>
+                </a>
+                <nav class="nav-links" id="navLinks">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
+                    <a href="#login" class="nav-link">Login Options</a>
+                    <a href="#" class="btn btn-outline">Live Demo</a>
+                </nav>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- Enhanced Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="highlight">
+                        <i class="fas fa-tag"></i> Start with Free Trial
+                    </div>
+                    <h1>Digital Menu Solution for <span>Restaurants</span></h1>
+                    <p>Transform your restaurant with our affordable, all-in-one digital menu system. Perfect for small to medium-sized food businesses looking to modernize their operations and enhance customer experience.</p>
+                    <div class="btn-group">
+                        <a href="#pricing" class="btn btn-primary">
+                            <i class="fas fa-crown"></i> View Plans
+                        </a>
+                        <a href="#login" class="btn btn-secondary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Restaurant Digital Menu">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Complete Restaurant Solution</h2>
+                <p>Everything you need to streamline operations and delight customers</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>Smart Digital Menu</h3>
+                    <p>Beautiful, customizable digital menus accessible via QR code. Update your menu items in real-time without printing costs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>In-house Ordering</h3>
+                    <p>Allow customers to place orders directly from their table. Reduce wait times and improve customer experience.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Order Management</h3>
+                    <p>Efficiently manage incoming orders, track preparation status, and streamline kitchen operations with real-time updates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3>Online Delivery</h3>
+                    <p>Coming soon! Integrated online food delivery system to expand your reach and increase revenue streams.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Choose Your Plan</h2>
+                <p>Start with a free trial or go pro for unlimited features</p>
+            </div>
+            <div class="pricing-container">
+                <!-- Trial Plan -->
+                <div class="pricing-card trial-card">
+                    <div class="plan-badge">POPULAR</div>
+                    <h3>Trial Plan</h3>
+                    <p>Perfect for trying out our platform</p>
+                    <div class="price trial-price">₹0<span>/month</span></div>
+                    <span class="price-note trial-note">14 days free trial</span>
+                    <ul class="pricing-features">
+                        <li>Digital Menu with QR Code Access</li>
+                        <li>In-house Order Placement System</li>
+                        <li>Basic Order Management Dashboard</li>
+                        <li>Up to 50 orders per month</li>
+                        <li>Basic Support</li>
+                        <li>All features for 14 days</li>
+                    </ul>
+                    <button class="btn btn-trial select-plan" data-plan="trial">
+                        <i class="fas fa-play-circle"></i> Start Free Trial
+                    </button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="pricing-card pro-card">
+                    <h3>Pro Plan</h3>
+                    <p>Perfect for growing restaurants</p>
+                    <div class="price">₹49<span>/month</span></div>
+                    <span class="price-note">Less than ₹2 per day!</span>
+                    <ul class="pricing-features">
+                        <li>Unlimited Digital Menu Access</li>
+                        <li>Advanced In-house Ordering</li>
+                        <li>Real-time Order Management</li>
+                        <li>Unlimited orders</li>
+                        <li>Priority Email & Chat Support</li>
+                        <li>Advanced Analytics & Reporting</li>
+                        <li>Custom Branding Options</li>
+                        <li>Online Delivery Integration</li>
+                    </ul>
+                    <button class="btn btn-primary select-plan" data-plan="pro">
+                        <i class="fas fa-crown"></i> Go Pro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Login Options Section -->
+    <section class="login-options" id="login">
+        <div class="container">
+            <div class="section-title">
+                <h2>Access Your Account</h2>
+                <p>Choose your login option based on your role in the system</p>
+            </div>
+            <div class="options-grid">
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>New Registration</h3>
+                    <p>Create your restaurant account and get started in minutes with our easy setup process.</p>
+                    <a href="#" class="btn btn-primary" id="registerBtn">
+                        <i class="fas fa-user-plus"></i> Register Now
+                    </a>
+                </div>
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Admin Login</h3>
+                    <p>Administrator access for system management, configuration, and overall oversight.</p>
+                    <a href="admin/index.html" class="btn btn-secondary">
+                        <i class="fas fa-sign-in-alt"></i> Admin Login
+                    </a>
+                </div>
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Manager Login</h3>
+                    <p>Restaurant manager access for daily operations, staff management, and reporting.</p>
+                    <a href="manager/index.html" class="btn btn-secondary">
+                        <i class="fas fa-sign-in-alt"></i> Manager Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">Menu<span>Pro</span></div>
+                    <p>Affordable digital menu solution for small to medium-sized restaurants. Streamline your operations and enhance customer experience with our modern platform.</p>
+                    <p><strong>Starting with FREE trial</strong></p>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#login">Login Options</a></li>
+                        <li><a href="#">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 MenuPro. All rights reserved. | Affordable Digital Menu Solution for Restaurants
+            </div>
+        </div>
+    </footer>
+
+    <!-- Registration Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Your Restaurant Account</h3>
+                <button class="modal-close" id="closeRegisterModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="plan-selector" id="planSelector">
+                    <div class="plan-option trial-plan selected" data-plan="trial">
+                        <h4>Trial Plan</h4>
+                        <div class="price trial-price">₹0<span>/month</span></div>
+                        <div class="period">14 days free trial</div>
+                    </div>
+                    <div class="plan-option pro-plan" data-plan="pro">
+                        <h4>Pro Plan</h4>
+                        <div class="price">₹49<span>/month</span></div>
+                        <div class="period">Billed monthly</div>
+                    </div>
+                </div>
+                
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="restaurantName">Restaurant Name *</label>
+                        <input type="text" id="restaurantName" class="form-control" placeholder="Enter your restaurant name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ownerName">Owner/Manager Name *</label>
+                        <input type="text" id="ownerName" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Create Password *</label>
+                        <input type="password" id="password" class="form-control" placeholder="Create a secure password" required>
+                        <small style="color: var(--gray); font-size: 13px; display: block; margin-top: 5px;">Minimum 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 25px;">
+                        <div style="display: flex; align-items: flex-start; gap: 10px;">
+                            <input type="checkbox" id="terms" required style="margin-top: 3px;">
+                            <label for="terms" style="font-size: 14px; color: var(--gray); font-weight: normal;">
+                                I agree to the <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;" id="submitBtn">
+                        <i class="fas fa-rocket"></i> Create Account
+                    </button>
+                </form>
+                
+                <div class="form-footer">
+                    Already have an account? <a href="#" id="loginLink">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+        
+        function toggleMobileMenu() {
+            const isActive = navLinks.classList.contains('active');
+            navLinks.classList.toggle('active');
+            navOverlay.classList.toggle('active');
+            mobileMenuBtn.innerHTML = isActive 
+                ? '<i class="fas fa-bars"></i>' 
+                : '<i class="fas fa-times"></i>';
+            document.body.style.overflow = isActive ? 'auto' : 'hidden';
+        }
+        
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        navOverlay.addEventListener('click', toggleMobileMenu);
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Plan selection functionality
+        let selectedPlan = 'trial'; // Default plan
+        
+        // Plan selector in modal
+        document.querySelectorAll('.plan-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                document.querySelectorAll('.plan-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                
+                // Update selected plan
+                selectedPlan = this.getAttribute('data-plan');
+                
+                // Update button text based on selected plan
+                const submitBtn = document.getElementById('submitBtn');
+                if (selectedPlan === 'trial') {
+                    submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Free Trial';
+                    submitBtn.className = 'btn btn-trial';
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-crown"></i> Go Pro - ₹49/month';
+                    submitBtn.className = 'btn btn-primary';
+                }
+            });
+        });
+
+        // Plan selection from pricing cards
+        document.querySelectorAll('.select-plan').forEach(button => {
+            button.addEventListener('click', function() {
+                const plan = this.getAttribute('data-plan');
+                selectedPlan = plan;
+                
+                // Update modal plan selector
+                document.querySelectorAll('.plan-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.getAttribute('data-plan') === plan) {
+                        opt.classList.add('selected');
+                    }
+                });
+                
+                // Update button in modal
+                const submitBtn = document.getElementById('submitBtn');
+                if (plan === 'trial') {
+                    submitBtn.innerHTML = '<i class="fas fa-rocket"></i> Start Free Trial';
+                    submitBtn.className = 'btn btn-trial';
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-crown"></i> Go Pro - ₹49/month';
+                    submitBtn.className = 'btn btn-primary';
+                }
+                
+                // Open registration modal
+                registerModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Registration modal functionality
+        const registerBtns = document.querySelectorAll('#registerBtn');
+        const registerModal = document.getElementById('registerModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+
+        registerBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                registerModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        closeRegisterModal.addEventListener('click', function() {
+            registerModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === registerModal) {
+                registerModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Registration form submission
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const restaurantName = document.getElementById('restaurantName').value;
+            const ownerName = document.getElementById('ownerName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+            
+            // Validation
+            if (!restaurantName || !ownerName || !email || !phone || !password || !confirmPassword) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (!terms) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Phone validation (basic)
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            
+            // In a real application, this would send data to a server
+            // For this demo, we'll simulate API call
+            setTimeout(() => {
+                // Prepare registration data
+                const registrationData = {
+                    restaurantName: restaurantName,
+                    ownerName: ownerName,
+                    email: email,
+                    phone: phone,
+                    plan: selectedPlan,
+                    planName: selectedPlan === 'trial' ? '14-day Free Trial' : 'Pro Plan - ₹49/month',
+                    registrationDate: new Date().toISOString(),
+                    trialEndDate: selectedPlan === 'trial' ? 
+                        new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() : null
+                };
+                
+                // Store registration data in localStorage (simulating database)
+                localStorage.setItem('menuProRegistration', JSON.stringify(registrationData));
+                localStorage.setItem('menuProUser', JSON.stringify({
+                    email: email,
+                    restaurantName: restaurantName,
+                    plan: selectedPlan
+                }));
+                
+                // Success message
+                const planMessage = selectedPlan === 'trial' 
+                    ? 'Your 14-day free trial has been activated!' 
+                    : 'Your Pro Plan subscription is now active!';
+                
+                alert(`Thank you, ${ownerName}!\n\nRestaurant: ${restaurantName}\nPlan: ${registrationData.planName}\n\n${planMessage}\n\nLogin credentials have been sent to ${email}`);
+                
+                // Reset form
+                document.getElementById('registrationForm').reset();
+                
+                // Close modal
+                registerModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Redirect to appropriate page based on plan
+                // In a real app, you'd redirect to dashboard
+                // For demo, we'll show a success message
+                console.log('Registration successful:', registrationData);
+                
+                // Optionally redirect to dashboard or login page
+                // window.location.href = 'register/index.html';
+                
+            }, 1500); // Simulate API delay
+        });
+
+        // Enhanced smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                if (href === '#') return;
+                
+                // Don't prevent default for modal triggers
+                if (href === '#register') return;
+                
+                e.preventDefault();
+                
+                const targetId = href;
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        toggleMobileMenu();
+                    }
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            }
+        });
+
+        // Prevent iOS zoom on input focus
+        document.addEventListener('touchstart', function(event) {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT') {
+                // Do nothing, let iOS handle it
+            }
+        }, { passive: true });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (registerModal.style.display === 'flex') {
+                    registerModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+                if (navLinks.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Login link in modal
+        document.getElementById('loginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            // In a real app, you'd redirect to login page
+            // For demo, show admin login options
+            alert('Please use Admin Login or Manager Login from the main page');
+        });
+    </script>
+</body>
+</html>
