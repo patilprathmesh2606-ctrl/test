@@ -1801,6 +1801,26 @@
     </div>
 
     <script>
+        // Configuration
+const SUPABASE_URL = 'https://aazqyrkklajqscsdfgjl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go';
+
+// Initialize Supabase
+let supabaseClient;
+let demoMode = false;
+
+try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            persistSession: false
+        }
+    });
+    console.log('✓ Supabase initialized successfully');
+} catch (error) {
+    console.error('Supabase initialization error:', error);
+    demoMode = true;
+    console.log('⚠️ Running in demo mode (no database connection)');
+}
         // Mobile menu functionality
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
@@ -2089,3 +2109,4 @@
     </script>
 </body>
 </html>
+
