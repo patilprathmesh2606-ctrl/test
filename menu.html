@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .restaurant-header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .restaurant-name {
+            font-size: 36px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .restaurant-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .category-section {
+            margin-bottom: 30px;
+        }
+
+        .category-title {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .menu-items {
+            display: grid;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .menu-item.inactive {
+            opacity: 0.5;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .item-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .no-items {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            color: #999;
+        }
+
+        .powered-by {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .restaurant-name {
+                font-size: 28px;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-image {
+                margin: 0 0 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loadingSection" class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Loading menu...</p>
+        </div>
+
+        <div id="errorSection" class="error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Restaurant Not Found</h2>
+            <p>This menu is not available or the restaurant doesn't exist.</p>
+        </div>
+
+        <div id="menuSection" style="display: none;">
+            <div class="restaurant-header">
+                <h1 class="restaurant-name" id="restaurantName">Loading...</h1>
+                <div class="restaurant-info" id="restaurantInfo"></div>
+            </div>
+
+            <div id="menuContent"></div>
+
+            <div class="powered-by">
+                <p>Powered by MenuPro 🍽️</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // ===================================
+        // CONFIGURATION
+        // ===================================
+        const CONFIG = {
+            SUPABASE_URL: 'https://aazqyrkklajqscsdfgjl.supabase.co',
+            SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go'
+        };
+
+        const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+        // Get URL slug from path
+        function getUrlSlug() {
+            const path = window.location.pathname;
+            const parts = path.split('/').filter(p => p);
+            
+            // For GitHub Pages: /repo-name/restaurant-slug
+            // For custom domain: /restaurant-slug
+            // Return the last part (restaurant slug)
+            return parts[parts.length - 1];
+        }
+
+        // Fetch restaurant and menu data
+        async function loadMenu() {
+            const urlSlug = getUrlSlug();
+            
+            if (!urlSlug || urlSlug === 'index.html') {
+                showError('Invalid restaurant URL');
+                return;
+            }
+
+            console.log('Loading menu for:', urlSlug);
+
+            try {
+                // Step 1: Fetch restaurant by URL slug
+                const { data: restaurant, error: restaurantError } = await supabase
+                    .from('restaurants')
+                    .select('*')
+                    .eq('url_slug', urlSlug)
+                    .eq('status', 'active')
+                    .single();
+
+                if (restaurantError || !restaurant) {
+                    console.error('Restaurant not found:', restaurantError);
+                    showError('Restaurant not found');
+                    return;
+                }
+
+                console.log('Restaurant found:', restaurant);
+
+                // Step 2: Fetch dishes for this restaurant
+                const { data: dishes, error: dishesError } = await supabase
+                    .from('dishes')
+                    .select('*')
+                    .eq('restaurant_id', restaurant.id)
+                    .order('category', { ascending: true })
+                    .order('name', { ascending: true });
+
+                if (dishesError) {
+                    console.error('Error loading dishes:', dishesError);
+                    showError('Error loading menu items');
+                    return;
+                }
+
+                console.log('Dishes loaded:', dishes);
+
+                // Display the menu
+                displayMenu(restaurant, dishes || []);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('An error occurred while loading the menu');
+            }
+        }
+
+        // Display menu
+        function displayMenu(restaurant, dishes) {
+            // Hide loading, show menu
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('menuSection').style.display = 'block';
+
+            // Set restaurant info
+            document.getElementById('restaurantName').textContent = restaurant.name;
+            document.getElementById('restaurantInfo').textContent = restaurant.type || 'Restaurant';
+
+            // Group dishes by category
+            const categories = {};
+            dishes.forEach(dish => {
+                const category = dish.category || 'Other';
+                if (!categories[category]) {
+                    categories[category] = [];
+                }
+                categories[category].push(dish);
+            });
+
+            // Display dishes by category
+            const menuContent = document.getElementById('menuContent');
+            menuContent.innerHTML = '';
+
+            if (Object.keys(categories).length === 0) {
+                menuContent.innerHTML = `
+                    <div class="no-items">
+                        <i class="fas fa-utensils" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                        <h3>Menu Coming Soon</h3>
+                        <p>This restaurant is still setting up their menu.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render each category
+            Object.keys(categories).sort().forEach(category => {
+                const categorySection = document.createElement('div');
+                categorySection.className = 'category-section';
+                
+                categorySection.innerHTML = `
+                    <div class="category-title">${category}</div>
+                    <div class="menu-items">
+                        ${categories[category].map(dish => `
+                            <div class="menu-item ${dish.is_active === false ? 'inactive' : ''}">
+                                ${dish.image_url ? `<img src="${dish.image_url}" alt="${dish.name}" class="item-image">` : ''}
+                                <div class="item-details">
+                                    <div class="item-name">${dish.name}</div>
+                                    ${dish.description ? `<div class="item-description">${dish.description}</div>` : ''}
+                                </div>
+                                <div class="item-price">₹${parseFloat(dish.price).toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                menuContent.appendChild(categorySection);
+            });
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('errorSection').querySelector('p').textContent = message;
+        }
+
+        // Load menu when page loads
+        window.addEventListener('load', loadMenu);
+    </script>
+</body>
+</html>
