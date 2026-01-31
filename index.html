@@ -686,16 +686,16 @@
                     ? 'Your 14-day free trial has been activated!' 
                     : 'Your Pro Plan subscription is now active!';
                 
-                // Generate menu URL with correct format for GitHub Pages
+                // Generate menu URL with query parameter (works without folder creation)
                 const baseUrl = getBaseUrl();
-                const menuUrl = `${baseUrl}/${urlSlug}`;
+                const menuUrl = `${baseUrl}/menu-dynamic.html?slug=${urlSlug}`;
                 
                 showSuccess(`✅ Account created successfully! ${planMessage}`, menuUrl);
                 
                 console.log('Registration complete!');
                 console.log('Restaurant ID:', restaurantId);
-                console.log('Menu URL:', menuUrl);
                 console.log('URL Slug:', urlSlug);
+                console.log('Menu URL:', menuUrl);
                 
                 // Reset form
                 setTimeout(() => {
