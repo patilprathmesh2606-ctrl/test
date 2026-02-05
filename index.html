@@ -703,26 +703,12 @@
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                     
-                    /* setTimeout(() => {
+                    setTimeout(() => {
                         registerModal.style.display = 'none';
                     }, 2000);
-                }, 1000); */
+                }, 1000); 
             // Redirect to admin dashboard with restaurant context
-setTimeout(() => {
-    // Get the base URL
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    const pathname = window.location.pathname;
-    
-    // Remove the filename from pathname
-    const path = pathname.substring(0, pathname.lastIndexOf('/'));
-    
-    // Construct the redirect URL
-    const redirectUrl = `${protocol}//${host}${path}/admin/index.html?restaurant=${currentRestaurantSlug}&staff=true`;
-    
-    console.log('Redirecting to:', redirectUrl);
-    window.location.href = redirectUrl;
-}, 1500);
+
                 
             } catch (error) {
                 console.error('Registration error:', error);
@@ -739,4 +725,5 @@ setTimeout(() => {
     </script>
 </body>
 </html>
+
 
