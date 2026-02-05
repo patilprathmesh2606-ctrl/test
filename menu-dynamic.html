@@ -8,6 +8,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='15' fill='%234f46e5'/%3E%3Ctext x='50' y='70' font-size='60' font-family='Arial' fill='white' text-anchor='middle' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E">
     
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -35,6 +38,32 @@
             margin-bottom: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .staff-login-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .staff-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
         }
 
         .restaurant-name {
@@ -79,6 +108,115 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Staff Login Modal Styles */
+        .staff-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .staff-modal-content {
+            background-color: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .staff-modal-header {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .staff-modal-header h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .staff-modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .staff-login-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .staff-login-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .staff-error-message {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .staff-success-message {
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
         }
 
         .category-section {
@@ -176,6 +314,15 @@
             .item-image {
                 margin: 0 0 15px 0;
             }
+
+            .staff-login-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 0 auto 15px auto;
+                width: fit-content;
+                display: block;
+            }
         }
     </style>
 </head>
@@ -193,6 +340,12 @@
 
         <div id="menuSection" style="display: none;">
             <div class="restaurant-header">
+                <!-- Staff Login Button -->
+                <button class="staff-login-btn" id="staffLoginBtn">
+                    <i class="fas fa-user-tie"></i>
+                    Staff Login
+                </button>
+                
                 <h1 class="restaurant-name" id="restaurantName">Loading...</h1>
                 <div class="restaurant-info" id="restaurantInfo"></div>
             </div>
@@ -201,6 +354,34 @@
 
             <div class="powered-by">
                 <p>Powered by MenuPro 🍽️</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Login Modal -->
+    <div class="staff-modal" id="staffModal">
+        <div class="staff-modal-content">
+            <div class="staff-modal-header">
+                <h3>Staff Login</h3>
+            </div>
+            <div class="staff-modal-body">
+                <div class="staff-error-message" id="staffErrorMessage"></div>
+                <div class="staff-success-message" id="staffSuccessMessage"></div>
+                
+                <form id="staffLoginForm">
+                    <div class="form-group">
+                        <label for="staffEmail"><i class="fas fa-envelope"></i> Email Address</label>
+                        <input type="email" id="staffEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="staffPassword"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="staffPassword" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <button type="submit" class="staff-login-submit" id="staffLoginSubmit">
+                        <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -215,19 +396,26 @@
             // Configuration
             const CONFIG = {
                 SUPABASE_URL: 'https://aazqyrkklajqscsdfgjl.supabase.co',
-                SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go'
+                SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go',
+                DASHBOARD_URL: 'https://patilprathmesh2606-ctrl.github.io/test' // Your dashboard URL
             };
 
-            // Initialize Supabase client
+            // Global variables
             let supabaseClient = null;
+            let currentRestaurantId = null;
+            let currentRestaurantSlug = null;
             
-            try {
-                supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialized');
-            } catch (error) {
-                console.error('❌ Supabase init error:', error);
-                showError('Failed to initialize database connection');
-                return;
+            // Initialize Supabase client
+            function initSupabase() {
+                try {
+                    supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                    console.log('✅ Supabase initialized');
+                    return true;
+                } catch (error) {
+                    console.error('❌ Supabase init error:', error);
+                    showError('Failed to initialize database connection');
+                    return false;
+                }
             }
 
             // Get URL slug from URL parameter
@@ -247,9 +435,104 @@
                 return slug;
             }
 
+            // Show error message
+            function showError(message) {
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('errorSection').style.display = 'block';
+                document.getElementById('errorMessage').textContent = message;
+            }
+
+            // Show staff error
+            function showStaffError(message) {
+                const errorDiv = document.getElementById('staffErrorMessage');
+                const successDiv = document.getElementById('staffSuccessMessage');
+                successDiv.style.display = 'none';
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.style.display = 'none', 5000);
+            }
+
+            // Show staff success
+            function showStaffSuccess(message) {
+                const errorDiv = document.getElementById('staffErrorMessage');
+                const successDiv = document.getElementById('staffSuccessMessage');
+                errorDiv.style.display = 'none';
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+
+            // Staff login function
+            async function staffLogin(email, password) {
+                try {
+                    console.log('Attempting staff login for:', email);
+                    
+                    // Sign in with email and password
+                    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (authError) {
+                        console.error('Auth error:', authError);
+                        showStaffError('Invalid email or password');
+                        return null;
+                    }
+
+                    console.log('✅ Auth successful:', authData.user.id);
+
+                    // Check if user is staff for this restaurant
+                    const { data: staffData, error: staffError } = await supabaseClient
+                        .from('staff_users')
+                        .select('*')
+                        .eq('user_id', authData.user.id)
+                        .eq('restaurant_id', currentRestaurantId)
+                        .eq('is_active', true)
+                        .maybeSingle();
+
+                    if (staffError) {
+                        console.error('Staff check error:', staffError);
+                        showStaffError('Database error. Please try again.');
+                        return null;
+                    }
+
+                    if (!staffData) {
+                        console.error('User is not staff for this restaurant');
+                        showStaffError('You are not authorized to manage this restaurant.');
+                        await supabaseClient.auth.signOut();
+                        return null;
+                    }
+
+                    console.log('✅ Staff verified:', staffData.role);
+                    showStaffSuccess('✅ Login successful! Redirecting to dashboard...');
+
+                    // Store staff session data in localStorage
+                    localStorage.setItem('staff_session', JSON.stringify({
+                        user_id: authData.user.id,
+                        restaurant_id: currentRestaurantId,
+                        staff_id: staffData.id,
+                        role: staffData.role,
+                        name: staffData.name,
+                        logged_in: true
+                    }));
+
+                    // Redirect to dashboard (you'll need to create this page)
+                    setTimeout(() => {
+                        window.location.href = `${CONFIG.DASHBOARD_URL}/staff-dashboard.html?restaurant=${currentRestaurantSlug}`;
+                    }, 1500);
+
+                    return staffData;
+
+                } catch (error) {
+                    console.error('Staff login error:', error);
+                    showStaffError('Login failed. Please try again.');
+                    return null;
+                }
+            }
+
             // Fetch restaurant and menu data
             async function loadMenu() {
                 const urlSlug = getUrlSlug();
+                currentRestaurantSlug = urlSlug;
                 
                 if (!urlSlug) {
                     showError('No restaurant specified. Please use: ?slug=restaurant-name');
@@ -284,6 +567,7 @@
                     }
 
                     console.log('✅ Restaurant found:', restaurant.name);
+                    currentRestaurantId = restaurant.id;
 
                     // Fetch dishes
                     const { data: dishes, error: dishesError } = await supabaseClient
@@ -373,15 +657,70 @@
                 });
             }
 
-            // Show error
-            function showError(message) {
-                document.getElementById('loadingSection').style.display = 'none';
-                document.getElementById('errorSection').style.display = 'block';
-                document.getElementById('errorMessage').textContent = message;
+            // Initialize staff login modal functionality
+            function initStaffLogin() {
+                const staffLoginBtn = document.getElementById('staffLoginBtn');
+                const staffModal = document.getElementById('staffModal');
+                const staffLoginForm = document.getElementById('staffLoginForm');
+                const staffLoginSubmit = document.getElementById('staffLoginSubmit');
+
+                if (!staffLoginBtn) return;
+
+                // Open modal
+                staffLoginBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    staffModal.style.display = 'flex';
+                });
+
+                // Close modal when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target === staffModal) {
+                        staffModal.style.display = 'none';
+                    }
+                });
+
+                // Handle form submission
+                staffLoginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('staffEmail').value.trim();
+                    const password = document.getElementById('staffPassword').value;
+
+                    if (!email || !password) {
+                        showStaffError('Please enter both email and password');
+                        return;
+                    }
+
+                    // Show loading
+                    const originalText = staffLoginSubmit.innerHTML;
+                    staffLoginSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                    staffLoginSubmit.disabled = true;
+
+                    try {
+                        await staffLogin(email, password);
+                    } finally {
+                        staffLoginSubmit.innerHTML = originalText;
+                        staffLoginSubmit.disabled = false;
+                    }
+                });
             }
 
-            // Load menu when page loads
-            window.addEventListener('load', loadMenu);
+            // Main initialization
+            function init() {
+                // Initialize Supabase
+                if (!initSupabase()) {
+                    return;
+                }
+
+                // Load menu
+                loadMenu();
+
+                // Initialize staff login
+                initStaffLogin();
+            }
+
+            // Start when page loads
+            window.addEventListener('load', init);
         })();
     </script>
 </body>
