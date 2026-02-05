@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Menu</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='15' fill='%234f46e5'/%3E%3Ctext x='50' y='70' font-size='60' font-family='Arial' fill='white' text-anchor='middle' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E">
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -53,17 +57,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .loading i {
-            font-size: 48px;
-            color: #667eea;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -72,6 +65,11 @@
             height: 50px;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .error-message {
@@ -117,10 +115,6 @@
         .menu-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .menu-item.inactive {
-            opacity: 0.5;
         }
 
         .item-image {
@@ -194,7 +188,7 @@
 
         <div id="errorSection" class="error-message" style="display: none;">
             <h2>⚠️ Restaurant Not Found</h2>
-            <p id="errorMessage">This menu is not available or the restaurant doesn't exist.</p>
+            <p id="errorMessage">This menu is not available.</p>
         </div>
 
         <div id="menuSection" style="display: none;">
@@ -215,180 +209,180 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // Configuration
-        const CONFIG = {
-            SUPABASE_URL: 'https://aazqyrkklajqscsdfgjl.supabase.co',
-            SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go'
-        };
-
-        const supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-
-        // Get URL slug from URL parameter
-        function getUrlSlug() {
-            // Check for ?slug= parameter first
-            const urlParams = new URLSearchParams(window.location.search);
-            const slugParam = urlParams.get('slug');
+        (function() {
+            'use strict';
             
-            if (slugParam) {
-                console.log('Found slug in URL parameter:', slugParam);
-                return slugParam;
-            }
-            
-            // Otherwise try to extract from path
-            const path = window.location.pathname;
-            const parts = path.split('/').filter(p => p && p !== 'index.html');
-            
-            // For GitHub Pages: /repo-name/restaurant-slug or /restaurant-slug
-            // Return the last part (restaurant slug)
-            const slug = parts[parts.length - 1];
-            console.log('Found slug in path:', slug);
-            return slug;
-        }
+            // Configuration
+            const CONFIG = {
+                SUPABASE_URL: 'https://aazqyrkklajqscsdfgjl.supabase.co',
+                SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go'
+            };
 
-        // Fetch restaurant and menu data
-        async function loadMenu() {
-            const urlSlug = getUrlSlug();
+            // Initialize Supabase client
+            let supabaseClient = null;
             
-            if (!urlSlug) {
-                showError('Invalid restaurant URL. Please use: ?slug=restaurant-name');
-                return;
-            }
-
-            console.log('Loading menu for slug:', urlSlug);
-
             try {
-                // Step 1: Fetch restaurant by URL slug
-                const { data: restaurant, error: restaurantError } = await supabase
-                    .from('restaurants')
-                    .select('*')
-                    .eq('url_slug', urlSlug)
-                    .maybeSingle();
-
-                if (restaurantError) {
-                    console.error('Database error:', restaurantError);
-                    showError('Database error: ' + restaurantError.message);
-                    return;
-                }
-
-                if (!restaurant) {
-                    console.error('Restaurant not found for slug:', urlSlug);
-                    showError(`Restaurant "${urlSlug}" not found. Please check the URL.`);
-                    return;
-                }
-
-                // Check if restaurant is active
-                if (restaurant.status !== 'active') {
-                    showError('This restaurant is currently inactive.');
-                    return;
-                }
-
-                console.log('Restaurant found:', restaurant);
-
-                // Step 2: Fetch dishes for this restaurant
-                const { data: dishes, error: dishesError } = await supabase
-                    .from('dishes')
-                    .select('*')
-                    .eq('restaurant_id', restaurant.id)
-                    .eq('is_active', true)
-                    .order('category', { ascending: true })
-                    .order('name', { ascending: true });
-
-                if (dishesError) {
-                    console.error('Error loading dishes:', dishesError);
-                    // Don't fail completely if dishes can't load - show empty menu
-                    displayMenu(restaurant, []);
-                    return;
-                }
-
-                console.log('Dishes loaded:', dishes ? dishes.length : 0);
-
-                // Display the menu
-                displayMenu(restaurant, dishes || []);
-
+                supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized');
             } catch (error) {
-                console.error('Unexpected error:', error);
-                showError('An error occurred while loading the menu: ' + error.message);
-            }
-        }
-
-        // Display menu
-        function displayMenu(restaurant, dishes) {
-            // Hide loading, show menu
-            document.getElementById('loadingSection').style.display = 'none';
-            document.getElementById('menuSection').style.display = 'block';
-
-            // Set restaurant info
-            document.getElementById('restaurantName').textContent = restaurant.name;
-            
-            let infoText = '';
-            if (restaurant.type) infoText += restaurant.type;
-            if (restaurant.address) infoText += (infoText ? ' • ' : '') + restaurant.address;
-            if (restaurant.owner_phone) infoText += (infoText ? ' • ' : '') + restaurant.owner_phone;
-            
-            document.getElementById('restaurantInfo').textContent = infoText || 'Digital Menu';
-
-            // Group dishes by category
-            const categories = {};
-            dishes.forEach(dish => {
-                const category = dish.category || 'Other';
-                if (!categories[category]) {
-                    categories[category] = [];
-                }
-                categories[category].push(dish);
-            });
-
-            // Display dishes by category
-            const menuContent = document.getElementById('menuContent');
-            menuContent.innerHTML = '';
-
-            if (Object.keys(categories).length === 0) {
-                menuContent.innerHTML = `
-                    <div class="no-items">
-                        <div style="font-size: 48px; margin-bottom: 10px;">🍽️</div>
-                        <h3>Menu Coming Soon</h3>
-                        <p>This restaurant is still setting up their menu. Please check back later!</p>
-                    </div>
-                `;
+                console.error('❌ Supabase init error:', error);
+                showError('Failed to initialize database connection');
                 return;
             }
 
-            // Render each category
-            Object.keys(categories).sort().forEach(category => {
-                const categorySection = document.createElement('div');
-                categorySection.className = 'category-section';
+            // Get URL slug from URL parameter
+            function getUrlSlug() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const slugParam = urlParams.get('slug');
                 
-                categorySection.innerHTML = `
-                    <div class="category-title">${category}</div>
-                    <div class="menu-items">
-                        ${categories[category].map(dish => `
-                            <div class="menu-item">
-                                ${dish.image_url ? `<img src="${dish.image_url}" alt="${dish.name}" class="item-image" onerror="this.style.display='none'">` : ''}
-                                <div class="item-details">
-                                    <div class="item-name">${dish.name}</div>
-                                    ${dish.description ? `<div class="item-description">${dish.description}</div>` : ''}
+                if (slugParam) {
+                    console.log('📍 Slug from parameter:', slugParam);
+                    return slugParam;
+                }
+                
+                const path = window.location.pathname;
+                const parts = path.split('/').filter(p => p && p !== 'index.html' && !p.endsWith('.html'));
+                const slug = parts[parts.length - 1];
+                console.log('📍 Slug from path:', slug);
+                return slug;
+            }
+
+            // Fetch restaurant and menu data
+            async function loadMenu() {
+                const urlSlug = getUrlSlug();
+                
+                if (!urlSlug) {
+                    showError('No restaurant specified. Please use: ?slug=restaurant-name');
+                    return;
+                }
+
+                console.log('🔍 Loading menu for:', urlSlug);
+
+                try {
+                    // Fetch restaurant
+                    const { data: restaurant, error: restaurantError } = await supabaseClient
+                        .from('restaurants')
+                        .select('*')
+                        .eq('url_slug', urlSlug)
+                        .maybeSingle();
+
+                    if (restaurantError) {
+                        console.error('❌ Database error:', restaurantError);
+                        showError('Database error: ' + restaurantError.message);
+                        return;
+                    }
+
+                    if (!restaurant) {
+                        console.error('❌ Restaurant not found:', urlSlug);
+                        showError(`Restaurant "${urlSlug}" not found.`);
+                        return;
+                    }
+
+                    if (restaurant.status !== 'active') {
+                        showError('This restaurant is currently inactive.');
+                        return;
+                    }
+
+                    console.log('✅ Restaurant found:', restaurant.name);
+
+                    // Fetch dishes
+                    const { data: dishes, error: dishesError } = await supabaseClient
+                        .from('dishes')
+                        .select('*')
+                        .eq('restaurant_id', restaurant.id)
+                        .eq('is_active', true)
+                        .order('category', { ascending: true })
+                        .order('name', { ascending: true });
+
+                    if (dishesError) {
+                        console.error('⚠️ Error loading dishes:', dishesError);
+                        displayMenu(restaurant, []);
+                        return;
+                    }
+
+                    console.log(`✅ Loaded ${dishes ? dishes.length : 0} dishes`);
+                    displayMenu(restaurant, dishes || []);
+
+                } catch (error) {
+                    console.error('❌ Unexpected error:', error);
+                    showError('Error loading menu: ' + error.message);
+                }
+            }
+
+            // Display menu
+            function displayMenu(restaurant, dishes) {
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('menuSection').style.display = 'block';
+
+                // Set restaurant info
+                document.getElementById('restaurantName').textContent = restaurant.name;
+                
+                let infoText = '';
+                if (restaurant.type) infoText += restaurant.type;
+                if (restaurant.address) infoText += (infoText ? ' • ' : '') + restaurant.address;
+                if (restaurant.owner_phone) infoText += (infoText ? ' • ' : '') + restaurant.owner_phone;
+                
+                document.getElementById('restaurantInfo').textContent = infoText || 'Digital Menu';
+
+                // Group dishes by category
+                const categories = {};
+                dishes.forEach(dish => {
+                    const category = dish.category || 'Other';
+                    if (!categories[category]) {
+                        categories[category] = [];
+                    }
+                    categories[category].push(dish);
+                });
+
+                const menuContent = document.getElementById('menuContent');
+                menuContent.innerHTML = '';
+
+                if (Object.keys(categories).length === 0) {
+                    menuContent.innerHTML = `
+                        <div class="no-items">
+                            <div style="font-size: 48px; margin-bottom: 10px;">🍽️</div>
+                            <h3>Menu Coming Soon</h3>
+                            <p>This restaurant is still setting up their menu.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render categories
+                Object.keys(categories).sort().forEach(category => {
+                    const categorySection = document.createElement('div');
+                    categorySection.className = 'category-section';
+                    
+                    categorySection.innerHTML = `
+                        <div class="category-title">${category}</div>
+                        <div class="menu-items">
+                            ${categories[category].map(dish => `
+                                <div class="menu-item">
+                                    ${dish.image_url ? `<img src="${dish.image_url}" alt="${dish.name}" class="item-image" onerror="this.style.display='none'">` : ''}
+                                    <div class="item-details">
+                                        <div class="item-name">${dish.name}</div>
+                                        ${dish.description ? `<div class="item-description">${dish.description}</div>` : ''}
+                                    </div>
+                                    <div class="item-price">₹${parseFloat(dish.price).toFixed(2)}</div>
                                 </div>
-                                <div class="item-price">₹${parseFloat(dish.price).toFixed(2)}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                
-                menuContent.appendChild(categorySection);
-            });
-        }
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    menuContent.appendChild(categorySection);
+                });
+            }
 
-        // Show error
-        function showError(message) {
-            document.getElementById('loadingSection').style.display = 'none';
-            document.getElementById('errorSection').style.display = 'block';
-            document.getElementById('errorMessage').textContent = message;
-        }
+            // Show error
+            function showError(message) {
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('errorSection').style.display = 'block';
+                document.getElementById('errorMessage').textContent = message;
+            }
 
-        // Load menu when page loads
-        window.addEventListener('load', loadMenu);
-
-        // Also reload if URL changes (for single-page navigation)
-        window.addEventListener('popstate', loadMenu);
+            // Load menu when page loads
+            window.addEventListener('load', loadMenu);
+        })();
     </script>
 </body>
 </html>
