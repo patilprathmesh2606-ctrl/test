@@ -516,9 +516,26 @@
                     }));
 
                     // Redirect to dashboard (you'll need to create this page)
-                    setTimeout(() => {
+                    /* setTimeout(() => {
                         window.location.href = `${CONFIG.DASHBOARD_URL}/staff-dashboard.html?restaurant=${currentRestaurantSlug}`;
-                    }, 1500);
+                    }, 1500); */
+
+                    // Redirect to admin dashboard with restaurant context
+setTimeout(() => {
+    // Get the base URL
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    const pathname = window.location.pathname;
+    
+    // Remove the filename from pathname
+    const path = pathname.substring(0, pathname.lastIndexOf('/'));
+    
+    // Construct the redirect URL
+    const redirectUrl = `${protocol}//${host}${path}/admin/index.html?restaurant=${currentRestaurantSlug}&staff=true`;
+    
+    console.log('Redirecting to:', redirectUrl);
+    window.location.href = redirectUrl;
+}, 1500);
 
                     return staffData;
 
