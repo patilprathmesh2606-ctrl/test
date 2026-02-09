@@ -94,6 +94,23 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+        
+        .image-grid-item {
+            transition: all 0.2s ease;
+        }
+        
+        .image-grid-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .image-grid-item.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -347,26 +364,6 @@
                                 </button>
                             </div>
                         </div>
-                        
-                        <!-- Order History Section -->
-                        <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-                            <h3 class="text-lg font-bold mb-4">Order History</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="staff-action" data-permission="viewOrderHistoryName">
-                                    <h4 class="font-medium mb-2">By Customer Name</h4>
-                                    <div id="orderHistoryByName" class="bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
-                                        <p class="text-sm text-gray-600">Loading...</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="staff-action" data-permission="viewOrderHistoryTable">
-                                    <h4 class="font-medium mb-2">By Table Number</h4>
-                                    <div id="orderHistoryByTable" class="bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
-                                        <p class="text-sm text-gray-600">Loading...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     
                     <!-- Charts -->
@@ -383,19 +380,6 @@
                             <div class="h-80">
                                 <canvas id="planChart"></canvas>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Activities -->
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold">Recent Activities</h3>
-                            <button onclick="loadActivities()" class="text-sm text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-sync-alt mr-1"></i> Refresh
-                            </button>
-                        </div>
-                        <div id="activitiesList" class="space-y-4">
-                            <!-- Activities will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -419,36 +403,6 @@
                         </div>
                     </div>
                     
-                    <!-- Filters -->
-                    <div class="bg-white rounded-lg shadow p-4 mb-6 admin-only">
-                        <div class="flex flex-wrap gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select id="statusFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="suspended">Suspended</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
-                                <select id="planFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Plans</option>
-                                    <option value="basic">Basic</option>
-                                    <option value="pro">Pro</option>
-                                    <option value="enterprise">Enterprise</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                                <input type="date" id="dateFrom" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                <span class="mx-2">to</span>
-                                <input type="date" id="dateTo" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Restaurants/Menu Table -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="overflow-x-auto">
@@ -463,63 +417,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-                            <div class="text-sm text-gray-500">
-                                Showing <span id="restaurantStart">0</span> to <span id="restaurantEnd">0</span> of <span id="restaurantTotal">0</span> <span id="restaurantLabel">restaurants</span>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="prevRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button onclick="nextRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                
-                <!-- All Users View -->
-                <div id="viewUsers" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold" id="usersViewTitle">User Management</h2>
-                            <p class="text-gray-600" id="usersViewSubtitle">Manage all system users across restaurants</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <input type="text" id="userSearch" placeholder="Search users..." 
-                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterUsers()">
-                            <button onclick="exportUsers()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 admin-only">
-                                <i class="fas fa-download mr-2"></i>Export
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Users Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTable" class="bg-white divide-y divide-gray-200">
-                                    <!-- Users will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Other views (Subscriptions, Payments, Plans, Settings, Terms) -->
-                <!-- These remain mostly the same as your old dashboard -->
-                
             </main>
         </div>
     </div>
@@ -543,20 +442,13 @@
                 <button onclick="handleAdminLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
                     Login as Admin
                 </button>
-                
-                <p class="text-sm text-gray-500 text-center mt-4">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Admin access requires special privileges
-                </p>
             </div>
         </div>
     </div>
 
-    <!-- MODALS FOR QUICK ACTIONS -->
-
     <!-- Add Dish Modal -->
     <div id="addDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Add New Dish</h3>
@@ -585,15 +477,13 @@
                                 <select id="dishCategory" required 
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">Select Category</option>
-                                    <option value="Starters">Starters</option>
                                     <option value="Drinks">Drinks</option>
                                     <option value="Chinese">Chinese</option>
-                                    <option value="Beverages">Beverages</option>
-                                    <option value="Specials">Specials</option>
+                                    <option value="Desserts">Desserts</option>
                                     <option value="Fast Food">Fast Food</option>
+                                    <option value="Specials">Specials</option>
                                     <option value="Soups">Soups</option>
                                     <option value="Salads">Salads</option>
-                                    <option value="Breads">Breads</option>
                                 </select>
                             </div>
                             
@@ -651,36 +541,21 @@
                                            placeholder="https://example.com/dish-image.jpg">
                                 </div>
                                 
-                                <!-- Option 3: Select from preloaded images -->
-                                    <!-- In the Add Dish Modal (around line where preloadedImageSelect is) -->
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
-                                        <select id="preloadedImageSelect" onchange="selectPreloadedImage()" 
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="">Select an image</option>
-                                            <!-- Options will be populated dynamically from Supabase -->
-                                        </select>
-                                        <div class="mt-2">
-                                            <img id="preloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                <!-- Option 3: Image Grid from Supabase -->
+                                <div id="addDishImageGridContainer">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
+                                    <div id="addDishImageGrid" class="bg-gray-50 p-4 rounded-lg max-h-80 overflow-y-auto">
+                                        <div class="text-center py-8">
+                                            <div class="loading inline-block"></div>
+                                            <p class="text-gray-600 mt-2">Loading images...</p>
                                         </div>
                                     </div>
-                                    
-                                    <!-- In the Edit Dish Modal (around line where editPreloadedImageSelect is) -->
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
-                                        <select id="editPreloadedImageSelect" onchange="selectEditPreloadedImage()" 
-                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="">Select an image</option>
-                                            <!-- Options will be populated dynamically from Supabase -->
-                                        </select>
-                                        <div class="mt-2">
-                                            <img id="editPreloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
-                                        </div>
+                                    <div class="mt-2">
+                                        <img id="addDishGridPreview" class="image-preview hidden" src="" alt="Selected image">
                                     </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div id="imageUploadStatus" class="hidden text-sm"></div>
                         
                         <div class="flex justify-end space-x-3 pt-4 border-t">
                             <button type="button" onclick="closeAddDishModal()" 
@@ -701,7 +576,7 @@
 
     <!-- Edit Dish Modal -->
     <div id="editDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Edit Dish</h3>
@@ -732,10 +607,10 @@
                                 <select id="editDishCategory" required 
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">Select Category</option>
-                                    <option value="Starters">Starters</option>
                                     <option value="Drinks">Drinks</option>
                                     <option value="Chinese">Chinese</option>
-                                    <option value="Beverages">Beverages</option>
+                                    <option value="Desserts">Desserts</option>
+                                    <option value="Fast Food">Fast Food</option>
                                     <option value="Specials">Specials</option>
                                 </select>
                             </div>
@@ -770,16 +645,16 @@
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         
-                        <!-- Image Upload Section for Edit -->
+                        <!-- Current Image -->
+                        <div id="currentImageContainer" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Image</label>
+                            <img id="currentDishImage" class="image-preview" src="" alt="Current dish image">
+                        </div>
+                        
+                        <!-- New Image Upload Section -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">New Dish Image</label>
                             <div class="space-y-4">
-                                <!-- Current Image Preview -->
-                                <div id="currentImageContainer" class="hidden">
-                                    <p class="text-sm text-gray-600 mb-2">Current Image:</p>
-                                    <img id="currentDishImage" class="image-preview" src="" alt="Current dish image">
-                                </div>
-                                
                                 <!-- Option 1: Upload from computer -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Upload New Image</label>
@@ -798,26 +673,21 @@
                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
                                 
-                                <!-- Option 3: Select from preloaded images -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from preloaded images</label>
-                                    <select id="editPreloadedImageSelect" onchange="selectEditPreloadedImage()" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                        <option value="">Select an image</option>
-                                        <option value="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop">Burger</option>
-                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Salad</option>
-                                        <option value="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop">Pizza</option>
-                                        <option value="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop">Pasta</option>
-                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Dessert</option>
-                                    </select>
+                                <!-- Option 3: Image Grid from Supabase -->
+                                <div id="editDishImageGridContainer">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
+                                    <div id="editDishImageGrid" class="bg-gray-50 p-4 rounded-lg max-h-80 overflow-y-auto">
+                                        <div class="text-center py-8">
+                                            <div class="loading inline-block"></div>
+                                            <p class="text-gray-600 mt-2">Loading images...</p>
+                                        </div>
+                                    </div>
                                     <div class="mt-2">
-                                        <img id="editPreloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                        <img id="editDishGridPreview" class="image-preview hidden" src="" alt="Selected image">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div id="editImageUploadStatus" class="hidden text-sm"></div>
                         
                         <div class="flex justify-end space-x-3 pt-4 border-t">
                             <button type="button" onclick="closeEditDishModal()" 
@@ -864,233 +734,6 @@
         </div>
     </div>
 
-    <!-- Revenue Report Modal -->
-    <div id="revenueReportModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Revenue Report</h3>
-                    <button onclick="closeRevenueReportModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <!-- Date Range Selector -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-3 md:space-y-0">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                            <select id="revenueDateRange" onchange="updateRevenueReport()" 
-                                    class="px-4 py-2 border border-gray-300 rounded-lg">
-                                <option value="today">Today</option>
-                                <option value="yesterday">Yesterday</option>
-                                <option value="week">Last 7 Days</option>
-                                <option value="month">This Month</option>
-                                <option value="custom">Custom Range</option>
-                            </select>
-                        </div>
-                        
-                        <div id="customDateRange" class="hidden md:flex items-center space-x-2">
-                            <input type="date" id="revenueStartDate" 
-                                   class="px-4 py-2 border border-gray-300 rounded-lg">
-                            <span>to</span>
-                            <input type="date" id="revenueEndDate" 
-                                   class="px-4 py-2 border border-gray-300 rounded-lg">
-                            <button onclick="applyCustomDateRange()" 
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Revenue Summary -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-white border rounded-lg p-4 shadow">
-                        <div class="text-sm text-gray-600 mb-1">Total Revenue</div>
-                        <div class="text-2xl font-bold text-gray-800" id="totalRevenue">₹0</div>
-                    </div>
-                    <div class="bg-white border rounded-lg p-4 shadow">
-                        <div class="text-sm text-gray-600 mb-1">Total Orders</div>
-                        <div class="text-2xl font-bold text-gray-800" id="totalOrders">0</div>
-                    </div>
-                    <div class="bg-white border rounded-lg p-4 shadow">
-                        <div class="text-sm text-gray-600 mb-1">Average Order Value</div>
-                        <div class="text-2xl font-bold text-gray-800" id="averageOrderValue">₹0</div>
-                    </div>
-                </div>
-                
-                <!-- Revenue Chart -->
-                <div class="bg-white border rounded-lg p-4 shadow mb-6">
-                    <h4 class="font-medium text-gray-800 mb-4">Revenue Trend</h4>
-                    <div class="h-64">
-                        <canvas id="revenueReportChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Top Selling Dishes -->
-                <div class="bg-white border rounded-lg p-4 shadow">
-                    <h4 class="font-medium text-gray-800 mb-4">Top Selling Dishes</h4>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="px-4 py-2 text-left">Dish Name</th>
-                                    <th class="px-4 py-2 text-left">Quantity Sold</th>
-                                    <th class="px-4 py-2 text-left">Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody id="topDishesTable">
-                                <!-- Will be populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Table Reservation Modal -->
-    <div id="reserveTableModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Reserve Table</h3>
-                    <button onclick="closeReserveTableModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="reserveTableForm" onsubmit="event.preventDefault(); reserveTable();">
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
-                                <input type="text" id="customerName" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
-                                <input type="tel" id="customerPhone" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests *</label>
-                                <select id="numberOfGuests" required 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Select</option>
-                                    <option value="1">1 Person</option>
-                                    <option value="2">2 People</option>
-                                    <option value="3">3 People</option>
-                                    <option value="4">4 People</option>
-                                    <option value="5">5 People</option>
-                                    <option value="6">6 People</option>
-                                    <option value="7">7 People</option>
-                                    <option value="8">8 People</option>
-                                    <option value="9">9+ People</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Table Number</label>
-                                <select id="tableNumber" 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Auto Assign</option>
-                                    <option value="1">Table 1</option>
-                                    <option value="2">Table 2</option>
-                                    <option value="3">Table 3</option>
-                                    <option value="4">Table 4</option>
-                                    <option value="5">Table 5</option>
-                                    <option value="6">Table 6</option>
-                                    <option value="7">Table 7</option>
-                                    <option value="8">Table 8</option>
-                                    <option value="9">Table 9</option>
-                                    <option value="10">Table 10</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Reservation Date *</label>
-                                <input type="date" id="reservationDate" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Reservation Time *</label>
-                                <input type="time" id="reservationTime" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
-                            <textarea id="specialRequests" rows="3" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        
-                        <div class="flex justify-end space-x-3 pt-4 border-t">
-                            <button type="button" onclick="closeReserveTableModal()" 
-                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                Reserve Table
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Orders Modal -->
-    <div id="ordersModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Current Orders</h3>
-                    <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <!-- Filters -->
-                <div class="flex flex-wrap gap-4 mb-6">
-                    <select id="orderStatusFilter" onchange="filterOrders()" 
-                            class="px-4 py-2 border border-gray-300 rounded-lg">
-                        <option value="all">All Orders</option>
-                        <option value="pending">Pending</option>
-                        <option value="preparing">Preparing</option>
-                        <option value="ready">Ready</option>
-                        <option value="served">Served</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    
-                    <input type="text" id="orderSearch" placeholder="Search by table or customer..." 
-                           class="px-4 py-2 border border-gray-300 rounded-lg w-64" oninput="filterOrders()">
-                </div>
-                
-                <!-- Orders Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ordersGrid">
-                    <!-- Orders will be loaded dynamically -->
-                </div>
-                
-                <!-- No Orders Message -->
-                <div id="noOrdersMessage" class="text-center py-12 hidden">
-                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-500">No orders found</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <script>
 // Configuration
 const SUPABASE_URL = 'https://aazqyrkklajqscsdfgjl.supabase.co';
@@ -1108,26 +751,10 @@ try {
 // Global variables
 let currentUser = null;
 let currentRestaurant = null;
-let userRole = 'admin'; // 'admin' or 'staff'
+let userRole = 'admin';
 let isStaffMode = false;
 let restaurants = [];
-let subscriptions = [];
-let payments = [];
-let users = [];
 let dishes = [];
-let currentRestaurantPage = 1;
-let currentPaymentPage = 1;
-const itemsPerPage = 10;
-
-// Chart instances
-let revenueChart = null;
-let planChart = null;
-let revenueReportChart = null;
-
-// Current orders data
-let currentOrders = [];
-
-// Image upload handling
 let uploadedImageUrl = null;
 
 // Initialize dashboard
@@ -1135,7 +762,6 @@ async function initDashboard() {
     try {
         // Set today's date for date inputs
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('reservationDate').value = today;
         
         // Check if user is already logged in
         const { data: { user } } = await supabaseClient.auth.getUser();
@@ -1155,7 +781,7 @@ async function initDashboard() {
             document.getElementById('adminLoginModal').classList.remove('hidden');
         }
     } catch (error) {
-        console.error('❌ Dashboard initialization error:', error);
+        console.error('Dashboard initialization error:', error);
         document.getElementById('adminLoginModal').classList.remove('hidden');
     }
 }
@@ -1180,52 +806,109 @@ function previewImage(input, previewId) {
     }
 }
 
-// Select preloaded image for add dish
-function selectPreloadedImage() {
-    const select = document.getElementById('preloadedImageSelect');
-    const preview = document.getElementById('preloadedImagePreview');
-    const urlInput = document.getElementById('dishImageUrl');
-    
-    if (select.value) {
-        preview.src = select.value;
-        preview.classList.remove('hidden');
-        urlInput.value = select.value;
-        uploadedImageUrl = select.value;
-    } else {
-        preview.src = '';
-        preview.classList.add('hidden');
-        urlInput.value = '';
-        uploadedImageUrl = null;
+// Load images from Supabase Storage
+async function loadDishImagesFromStorage() {
+    try {
+        const { data: files, error } = await supabaseClient.storage
+            .from('dish-images')
+            .list('', {
+                limit: 100,
+                offset: 0,
+                sortBy: { column: 'name', order: 'asc' }
+            });
+        
+        if (error) {
+            console.error('Error loading images:', error);
+            return [];
+        }
+        
+        // Get public URLs for all images
+        const imageUrls = files
+            .filter(file => !file.id) // Filter out folders
+            .map(file => {
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('dish-images')
+                    .getPublicUrl(file.name);
+                return {
+                    name: file.name,
+                    url: publicUrl
+                };
+            });
+        
+        console.log(`Loaded ${imageUrls.length} images from storage`);
+        return imageUrls;
+        
+    } catch (error) {
+        console.error('Error loading images:', error);
+        return [];
     }
 }
 
-// Select preloaded image for edit dish
-function selectEditPreloadedImage() {
-    const select = document.getElementById('editPreloadedImageSelect');
-    const preview = document.getElementById('editPreloadedImagePreview');
-    const urlInput = document.getElementById('editDishImageUrl');
+// Render image grid
+function renderImageGrid(images, containerId, selectedImageUrl = null) {
+    const container = document.getElementById(containerId);
     
-    if (select.value) {
-        preview.src = select.value;
+    if (!images || images.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-image text-3xl mb-2"></i>
+                <p>No images found in storage</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+    `;
+    
+    images.forEach((image, index) => {
+        const isSelected = selectedImageUrl === image.url;
+        const fileName = image.name.length > 15 ? image.name.substring(0, 12) + '...' : image.name;
+        
+        html += `
+            <div class="image-grid-item cursor-pointer ${isSelected ? 'selected' : ''}" 
+                 onclick="selectImageFromGrid('${image.url}', '${containerId.includes('add') ? 'add' : 'edit'}')">
+                <div class="aspect-square overflow-hidden rounded-lg border-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'} hover:border-blue-400 transition-all">
+                    <img src="${image.url}" 
+                         alt="${image.name}"
+                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
+                         loading="lazy">
+                </div>
+                <div class="mt-1 text-xs text-gray-600 truncate text-center" title="${image.name}">
+                    ${fileName}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// Select image from grid
+function selectImageFromGrid(imageUrl, modalType) {
+    uploadedImageUrl = imageUrl;
+    
+    if (modalType === 'add') {
+        document.getElementById('dishImageUrl').value = imageUrl;
+        const preview = document.getElementById('addDishGridPreview');
+        preview.src = imageUrl;
         preview.classList.remove('hidden');
-        urlInput.value = select.value;
-        uploadedImageUrl = select.value;
     } else {
-        preview.src = '';
-        preview.classList.add('hidden');
-        urlInput.value = '';
-        uploadedImageUrl = null;
+        document.getElementById('editDishImageUrl').value = imageUrl;
+        const preview = document.getElementById('editDishGridPreview');
+        preview.src = imageUrl;
+        preview.classList.remove('hidden');
     }
 }
 
 // Upload image to Supabase Storage
-async function uploadImageToStorage(file, dishId) {
+async function uploadImageToStorage(file) {
     try {
-        console.log('Uploading image to storage...');
-        
         // Create unique filename
         const fileExt = file.name.split('.').pop();
-        const fileName = `${dishId || 'temp'}_${Date.now()}.${fileExt}`;
+        const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
         const filePath = `dish-images/${fileName}`;
         
         // Upload to Supabase Storage
@@ -1233,7 +916,7 @@ async function uploadImageToStorage(file, dishId) {
             .from('dish-images')
             .upload(filePath, file, {
                 cacheControl: '3600',
-                upsert: true
+                upsert: false
             });
         
         if (error) {
@@ -1250,7 +933,7 @@ async function uploadImageToStorage(file, dishId) {
         return publicUrl;
         
     } catch (error) {
-        console.error('Error in uploadImageToStorage:', error);
+        console.error('Error uploading image:', error);
         return null;
     }
 }
@@ -1258,8 +941,6 @@ async function uploadImageToStorage(file, dishId) {
 // Handle staff access
 async function handleStaffAccess(user, restaurantSlug) {
     try {
-        console.log('🔍 Checking staff access for:', user.email, 'restaurant:', restaurantSlug);
-        
         // Get restaurant by slug
         const { data: restaurant, error: resError } = await supabaseClient
             .from('restaurants')
@@ -1268,7 +949,6 @@ async function handleStaffAccess(user, restaurantSlug) {
             .single();
         
         if (resError || !restaurant) {
-            console.error('Restaurant not found:', resError);
             alert('Restaurant not found. Redirecting...');
             window.location.href = `../menu-dynamic.html?slug=${restaurantSlug}`;
             return;
@@ -1284,7 +964,6 @@ async function handleStaffAccess(user, restaurantSlug) {
             .single();
         
         if (staffError || !staffUser) {
-            console.error('Staff not found or inactive:', staffError);
             alert('You are not authorized to access this restaurant dashboard.');
             window.location.href = `../menu-dynamic.html?slug=${restaurantSlug}`;
             return;
@@ -1294,11 +973,8 @@ async function handleStaffAccess(user, restaurantSlug) {
         currentRestaurant = restaurant;
         userRole = staffUser.role;
         
-        console.log('✅ Staff logged in:', staffUser.name, 'Role:', staffUser.role, 'Restaurant:', restaurant.name);
-        
         // Set default permissions if none exist
         if (!staffUser.permissions || Object.keys(staffUser.permissions).length === 0) {
-            console.log('⚠️ No permissions found, setting defaults...');
             await setDefaultPermissions(staffUser.id, staffUser.role);
             const { data: updatedUser } = await supabaseClient
                 .from('staff_users')
@@ -1308,22 +984,18 @@ async function handleStaffAccess(user, restaurantSlug) {
             currentUser = updatedUser;
         }
         
-        console.log('📋 User permissions:', currentUser.permissions);
-        
         setupStaffUI();
         await loadRestaurantData(restaurant.id);
         document.getElementById('adminLoginModal').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         
-        console.log('✓ Staff dashboard initialized');
-        
     } catch (error) {
-        console.error('❌ Staff access error:', error);
+        console.error('Staff access error:', error);
         document.getElementById('adminLoginModal').classList.remove('hidden');
     }
 }
 
-// Function to set default permissions
+// Set default permissions
 async function setDefaultPermissions(userId, role) {
     const defaultPermissions = {
         'owner': {
@@ -1333,9 +1005,7 @@ async function setDefaultPermissions(userId, role) {
             "manageStaff": true,
             "viewRevenue": true,
             "reserveTable": true,
-            "viewTableOrders": true,
-            "viewOrderHistoryName": true,
-            "viewOrderHistoryTable": true
+            "viewTableOrders": true
         },
         'manager': {
             "addDish": true,
@@ -1344,9 +1014,7 @@ async function setDefaultPermissions(userId, role) {
             "manageStaff": false,
             "viewRevenue": true,
             "reserveTable": true,
-            "viewTableOrders": true,
-            "viewOrderHistoryName": true,
-            "viewOrderHistoryTable": true
+            "viewTableOrders": true
         },
         'chef': {
             "addDish": true,
@@ -1355,9 +1023,7 @@ async function setDefaultPermissions(userId, role) {
             "manageStaff": false,
             "viewRevenue": false,
             "reserveTable": false,
-            "viewTableOrders": true,
-            "viewOrderHistoryName": true,
-            "viewOrderHistoryTable": true
+            "viewTableOrders": true
         },
         'waiter': {
             "addDish": false,
@@ -1366,9 +1032,7 @@ async function setDefaultPermissions(userId, role) {
             "manageStaff": false,
             "viewRevenue": false,
             "reserveTable": true,
-            "viewTableOrders": true,
-            "viewOrderHistoryName": true,
-            "viewOrderHistoryTable": true
+            "viewTableOrders": true
         }
     };
     
@@ -1383,43 +1047,21 @@ async function setDefaultPermissions(userId, role) {
         .eq('id', userId);
     
     if (error) {
-        console.error('Error setting default permissions:', error);
+        console.error('Error setting permissions:', error);
         throw error;
     }
-    
-    console.log('✓ Default permissions set for', role);
 }
 
-// Get current user's permissions
-function getUserPermissions() {
-    if (userRole === 'admin') {
-        return {
-            "addDish": true,
-            "editDish": true,
-            "deleteDish": true,
-            "manageStaff": true,
-            "viewRevenue": true,
-            "reserveTable": true,
-            "viewTableOrders": true,
-            "viewOrderHistoryName": true,
-            "viewOrderHistoryTable": true
-        };
-    }
-    return currentUser?.permissions || {};
-}
-
-// Check if user has specific permission
+// Check permissions
 function hasPermission(permissionName) {
-    const permissions = getUserPermissions();
+    if (userRole === 'admin') return true;
+    const permissions = currentUser?.permissions || {};
     return permissions[permissionName] === true;
 }
 
 // Update UI based on permissions
 function updateUIBasedOnPermissions() {
     if (userRole === 'admin') return;
-    
-    const permissions = getUserPermissions();
-    console.log('🔧 Applying user permissions:', permissions);
     
     const staffActionsSection = document.getElementById('staffActionsSection');
     if (staffActionsSection) {
@@ -1440,21 +1082,10 @@ function updateUIBasedOnPermissions() {
             element.disabled = !hasPerm;
         }
     });
-    
-    if (userRole === 'owner') {
-        document.querySelectorAll('.staff-action').forEach(el => {
-            el.classList.remove('hidden');
-            if (el.tagName === 'BUTTON') {
-                el.disabled = false;
-            }
-        });
-    }
 }
 
-// QUICK ACTIONS MODAL FUNCTIONS
-
-// Add Dish
-function showAddDishModal() {
+// Add Dish Modal
+async function showAddDishModal() {
     if (!hasPermission('addDish')) {
         alert('You do not have permission to add dishes');
         return;
@@ -1465,14 +1096,17 @@ function showAddDishModal() {
     
     // Clear image previews
     document.getElementById('addDishImagePreview').classList.add('hidden');
-    document.getElementById('preloadedImagePreview').classList.add('hidden');
+    document.getElementById('addDishGridPreview').classList.add('hidden');
     
     // Reset uploaded image URL
     uploadedImageUrl = null;
     
+    // Load and display images from Supabase
+    const images = await loadDishImagesFromStorage();
+    renderImageGrid(images, 'addDishImageGrid');
+    
     // Show modal
     document.getElementById('addDishModal').classList.remove('hidden');
-    console.log('Add Dish modal opened');
 }
 
 function closeAddDishModal() {
@@ -1486,12 +1120,11 @@ async function saveNewDish() {
         return;
     }
     
-    // Get form values
+    // Validate required fields
     const dishName = document.getElementById('dishName').value;
     const dishPrice = document.getElementById('dishPrice').value;
     const dishCategory = document.getElementById('dishCategory').value;
     
-    // Validate required fields
     if (!dishName || !dishPrice || !dishCategory) {
         alert('Please fill in all required fields (Name, Price, Category)');
         return;
@@ -1512,21 +1145,13 @@ async function saveNewDish() {
         
         if (fileInput.files && fileInput.files[0]) {
             // Upload file to storage
-            console.log('Uploading image file...');
             const file = fileInput.files[0];
-            
-            // Create temporary dish ID for file naming
-            const tempDishId = Date.now().toString();
-            finalImageUrl = await uploadImageToStorage(file, tempDishId);
-            
-            if (!finalImageUrl) {
-                throw new Error('Failed to upload image');
-            }
+            finalImageUrl = await uploadImageToStorage(file);
         } else if (urlInput) {
             // Use URL if provided
             finalImageUrl = urlInput;
         } else if (uploadedImageUrl) {
-            // Use preloaded image if selected
+            // Use image selected from grid
             finalImageUrl = uploadedImageUrl;
         }
         
@@ -1544,8 +1169,6 @@ async function saveNewDish() {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
-        
-        console.log('Saving dish:', dishData);
         
         // Save to database
         const { data, error } = await supabaseClient
@@ -1565,7 +1188,7 @@ async function saveNewDish() {
         alert('Dish added successfully!');
         closeAddDishModal();
         
-        // Update UI
+        // Update UI if restaurants view is open
         if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
@@ -1580,20 +1203,19 @@ async function saveNewDish() {
     }
 }
 
-// Edit Dish
-function showEditDishModal() {
+// Edit Dish Modal
+async function showEditDishModal() {
     if (!hasPermission('editDish')) {
         alert('You do not have permission to edit dishes');
         return;
     }
     
-    // For demo, show the first dish - in real app, you'd select which dish to edit
     if (dishes.length === 0) {
         alert('No dishes available to edit');
         return;
     }
     
-    // Let user select a dish to edit (for now, edit first dish)
+    // For demo, use first dish - in real app, you'd select which dish to edit
     const dish = dishes[0];
     
     // Fill form with dish data
@@ -1606,27 +1228,29 @@ function showEditDishModal() {
     document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
     document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
     
-    // Handle image
-    const currentImage = document.getElementById('currentDishImage');
+    // Handle current image
     const currentImageContainer = document.getElementById('currentImageContainer');
     if (dish.image_url) {
-        currentImage.src = dish.image_url;
+        document.getElementById('currentDishImage').src = dish.image_url;
         currentImageContainer.classList.remove('hidden');
         document.getElementById('editDishImageUrl').value = dish.image_url;
+        uploadedImageUrl = dish.image_url;
     } else {
         currentImageContainer.classList.add('hidden');
+        document.getElementById('editDishImageUrl').value = '';
+        uploadedImageUrl = null;
     }
     
     // Clear other image previews
     document.getElementById('editDishImagePreview').classList.add('hidden');
-    document.getElementById('editPreloadedImagePreview').classList.add('hidden');
+    document.getElementById('editDishGridPreview').classList.add('hidden');
     
-    // Reset uploaded image URL
-    uploadedImageUrl = null;
+    // Load and display images from Supabase
+    const images = await loadDishImagesFromStorage();
+    renderImageGrid(images, 'editDishImageGrid', dish.image_url);
     
     // Show modal
     document.getElementById('editDishModal').classList.remove('hidden');
-    console.log('Edit Dish modal opened for:', dish.name);
 }
 
 function closeEditDishModal() {
@@ -1664,15 +1288,14 @@ async function updateDish() {
         
         if (fileInput.files && fileInput.files[0]) {
             // Upload file to storage
-            console.log('Uploading new image file...');
             const file = fileInput.files[0];
-            const newImageUrl = await uploadImageToStorage(file, dishId);
+            const newImageUrl = await uploadImageToStorage(file);
             
             if (newImageUrl) {
                 finalImageUrl = newImageUrl;
             }
-        } else if (uploadedImageUrl) {
-            // Use preloaded image if selected
+        } else if (uploadedImageUrl && uploadedImageUrl !== document.getElementById('editDishImageUrl').value) {
+            // Use image selected from grid
             finalImageUrl = uploadedImageUrl;
         }
         
@@ -1688,8 +1311,6 @@ async function updateDish() {
             image_url: finalImageUrl || null,
             updated_at: new Date().toISOString()
         };
-        
-        console.log('Updating dish:', dishId, dishData);
         
         // Update in database
         const { data, error } = await supabaseClient
@@ -1710,7 +1331,7 @@ async function updateDish() {
         alert('Dish updated successfully!');
         closeEditDishModal();
         
-        // Update UI
+        // Update UI if restaurants view is open
         if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
@@ -1732,7 +1353,6 @@ function showDeleteDishModal() {
         return;
     }
     
-    // For demo, show confirmation for first dish
     if (dishes.length === 0) {
         alert('No dishes available to delete');
         return;
@@ -1742,7 +1362,6 @@ function showDeleteDishModal() {
     document.getElementById('deleteDishId').value = dish.id;
     document.getElementById('deleteDishMessage').textContent = `Are you sure you want to delete "${dish.name}"? This action cannot be undone.`;
     
-    // Show modal
     document.getElementById('deleteDishModal').classList.remove('hidden');
 }
 
@@ -1773,7 +1392,7 @@ async function confirmDeleteDish() {
         alert('Dish deleted successfully!');
         closeDeleteDishModal();
         
-        // Update UI
+        // Update UI if restaurants view is open
         if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
@@ -1781,481 +1400,6 @@ async function confirmDeleteDish() {
     } catch (error) {
         console.error('Error deleting dish:', error);
         alert('Error deleting dish: ' + error.message);
-    }
-}
-
-// View Revenue
-function showRevenueReport() {
-    if (!hasPermission('viewRevenue')) {
-        alert('You do not have permission to view revenue');
-        return;
-    }
-    
-    loadRevenueReport();
-    document.getElementById('revenueReportModal').classList.remove('hidden');
-}
-
-function closeRevenueReportModal() {
-    document.getElementById('revenueReportModal').classList.add('hidden');
-}
-
-async function loadRevenueReport() {
-    try {
-        // For demo, we'll use sample data
-        // In a real app, you would fetch from Supabase
-        
-        const today = new Date();
-        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-        
-        // Sample data for demo
-        const sampleData = {
-            totalRevenue: 12500,
-            totalOrders: 42,
-            averageOrderValue: 297.62,
-            topDishes: [
-                { name: "Butter Chicken", quantity: 18, revenue: 3600 },
-                { name: "Garlic Naan", quantity: 35, revenue: 2800 },
-                { name: "Biryani", quantity: 12, revenue: 2400 },
-                { name: "Paneer Tikka", quantity: 15, revenue: 2250 },
-                { name: "Mango Lassi", quantity: 20, revenue: 1600 }
-            ],
-            hourlyRevenue: [800, 1200, 1800, 2200, 2500, 3000]
-        };
-        
-        // Update UI
-        document.getElementById('totalRevenue').textContent = `₹${sampleData.totalRevenue}`;
-        document.getElementById('totalOrders').textContent = sampleData.totalOrders;
-        document.getElementById('averageOrderValue').textContent = `₹${sampleData.averageOrderValue}`;
-        
-        // Update top dishes table
-        let topDishesHTML = '';
-        sampleData.topDishes.forEach((dish, index) => {
-            topDishesHTML += `
-                <tr class="${index % 2 === 0 ? 'bg-gray-50' : ''}">
-                    <td class="px-4 py-2">${dish.name}</td>
-                    <td class="px-4 py-2">${dish.quantity}</td>
-                    <td class="px-4 py-2">₹${dish.revenue}</td>
-                </tr>
-            `;
-        });
-        document.getElementById('topDishesTable').innerHTML = topDishesHTML;
-        
-        // Update chart
-        updateRevenueChart(sampleData.hourlyRevenue);
-        
-    } catch (error) {
-        console.error('Error loading revenue report:', error);
-    }
-}
-
-function updateRevenueChart(hourlyRevenue) {
-    const ctx = document.getElementById('revenueReportChart').getContext('2d');
-    
-    if (revenueReportChart) {
-        revenueReportChart.destroy();
-    }
-    
-    const hours = ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'];
-    
-    revenueReportChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: hours.slice(0, hourlyRevenue.length),
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: hourlyRevenue,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgb(59, 130, 246)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        display: true
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
-    });
-}
-
-function updateRevenueReport() {
-    const range = document.getElementById('revenueDateRange').value;
-    
-    if (range === 'custom') {
-        document.getElementById('customDateRange').classList.remove('hidden');
-    } else {
-        document.getElementById('customDateRange').classList.add('hidden');
-        loadRevenueReport();
-    }
-}
-
-function applyCustomDateRange() {
-    const startDate = document.getElementById('revenueStartDate').value;
-    const endDate = document.getElementById('revenueEndDate').value;
-    
-    if (!startDate || !endDate) {
-        alert('Please select both start and end dates');
-        return;
-    }
-    
-    // In a real app, you would fetch data for the selected date range
-    console.log('Loading revenue for date range:', startDate, 'to', endDate);
-    loadRevenueReport();
-}
-
-// Reserve Table
-function showReserveTableModal() {
-    if (!hasPermission('reserveTable')) {
-        alert('You do not have permission to reserve tables');
-        return;
-    }
-    
-    // Reset form
-    document.getElementById('reserveTableForm').reset();
-    
-    // Set default time (next hour)
-    const now = new Date();
-    now.setHours(now.getHours() + 1);
-    const nextHour = now.toTimeString().substring(0, 5);
-    document.getElementById('reservationTime').value = nextHour;
-    
-    // Show modal
-    document.getElementById('reserveTableModal').classList.remove('hidden');
-}
-
-function closeReserveTableModal() {
-    document.getElementById('reserveTableModal').classList.add('hidden');
-}
-
-async function reserveTable() {
-    if (!hasPermission('reserveTable')) {
-        alert('Permission denied');
-        return;
-    }
-    
-    const reservationData = {
-        restaurant_id: currentRestaurant.id,
-        customer_name: document.getElementById('customerName').value,
-        customer_phone: document.getElementById('customerPhone').value,
-        number_of_guests: parseInt(document.getElementById('numberOfGuests').value),
-        table_number: document.getElementById('tableNumber').value || null,
-        reservation_date: document.getElementById('reservationDate').value,
-        reservation_time: document.getElementById('reservationTime').value,
-        special_requests: document.getElementById('specialRequests').value,
-        status: 'confirmed',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
-    
-    try {
-        // In a real app, you would insert into a reservations table
-        // For demo, we'll just show a success message
-        
-        console.log('Reservation data:', reservationData);
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Show success message
-        alert(`Table reserved successfully!\n\nReservation Details:\nCustomer: ${reservationData.customer_name}\nDate: ${reservationData.reservation_date}\nTime: ${reservationData.reservation_time}\nGuests: ${reservationData.number_of_guests}`);
-        
-        closeReserveTableModal();
-        
-    } catch (error) {
-        console.error('Error creating reservation:', error);
-        alert('Error creating reservation: ' + error.message);
-    }
-}
-
-// View Orders
-function showOrdersModal() {
-    if (!hasPermission('viewTableOrders')) {
-        alert('You do not have permission to view orders');
-        return;
-    }
-    
-    loadCurrentOrders();
-    document.getElementById('ordersModal').classList.remove('hidden');
-}
-
-function closeOrdersModal() {
-    document.getElementById('ordersModal').classList.add('hidden');
-}
-
-async function loadCurrentOrders() {
-    try {
-        // In a real app, fetch orders from Supabase
-        // For demo, use sample data
-        
-        const sampleOrders = [
-            {
-                id: 'ORD001',
-                table_number: 'T1',
-                customer_name: 'John Doe',
-                status: 'preparing',
-                total_amount: 1250,
-                items: [
-                    { name: 'Butter Chicken', quantity: 2, price: 250 },
-                    { name: 'Garlic Naan', quantity: 4, price: 40 }
-                ],
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 'ORD002',
-                table_number: 'T3',
-                customer_name: 'Jane Smith',
-                status: 'pending',
-                total_amount: 850,
-                items: [
-                    { name: 'Paneer Tikka', quantity: 1, price: 200 },
-                    { name: 'Biryani', quantity: 1, price: 300 },
-                    { name: 'Coke', quantity: 2, price: 50 }
-                ],
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 'ORD003',
-                table_number: 'T5',
-                customer_name: 'Robert Johnson',
-                status: 'ready',
-                total_amount: 1800,
-                items: [
-                    { name: 'Butter Chicken', quantity: 1, price: 250 },
-                    { name: 'Biryani', quantity: 2, price: 300 },
-                    { name: 'Garlic Naan', quantity: 6, price: 40 }
-                ],
-                created_at: new Date().toISOString()
-            }
-        ];
-        
-        currentOrders = sampleOrders;
-        renderOrders(sampleOrders);
-        
-    } catch (error) {
-        console.error('Error loading orders:', error);
-    }
-}
-
-function renderOrders(orders) {
-    const ordersGrid = document.getElementById('ordersGrid');
-    const noOrdersMessage = document.getElementById('noOrdersMessage');
-    
-    if (orders.length === 0) {
-        ordersGrid.innerHTML = '';
-        noOrdersMessage.classList.remove('hidden');
-        return;
-    }
-    
-    noOrdersMessage.classList.add('hidden');
-    
-    let ordersHTML = '';
-    
-    orders.forEach(order => {
-        const statusColors = {
-            'pending': 'bg-yellow-100 text-yellow-800',
-            'preparing': 'bg-blue-100 text-blue-800',
-            'ready': 'bg-green-100 text-green-800',
-            'served': 'bg-purple-100 text-purple-800',
-            'completed': 'bg-gray-100 text-gray-800'
-        };
-        
-        const statusText = {
-            'pending': 'Pending',
-            'preparing': 'Preparing',
-            'ready': 'Ready to Serve',
-            'served': 'Served',
-            'completed': 'Completed'
-        };
-        
-        const statusColor = statusColors[order.status] || 'bg-gray-100 text-gray-800';
-        const statusDisplay = statusText[order.status] || order.status;
-        
-        let itemsHTML = '';
-        order.items.forEach(item => {
-            itemsHTML += `
-                <div class="flex justify-between text-sm">
-                    <span>${item.name} × ${item.quantity}</span>
-                    <span>₹${item.price * item.quantity}</span>
-                </div>
-            `;
-        });
-        
-        ordersHTML += `
-            <div class="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <div class="font-bold text-lg">Table ${order.table_number}</div>
-                        <div class="text-sm text-gray-600">${order.customer_name}</div>
-                    </div>
-                    <span class="px-3 py-1 text-xs rounded-full ${statusColor}">
-                        ${statusDisplay}
-                    </span>
-                </div>
-                
-                <div class="space-y-2 mb-4">
-                    ${itemsHTML}
-                </div>
-                
-                <div class="border-t pt-3">
-                    <div class="flex justify-between font-bold">
-                        <span>Total</span>
-                        <span>₹${order.total_amount}</span>
-                    </div>
-                    
-                    <div class="flex space-x-2 mt-3">
-                        ${order.status === 'pending' ? `
-                            <button onclick="updateOrderStatus('${order.id}', 'preparing')" 
-                                    class="flex-1 bg-blue-600 text-white py-1 rounded hover:bg-blue-700 text-sm">
-                                Start Preparing
-                            </button>
-                        ` : ''}
-                        
-                        ${order.status === 'preparing' ? `
-                            <button onclick="updateOrderStatus('${order.id}', 'ready')" 
-                                    class="flex-1 bg-green-600 text-white py-1 rounded hover:bg-green-700 text-sm">
-                                Mark Ready
-                            </button>
-                        ` : ''}
-                        
-                        ${order.status === 'ready' ? `
-                            <button onclick="updateOrderStatus('${order.id}', 'served')" 
-                                    class="flex-1 bg-purple-600 text-white py-1 rounded hover:bg-purple-700 text-sm">
-                                Mark Served
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    ordersGrid.innerHTML = ordersHTML;
-}
-
-function filterOrders() {
-    const statusFilter = document.getElementById('orderStatusFilter').value;
-    const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
-    
-    let filteredOrders = currentOrders;
-    
-    if (statusFilter !== 'all') {
-        filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
-    }
-    
-    if (searchTerm) {
-        filteredOrders = filteredOrders.filter(order => 
-            order.table_number.toLowerCase().includes(searchTerm) ||
-            order.customer_name.toLowerCase().includes(searchTerm)
-        );
-    }
-    
-    renderOrders(filteredOrders);
-}
-
-async function updateOrderStatus(orderId, newStatus) {
-    try {
-        // In a real app, update order in Supabase
-        console.log(`Updating order ${orderId} to status: ${newStatus}`);
-        
-        // Update local state
-        const orderIndex = currentOrders.findIndex(order => order.id === orderId);
-        if (orderIndex !== -1) {
-            currentOrders[orderIndex].status = newStatus;
-            renderOrders(currentOrders);
-            
-            // Show success message
-            const statusMessages = {
-                'preparing': 'Order is now being prepared',
-                'ready': 'Order is ready to serve',
-                'served': 'Order has been served'
-            };
-            
-            alert(statusMessages[newStatus] || 'Order status updated');
-        }
-        
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status: ' + error.message);
-    }
-}
-
-// Load Order History
-async function loadOrderHistory() {
-    if (!hasPermission('viewOrderHistoryName') && !hasPermission('viewOrderHistoryTable')) {
-        return;
-    }
-    
-    try {
-        // In a real app, fetch order history from Supabase
-        // For demo, use sample data
-        
-        const sampleHistoryByName = [
-            { customer: 'John Doe', orders: 5, total: 6250 },
-            { customer: 'Jane Smith', orders: 3, total: 2550 },
-            { customer: 'Robert Johnson', orders: 7, total: 12600 },
-            { customer: 'Sarah Williams', orders: 2, total: 1800 }
-        ];
-        
-        const sampleHistoryByTable = [
-            { table: 'T1', orders: 8, total: 10000 },
-            { table: 'T3', orders: 5, total: 6250 },
-            { table: 'T5', orders: 12, total: 15000 },
-            { table: 'T7', orders: 3, total: 3750 }
-        ];
-        
-        // Render history by name
-        if (hasPermission('viewOrderHistoryName')) {
-            let historyByNameHTML = '';
-            sampleHistoryByName.forEach(item => {
-                historyByNameHTML += `
-                    <div class="flex justify-between items-center p-2 border-b">
-                        <div>
-                            <div class="font-medium">${item.customer}</div>
-                            <div class="text-sm text-gray-600">${item.orders} orders</div>
-                        </div>
-                        <div class="font-bold">₹${item.total}</div>
-                    </div>
-                `;
-            });
-            document.getElementById('orderHistoryByName').innerHTML = historyByNameHTML || '<p class="text-gray-500">No history available</p>';
-        }
-        
-        // Render history by table
-        if (hasPermission('viewOrderHistoryTable')) {
-            let historyByTableHTML = '';
-            sampleHistoryByTable.forEach(item => {
-                historyByTableHTML += `
-                    <div class="flex justify-between items-center p-2 border-b">
-                        <div>
-                            <div class="font-medium">Table ${item.table}</div>
-                            <div class="text-sm text-gray-600">${item.orders} orders</div>
-                        </div>
-                        <div class="font-bold">₹${item.total}</div>
-                    </div>
-                `;
-            });
-            document.getElementById('orderHistoryByTable').innerHTML = historyByTableHTML || '<p class="text-gray-500">No history available</p>';
-        }
-        
-    } catch (error) {
-        console.error('Error loading order history:', error);
     }
 }
 
@@ -2274,11 +1418,6 @@ function setupStaffUI() {
     
     document.getElementById('restaurantsViewTitle').textContent = 'Menu Management';
     document.getElementById('restaurantsViewSubtitle').textContent = 'Manage your restaurant menu';
-    
-    document.getElementById('usersViewTitle').textContent = 'Staff Management';
-    document.getElementById('usersViewSubtitle').textContent = 'Manage restaurant staff members';
-    
-    document.getElementById('restaurantLabel').textContent = 'menu items';
     
     updateUIBasedOnPermissions();
 }
@@ -2320,10 +1459,8 @@ async function handleAdminAccess(user) {
         document.getElementById('adminLoginModal').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         
-        console.log('✓ Admin dashboard initialized');
-        
     } catch (error) {
-        console.error('❌ Admin access error:', error);
+        console.error('Admin access error:', error);
         document.getElementById('adminLoginModal').classList.remove('hidden');
     }
 }
@@ -2341,11 +1478,6 @@ function setupAdminUI() {
     document.getElementById('staffActionsSection').style.display = 'none';
     document.getElementById('dashboardTitle').textContent = 'Admin Panel';
     document.getElementById('dashboardSubtitle').textContent = 'DigitalMenuPro';
-}
-
-// Show admin login modal
-function showAdminLogin() {
-    document.getElementById('adminLoginModal').classList.remove('hidden');
 }
 
 // Handle login
@@ -2378,7 +1510,7 @@ async function adminLogout() {
     try {
         await supabaseClient.auth.signOut();
         currentUser = null;
-        showAdminLogin();
+        document.getElementById('adminLoginModal').classList.remove('hidden');
     } catch (error) {
         console.error('Logout error:', error);
     }
@@ -2387,8 +1519,6 @@ async function adminLogout() {
 // Load admin data
 async function loadAdminData() {
     try {
-        console.log('📊 Loading admin data...');
-        
         // Load restaurants
         const { data: restaurantsData, error: resError } = await supabaseClient
             .from('restaurants')
@@ -2397,47 +1527,16 @@ async function loadAdminData() {
         
         if (!resError) restaurants = restaurantsData || [];
         
-        // Load subscriptions
-        const { data: subsData, error: subsError } = await supabaseClient
-            .from('subscriptions')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
-        
-        if (!subsError) subscriptions = subsData || [];
-        
-        // Load payments
-        const { data: paymentsData, error: payError } = await supabaseClient
-            .from('payments')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
-        
-        if (!payError) payments = paymentsData || [];
-        
-        // Load all users
-        const { data: usersData, error: usersError } = await supabaseClient
-            .from('staff_users')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
-        
-        if (!usersError) users = usersData || [];
-        
         updateDashboardStats();
-        setupCharts();
-        loadNotifications();
-        loadActivities();
-        
-        console.log('✓ Admin data loaded');
         
     } catch (error) {
-        console.error('❌ Error loading admin data:', error);
+        console.error('Error loading admin data:', error);
     }
 }
 
 // Load restaurant data for staff dashboard
 async function loadRestaurantData(restaurantId) {
     try {
-        console.log(`📋 Loading data for restaurant: ${restaurantId}`);
-        
         // Load dishes for this restaurant
         const { data: dishesData, error: dishesError } = await supabaseClient
             .from('dishes')
@@ -2447,41 +1546,20 @@ async function loadRestaurantData(restaurantId) {
         
         if (!dishesError) {
             dishes = dishesData || [];
-            console.log(`✓ Loaded ${dishes.length} dishes`);
         } else {
             console.error('Error loading dishes:', dishesError);
             dishes = [];
-        }
-        
-        // Load staff members for this restaurant
-        const { data: staffData, error: staffError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .eq('is_active', true);
-        
-        if (!staffError) {
-            users = staffData || [];
-            console.log(`✓ Loaded ${users.length} active staff members`);
         }
         
         // Update UI with restaurant name
         document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
         document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
         
-        setupStaffCharts();
-        loadNotifications();
-        loadActivities();
-        
-        // Load order history
-        loadOrderHistory();
-        
-        console.log('✓ Restaurant data loaded successfully');
+        updateDashboardStats();
         
     } catch (error) {
-        console.error('❌ Error loading restaurant data:', error);
+        console.error('Error loading restaurant data:', error);
         dishes = [];
-        users = [];
     }
 }
 
@@ -2490,443 +1568,219 @@ function updateDashboardStats() {
     // Total restaurants
     document.getElementById('totalRestaurants').textContent = restaurants.length;
     
-    // Active subscriptions
-    const activeSubs = subscriptions.filter(s => s.status === 'active').length;
-    document.getElementById('activeSubscriptions').textContent = activeSubs;
-    
-    // Monthly revenue (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const monthlyRevenue = payments
-        .filter(p => p.status === 'completed' && new Date(p.created_at) >= thirtyDaysAgo)
-        .reduce((sum, p) => sum + (p.amount || 0), 0);
-    document.getElementById('monthlyRevenue').textContent = `₹${monthlyRevenue}`;
-    
-    // Pending payments
-    const pending = payments.filter(p => p.status === 'pending').length;
-    document.getElementById('pendingPayments').textContent = pending;
-    
     // Update title based on user
     if (userRole !== 'admin' && currentRestaurant) {
         document.getElementById('stat1Title').textContent = 'Menu Items';
         document.getElementById('totalRestaurants').textContent = dishes.length;
         
-        document.getElementById('stat2Title').textContent = 'Today\'s Orders';
-        document.getElementById('activeSubscriptions').textContent = '42'; // Sample data
+        document.getElementById('stat2Title').textContent = 'Active Staff';
+        document.getElementById('activeSubscriptions').textContent = '0';
         
-        document.getElementById('stat3Title').textContent = 'Active Staff';
-        document.getElementById('monthlyRevenue').textContent = users.length;
+        document.getElementById('stat3Title').textContent = 'Today\'s Orders';
+        document.getElementById('monthlyRevenue').textContent = '0';
         
         document.getElementById('stat4Title').textContent = 'Table Occupancy';
-        document.getElementById('pendingPayments').textContent = '75%'; // Sample data
+        document.getElementById('pendingPayments').textContent = '0%';
     }
 }
 
-function setupCharts() {
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    const last6Months = getLast6Months();
-    
-    if (revenueChart) revenueChart.destroy();
-    
-    revenueChart = new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: last6Months,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: generateRevenueData(last6Months),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        display: true
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
+// View Navigation
+function showView(viewName) {
+    document.querySelectorAll('.view').forEach(view => {
+        view.classList.add('hidden');
     });
     
-    // Plan Distribution Chart
-    const planCtx = document.getElementById('planChart').getContext('2d');
+    document.querySelectorAll('nav a').forEach(navItem => {
+        navItem.classList.remove('active-nav', 'bg-gray-700');
+    });
     
-    if (planChart) planChart.destroy();
+    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
+    if (activeNav) {
+        activeNav.classList.add('active-nav', 'bg-gray-700');
+    }
     
-    const planCounts = {
-        basic: subscriptions.filter(s => s.plan === 'basic').length,
-        pro: subscriptions.filter(s => s.plan === 'pro').length,
-        enterprise: subscriptions.filter(s => s.plan === 'enterprise').length
+    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
+    if (viewElement) {
+        viewElement.classList.remove('hidden');
+    }
+    
+    updateViewTitle(viewName);
+    
+    if (viewName === 'restaurants') {
+        loadRestaurantsTable();
+    }
+}
+
+function updateViewTitle(viewName) {
+    const titles = {
+        'dashboard': { 
+            title: userRole === 'admin' ? 'Admin Dashboard' : `${currentRestaurant?.name || 'Restaurant'} Dashboard`, 
+            subtitle: userRole === 'admin' ? 'System Overview & Analytics' : 'Real-time Overview & Analytics' 
+        },
+        'restaurants': { 
+            title: userRole === 'admin' ? 'Restaurant Management' : 'Menu Management', 
+            subtitle: userRole === 'admin' ? 'Manage all registered restaurants' : 'Manage your restaurant menu items' 
+        }
     };
     
-    planChart = new Chart(planCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Basic', 'Pro', 'Enterprise'],
-            datasets: [{
-                data: [planCounts.basic, planCounts.pro, planCounts.enterprise],
-                backgroundColor: [
-                    'rgb(34, 197, 94)',
-                    'rgb(59, 130, 246)',
-                    'rgb(139, 92, 246)'
-                ],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
+    const viewInfo = titles[viewName] || titles.dashboard;
+    document.getElementById('viewTitle').textContent = viewInfo.title;
+    document.getElementById('viewSubtitle').textContent = viewInfo.subtitle;
 }
 
-function setupStaffCharts() {
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    if (revenueChart) revenueChart.destroy();
+// Sidebar Toggle
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"] i');
     
-    revenueChart = new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
-            datasets: [{
-                label: "Today's Orders",
-                data: [5, 12, 8, 15, 10, 20, 18],
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
-            }
-        }
-    });
+    sidebar.classList.toggle('collapsed');
     
-    const planCtx = document.getElementById('planChart').getContext('2d');
-    if (planChart) planChart.destroy();
-    
-    const categoryCount = {};
-    dishes.forEach(dish => {
-        categoryCount[dish.category] = (categoryCount[dish.category] || 0) + 1;
-    });
-    
-    planChart = new Chart(planCtx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(categoryCount),
-            datasets: [{
-                data: Object.values(categoryCount),
-                backgroundColor: [
-                    'rgb(59, 130, 246)',
-                    'rgb(16, 185, 129)',
-                    'rgb(245, 158, 11)',
-                    'rgb(239, 68, 68)',
-                    'rgb(139, 92, 246)',
-                    'rgb(236, 72, 153)'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                }
-            }
-        }
-    });
-}
-
-function getLast6Months() {
-    const months = [];
-    const now = new Date();
-    
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-    }
-    
-    return months;
-}
-
-function generateRevenueData(months) {
-    return months.map(() => Math.floor(Math.random() * 50000) + 10000);
-}
-
-async function loadNotifications() {
-    try {
-        let html = '';
-        
-        if (userRole === 'admin') {
-            const pendingPayments = payments.filter(p => p.status === 'pending').length;
-            const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
-            
-            if (pendingPayments > 0) {
-                html += `
-                    <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
-                        <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
-                        <div>
-                            <p class="font-medium">${pendingPayments} pending payment${pendingPayments > 1 ? 's' : ''}</p>
-                            <p class="text-sm text-gray-600">Require verification</p>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            if (pendingRestaurants > 0) {
-                html += `
-                    <div class="flex items-start p-3 bg-blue-50 rounded-lg">
-                        <i class="fas fa-clock text-blue-600 mt-1 mr-3"></i>
-                        <div>
-                            <p class="font-medium">${pendingRestaurants} restaurant${pendingRestaurants > 1 ? 's' : ''} pending</p>
-                            <p class="text-sm text-gray-600">Awaiting activation</p>
-                        </div>
-                    </div>
-                `;
-            }
-        } else {
-            // Sample staff notifications
-            const today = new Date();
-            const reservationsToday = 8; // Sample data
-            
-            html = `
-                <div class="flex items-start p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-chair text-blue-600 mt-1 mr-3"></i>
-                    <div>
-                        <p class="font-medium">${reservationsToday} reservations today</p>
-                        <p class="text-sm text-gray-600">Check table availability</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-start p-3 bg-green-50 rounded-lg">
-                    <i class="fas fa-utensils text-green-600 mt-1 mr-3"></i>
-                    <div>
-                        <p class="font-medium">2 new orders</p>
-                        <p class="text-sm text-gray-600">Waiting for preparation</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        if (!html) {
-            html = '<p class="text-gray-500 text-center py-4">No notifications</p>';
-        }
-        
-        document.getElementById('notificationsList').innerHTML = html;
-        
-    } catch (error) {
-        console.error('Error loading notifications:', error);
-    }
-}
-
-async function loadActivities() {
-    try {
-        let html = '';
-        
-        if (userRole === 'admin') {
-            const recentPayments = payments.slice(0, 5);
-            recentPayments.forEach(payment => {
-                const date = new Date(payment.created_at).toLocaleDateString();
-                const time = new Date(payment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                html += `
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center mr-3">
-                            <i class="fas fa-rupee-sign text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium">${payment.restaurants?.name || 'Unknown Restaurant'}</p>
-                            <p class="text-sm text-gray-600">Payment of ₹${payment.amount} ${payment.status}</p>
-                            <p class="text-xs text-gray-500">${date} at ${time}</p>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            const recentRestaurants = restaurants.slice(0, 3);
-            recentRestaurants.forEach(restaurant => {
-                const date = new Date(restaurant.created_at).toLocaleDateString();
-                
-                html += `
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
-                            <i class="fas fa-utensils text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium">${restaurant.name}</p>
-                            <p class="text-sm text-gray-600">New restaurant registered</p>
-                            <p class="text-xs text-gray-500">${date}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        } else {
-            // Sample staff activities
-            const activities = [
-                { icon: 'fa-plus', color: 'green', title: 'New dish added', desc: 'Butter Chicken added to menu', time: '10:30 AM' },
-                { icon: 'fa-edit', color: 'blue', title: 'Dish updated', desc: 'Paneer Tikka price updated', time: '11:45 AM' },
-                { icon: 'fa-chair', color: 'purple', title: 'Table reserved', desc: 'Table 3 reserved for 4 people', time: '12:15 PM' },
-                { icon: 'fa-list-alt', color: 'orange', title: 'Order completed', desc: 'Order #ORD003 served', time: '1:30 PM' }
-            ];
-            
-            activities.forEach(activity => {
-                html += `
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-${activity.color}-100 text-${activity.color}-600 flex items-center justify-center mr-3">
-                            <i class="fas ${activity.icon} text-sm"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium">${activity.title}</p>
-                            <p class="text-sm text-gray-600">${activity.desc}</p>
-                            <p class="text-xs text-gray-500">${activity.time}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-        
-        document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
-        
-    } catch (error) {
-        console.error('Error loading activities:', error);
-    }
-}
-
-// Add this function to load images from Supabase Storage
-async function loadDishImagesFromStorage() {
-    try {
-        const { data: files, error } = await supabaseClient.storage
-            .from('dish-images')
-            .list('', {
-                limit: 100,
-                offset: 0,
-                sortBy: { column: 'name', order: 'asc' }
-            });
-        
-        if (error) {
-            console.error('Error loading images:', error);
-            return [];
-        }
-        
-        // Get public URLs for all images
-        const imageUrls = files.map(file => {
-            const { data: { publicUrl } } = supabaseClient.storage
-                .from('dish-images')
-                .getPublicUrl(file.name);
-            return {
-                name: file.name,
-                url: publicUrl
-            };
-        });
-        
-        console.log(`Loaded ${imageUrls.length} images from storage`);
-        return imageUrls;
-        
-    } catch (error) {
-        console.error('Error in loadDishImagesFromStorage:', error);
-        return [];
-    }
-}
-
-// Update the showAddDishModal function
-async function showAddDishModal() {
-    if (!hasPermission('addDish')) {
-        alert('You do not have permission to add dishes');
-        return;
-    }
-    
-    // Reset form
-    document.getElementById('addDishForm').reset();
-    
-    // Clear image previews
-    document.getElementById('addDishImagePreview').classList.add('hidden');
-    document.getElementById('preloadedImagePreview').classList.add('hidden');
-    
-    // Reset uploaded image URL
-    uploadedImageUrl = null;
-    
-    // Load images from Supabase Storage
-    const images = await loadDishImagesFromStorage();
-    
-    // Populate preloaded images dropdown
-    const select = document.getElementById('preloadedImageSelect');
-    select.innerHTML = '<option value="">Select an image</option>';
-    
-    if (images.length > 0) {
-        images.forEach((image, index) => {
-            const option = document.createElement('option');
-            option.value = image.url;
-            option.textContent = `Image ${index + 1}: ${image.name}`;
-            select.appendChild(option);
-        });
+    if (sidebar.classList.contains('collapsed')) {
+        mainContent.style.marginLeft = '80px';
+        toggleBtn.classList.remove('fa-chevron-left');
+        toggleBtn.classList.add('fa-chevron-right');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Expand Sidebar';
     } else {
-        // Fallback to sample images
-        const sampleImages = [
-            { url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', name: 'Burger' },
-            { url: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop', name: 'Salad' },
-            { url: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop', name: 'Pizza' },
-            { url: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop', name: 'Pasta' }
-        ];
-        
-        sampleImages.forEach(image => {
-            const option = document.createElement('option');
-            option.value = image.url;
-            option.textContent = image.name;
-            select.appendChild(option);
-        });
+        mainContent.style.marginLeft = '256px';
+        toggleBtn.classList.remove('fa-chevron-right');
+        toggleBtn.classList.add('fa-chevron-left');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Collapse Sidebar';
     }
-    
-    // Show modal
-    document.getElementById('addDishModal').classList.remove('hidden');
-    console.log('Add Dish modal opened');
 }
 
-// Update the showEditDishModal function
-async function showEditDishModal() {
+// Load restaurants table
+async function loadRestaurantsTable() {
+    try {
+        if (userRole === 'admin') {
+            await loadAdminRestaurantsTable();
+        } else {
+            await loadStaffMenuTable();
+        }
+    } catch (error) {
+        console.error('Error loading table:', error);
+    }
+}
+
+// Load admin restaurants table
+async function loadAdminRestaurantsTable() {
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+    `;
+    
+    let tableHTML = '';
+    restaurants.forEach(restaurant => {
+        tableHTML += `
+            <tr class="restaurant-row hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-utensils text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${restaurant.name}</div>
+                            <div class="text-sm text-gray-500">${restaurant.url_slug}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${restaurant.owner_name || restaurant.owner_email}</div>
+                    <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                        ${restaurant.status.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${new Date(restaurant.created_at).toLocaleDateString()}
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                No restaurants found
+            </td>
+        </tr>
+    `;
+}
+
+// Load staff menu table
+async function loadStaffMenuTable() {
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    `;
+    
+    let tableHTML = '';
+    dishes.forEach(dish => {
+        const statusClass = dish.is_available ? 'status-active' : 'status-suspended';
+        const statusText = dish.is_available ? 'Available' : 'Unavailable';
+        
+        tableHTML += `
+            <tr class="dish-row">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                            ${dish.image_url ? 
+                                `<img src="${dish.image_url}" alt="${dish.name}" class="w-full h-full object-cover rounded-lg">` :
+                                `<i class="fas fa-utensil-spoon text-gray-600"></i>`
+                            }
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">${dish.category || 'Uncategorized'}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ₹${dish.price || '0'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="editDishRow('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                No dishes found
+            </td>
+        </tr>
+    `;
+}
+
+// Edit dish from table row
+async function editDishRow(dishId) {
     if (!hasPermission('editDish')) {
         alert('You do not have permission to edit dishes');
         return;
     }
     
-    // For demo, show the first dish - in real app, you'd select which dish to edit
-    if (dishes.length === 0) {
-        alert('No dishes available to edit');
-        return;
-    }
-    
-    // Let user select a dish to edit (for now, edit first dish)
-    const dish = dishes[0];
+    const dish = dishes.find(d => d.id === dishId);
+    if (!dish) return;
     
     // Fill form with dish data
     document.getElementById('editDishId').value = dish.id;
@@ -2938,106 +1792,74 @@ async function showEditDishModal() {
     document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
     document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
     
-    // Handle image
-    const currentImage = document.getElementById('currentDishImage');
+    // Handle current image
     const currentImageContainer = document.getElementById('currentImageContainer');
     if (dish.image_url) {
-        currentImage.src = dish.image_url;
+        document.getElementById('currentDishImage').src = dish.image_url;
         currentImageContainer.classList.remove('hidden');
         document.getElementById('editDishImageUrl').value = dish.image_url;
+        uploadedImageUrl = dish.image_url;
     } else {
         currentImageContainer.classList.add('hidden');
+        document.getElementById('editDishImageUrl').value = '';
+        uploadedImageUrl = null;
     }
     
     // Clear other image previews
     document.getElementById('editDishImagePreview').classList.add('hidden');
-    document.getElementById('editPreloadedImagePreview').classList.add('hidden');
+    document.getElementById('editDishGridPreview').classList.add('hidden');
     
-    // Reset uploaded image URL
-    uploadedImageUrl = null;
-    
-    // Load images from Supabase Storage
+    // Load and display images from Supabase
     const images = await loadDishImagesFromStorage();
-    
-    // Populate preloaded images dropdown
-    const select = document.getElementById('editPreloadedImageSelect');
-    select.innerHTML = '<option value="">Select an image</option>';
-    
-    if (images.length > 0) {
-        images.forEach((image, index) => {
-            const option = document.createElement('option');
-            option.value = image.url;
-            option.textContent = `Image ${index + 1}: ${image.name}`;
-            select.appendChild(option);
-        });
-    } else {
-        // Fallback to sample images
-        const sampleImages = [
-            { url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', name: 'Burger' },
-            { url: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop', name: 'Salad' },
-            { url: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop', name: 'Pizza' },
-            { url: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop', name: 'Pasta' }
-        ];
-        
-        sampleImages.forEach(image => {
-            const option = document.createElement('option');
-            option.value = image.url;
-            option.textContent = image.name;
-            select.appendChild(option);
-        });
-    }
+    renderImageGrid(images, 'editDishImageGrid', dish.image_url);
     
     // Show modal
     document.getElementById('editDishModal').classList.remove('hidden');
-    console.log('Edit Dish modal opened for:', dish.name);
 }
 
-// Update the uploadImageToStorage function to handle existing images
-async function uploadImageToStorage(file, dishId) {
+// Toggle dish status
+async function toggleDishStatus(dishId, currentStatus) {
+    if (!hasPermission('editDish')) {
+        alert('You do not have permission to edit dishes');
+        return;
+    }
+    
+    const newStatus = !currentStatus;
+    
     try {
-        console.log('Uploading image to storage...');
+        const { data, error } = await supabaseClient
+            .from('dishes')
+            .update({ 
+                is_available: newStatus,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', dishId)
+            .select();
         
-        // Create unique filename
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${dishId || Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-        const filePath = `dish-images/${fileName}`;
+        if (error) throw error;
         
-        // Upload to Supabase Storage
-        const { data, error } = await supabaseClient.storage
-            .from('dish-images')
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: true
-            });
+        // Refresh dishes list
+        await loadRestaurantData(currentRestaurant.id);
         
-        if (error) {
-            console.error('Error uploading image:', error);
-            
-            // If file exists, try to get public URL directly
-            if (error.message.includes('already exists')) {
-                const { data: { publicUrl } } = supabaseClient.storage
-                    .from('dish-images')
-                    .getPublicUrl(fileName);
-                return publicUrl;
-            }
-            
-            return null;
+        // Update UI
+        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
+            loadRestaurantsTable();
         }
         
-        // Get public URL
-        const { data: { publicUrl } } = supabaseClient.storage
-            .from('dish-images')
-            .getPublicUrl(filePath);
-        
-        console.log('Image uploaded successfully:', publicUrl);
-        return publicUrl;
+        alert(`Dish ${newStatus ? 'enabled' : 'disabled'} successfully!`);
         
     } catch (error) {
-        console.error('Error in uploadImageToStorage:', error);
-        return null;
+        console.error('Error toggling dish status:', error);
+        alert('Error updating dish status: ' + error.message);
     }
 }
-    
+
+// Filter restaurants/menu items
+function filterRestaurants() {
+    const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
+    console.log('Filtering by:', searchTerm);
+}
+
 // Initialize the dashboard
 initDashboard();
 </script>
