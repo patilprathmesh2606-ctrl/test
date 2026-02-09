@@ -2963,6 +2963,28 @@ function setupStaffUI() {
     // Apply permissions immediately
     updateUIBasedOnPermissions();
 }
+
+    // Update this section in updateMenuManagementPermissions
+if (!permissions.manage_categories) {
+    // Find table headers by checking their text
+    const allTh = document.querySelectorAll('th');
+    allTh.forEach(th => {
+        if (th.textContent.trim().toLowerCase().includes('category')) {
+            th.style.display = 'none';
+            // Also hide corresponding cells in all rows
+            const columnIndex = Array.from(th.parentNode.children).indexOf(th);
+            const allRows = document.querySelectorAll('tr');
+            allRows.forEach(row => {
+                const cell = row.children[columnIndex];
+                if (cell) cell.style.display = 'none';
+            });
+        }
+    });
+    
+    // Also hide standalone category badges
+    const categoryCells = document.querySelectorAll('.category-badge');
+    categoryCells.forEach(cell => cell.style.display = 'none');
+}
     
 // Initialize the dashboard
 initDashboard();
