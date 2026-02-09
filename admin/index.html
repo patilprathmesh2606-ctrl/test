@@ -2991,7 +2991,7 @@ function setupStaffUI() {
     updateUIBasedOnPermissions();
 }
 
-    // Update this section in updateMenuManagementPermissions
+    /* Update this section in updateMenuManagementPermissions
 if (!permissions.manage_categories) {
     // Find table headers by checking their text
     const allTh = document.querySelectorAll('th');
@@ -3006,7 +3006,7 @@ if (!permissions.manage_categories) {
                 if (cell) cell.style.display = 'none';
             });
         }
-    });
+    }); */
     
     // Also hide standalone category badges
     const categoryCells = document.querySelectorAll('.category-badge');
