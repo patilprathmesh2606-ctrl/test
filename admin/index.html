@@ -545,10 +545,13 @@
                                 
                                 <!-- Option 3: Image Grid from Supabase -->
                                 
-                                    // Replace the loadDishImagesFromStorage function with this:
-async function loadDishImagesFromStorage() {
+                                   // Function to load images from Supabase Storage
+async function loadImagesFromSupabase() {
     try {
-        const { data: files, error } = await supabaseClient.storage
+        console.log('📸 Loading images from Supabase Storage...');
+        
+        // List files in the dish-images bucket
+        const { data, error } = await supabaseClient.storage
             .from('dish-images')
             .list('', {
                 limit: 100,
@@ -556,136 +559,178 @@ async function loadDishImagesFromStorage() {
                 sortBy: { column: 'name', order: 'asc' }
             });
         
-        if (error) {
-            console.error('Error loading images:', error);
-            return [];
-        }
+        if (error) throw error;
         
-        // Filter out folders and get public URLs
-        const imageUrls = files
-            .filter(file => !file.id) // Filter out folders (folders have id)
-            .map(file => {
-                const { data: { publicUrl } } = supabaseClient.storage
-                    .from('dish-images')
-                    .getPublicUrl(file.name);
-                return {
-                    name: file.name,
-                    url: publicUrl,
-                    selected: false
-                };
-            });
+        // Filter out folders and get image URLs
+        availableImages = await Promise.all(
+            data
+                .filter(item => !item.id.endsWith('/')) // Exclude folders
+                .map(async (item) => {
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('dish-images')
+                        .getPublicUrl(item.name);
+                    
+                    return {
+                        name: item.name,
+                        url: publicUrl,
+                        created_at: item.created_at
+                    };
+                })
+        );
         
-        console.log(`Loaded ${imageUrls.length} images from storage`);
-        return imageUrls;
-        
+        console.log(`✓ Loaded ${availableImages.length} images from storage`);
+        return availableImages;
     } catch (error) {
-        console.error('Error in loadDishImagesFromStorage:', error);
+        console.error('❌ Error loading images:', error);
         return [];
     }
 }
 
-// Add this function to render image grid
-function renderImageGrid(images, containerId, isEditModal = false) {
-    const container = document.getElementById(containerId);
+// Function to render image gallery
+function renderImageGallery(images = availableImages) {
+    const gallery = document.getElementById('imageGallery');
+    const countSpan = document.getElementById('imageCount');
     
-    if (!images || images.length === 0) {
-        container.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-image text-3xl mb-2"></i>
-                <p>No images found in storage</p>
+    if (!gallery) return;
+    
+    countSpan.textContent = `${images.length} images`;
+    
+    if (images.length === 0) {
+        gallery.innerHTML = `
+            <div class="col-span-3 text-center py-4">
+                <i class="fas fa-image text-3xl text-gray-300 mb-2"></i>
+                <p class="text-gray-500">No images found</p>
             </div>
         `;
         return;
     }
     
-    let html = `
-        <div class="mb-4">
-            <p class="text-sm text-gray-600 mb-2">Select an image by clicking on it:</p>
-            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-60 overflow-y-auto p-2 border rounded-lg bg-gray-50">
-    `;
-    
-    images.forEach((image, index) => {
-        const fileName = image.name.length > 15 ? image.name.substring(0, 12) + '...' : image.name;
-        html += `
-            <div class="relative group cursor-pointer" onclick="selectImageFromGrid('${image.url}', ${index}, ${isEditModal})">
-                <div class="aspect-square overflow-hidden rounded-lg border-2 ${image.selected ? 'border-blue-500' : 'border-gray-200'} hover:border-blue-400 transition-all">
-                    <img src="${image.url}" 
-                         alt="${image.name}"
-                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
-                         loading="lazy">
-                </div>
-                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-circle text-white text-xl opacity-0 group-hover:opacity-100 ${image.selected ? 'opacity-100' : ''}"></i>
-                </div>
-                <div class="mt-1 text-xs text-gray-600 truncate text-center" title="${image.name}">
-                    ${fileName}
-                </div>
+    gallery.innerHTML = images.map(img => `
+        <div class="relative group">
+            <img src="${img.url}" 
+                 alt="${img.name}"
+                 onclick="selectImage('${img.url}', '${img.name}')"
+                 class="image-thumbnail w-full h-24 object-cover rounded-lg">
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <button onclick="selectImage('${img.url}', '${img.name}')" 
+                        class="px-3 py-1 bg-white text-gray-800 rounded text-sm font-medium hover:bg-gray-100">
+                    Select
+                </button>
             </div>
-        `;
+        </div>
+    `).join('');
+}
+
+// Function to render default images
+function renderDefaultImages() {
+    const container = document.getElementById('defaultImages');
+    if (!container) return;
+    
+    container.innerHTML = defaultImages.map(img => `
+        <div class="text-center">
+            <img src="${img.url}" 
+                 alt="${img.name}"
+                 onclick="selectDefaultImage('${img.url}')"
+                 class="default-image w-24 h-20 object-cover rounded-lg mb-1">
+            <p class="text-xs text-gray-600">${img.name}</p>
+        </div>
+    `).join('');
+}
+
+// Function to select an image
+function selectImage(url, name) {
+    // Remove selection from all images
+    document.querySelectorAll('.image-thumbnail').forEach(img => {
+        img.classList.remove('selected');
     });
     
-    html += `
-            </div>
-        </div>
-        <div class="flex items-center space-x-2 mt-2">
-            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span class="text-xs text-gray-600">Selected image</span>
-        </div>
-    `;
+    // Remove selection from default images
+    document.querySelectorAll('.default-image').forEach(img => {
+        img.classList.remove('selected');
+    });
     
-    container.innerHTML = html;
+    // Add selection to clicked image
+    const clickedImage = document.querySelector(`img[src="${url}"]`);
+    if (clickedImage) {
+        clickedImage.classList.add('selected');
+    }
+    
+    // Update selected image preview
+    document.getElementById('selectedImagePreview').src = url;
+    document.getElementById('selectedImageUrl').value = url;
+    
+    console.log(`Selected image: ${name}`);
 }
 
-// Add this function to handle image selection from grid
-function selectImageFromGrid(imageUrl, index, isEditModal = false) {
-    const urlInput = isEditModal ? 
-        document.getElementById('editDishImageUrl') : 
-        document.getElementById('dishImageUrl');
+// Function to select default image
+function selectDefaultImage(url) {
+    // Remove selection from all images
+    document.querySelectorAll('.image-thumbnail').forEach(img => {
+        img.classList.remove('selected');
+    });
     
-    // Update the URL input
-    urlInput.value = imageUrl;
-    uploadedImageUrl = imageUrl;
+    document.querySelectorAll('.default-image').forEach(img => {
+        img.classList.remove('selected');
+    });
     
-    // Show preview
-    const previewId = isEditModal ? 'editPreloadedImagePreview' : 'preloadedImagePreview';
-    const preview = document.getElementById(previewId);
-    preview.src = imageUrl;
-    preview.classList.remove('hidden');
+    // Add selection to clicked default image
+    const clickedImage = document.querySelector(`img[src="${url}"]`);
+    if (clickedImage) {
+        clickedImage.classList.add('selected');
+    }
     
-    // Show selection feedback (you'll need to track selected state in your images array)
-    // For now, just log the selection
-    console.log(`Selected image ${index}: ${imageUrl}`);
-    
-    // Scroll preview into view
-    preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Update selected image preview
+    document.getElementById('selectedImagePreview').src = url;
+    document.getElementById('selectedImageUrl').value = url;
 }
 
-// Update the showAddDishModal function
-async function showAddDishModal() {
-    if (!hasPermission('addDish')) {
-        alert('You do not have permission to add dishes');
+// Function to clear selected image
+function clearSelectedImage() {
+    // Clear selection
+    document.querySelectorAll('.image-thumbnail, .default-image').forEach(img => {
+        img.classList.remove('selected');
+    });
+    
+    // Reset to default placeholder
+    document.getElementById('selectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('selectedImageUrl').value = '';
+}
+
+// Function to search images
+function searchImages() {
+    const searchTerm = document.getElementById('imageSearch').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderImageGallery(availableImages);
         return;
     }
     
-    // Reset form
-    document.getElementById('addDishForm').reset();
+    const filteredImages = availableImages.filter(img => 
+        img.name.toLowerCase().includes(searchTerm)
+    );
     
-    // Clear image previews
-    document.getElementById('addDishImagePreview').classList.add('hidden');
-    document.getElementById('preloadedImagePreview').classList.add('hidden');
-    document.getElementById('preloadedImagePreview').src = '';
+    renderImageGallery(filteredImages);
+}
+
+// Function to refresh image gallery
+async function refreshImageGallery() {
+    await loadImagesFromSupabase();
+    renderImageGallery();
+    alert('Image gallery refreshed!');
+}
+
+async function saveUser() {
+    const name = document.getElementById('staffName').value;
+    const email = document.getElementById('staffEmailInput').value;
+    const password = document.getElementById('staffPasswordInput').value;
+    const roleInput = document.querySelector('input[name="userRole"]:checked');
     
-    // Reset uploaded image URL
-    uploadedImageUrl = null;
+    if (!roleInput) {
+        alert('Please select a role');
+        return;
+    }
     
-    // Load images from Supabase Storage
-    const images = await loadDishImagesFromStorage();
-    
-    // Render image grid
-    renderImageGrid(images, 'addDishImageGrid', false);
-    
-    // Hide the old dropdown and show the grid container
-    document.getElementById('preloadedImage
+    const role = roleInput.value;
                                 </div>
                             </div>
                         </div>
