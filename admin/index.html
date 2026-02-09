@@ -1004,6 +1004,21 @@ async function handleStaffAccess(user, restaurantSlug) {
         
         console.log('✅ Staff logged in:', staffUser.name, 'Role:', staffUser.role, 'Restaurant:', restaurant.name);
         
+        // IMPORTANT: If permissions are null/empty, set default permissions
+        if (!staffUser.permissions || Object.keys(staffUser.permissions).length === 0) {
+            console.log('⚠️ No permissions found, setting defaults...');
+            await setDefaultPermissions(staffUser.id, staffUser.role);
+            // Reload user with new permissions
+            const { data: updatedUser } = await supabaseClient
+                .from('staff_users')
+                .select('*')
+                .eq('id', staffUser.id)
+                .single();
+            currentUser = updatedUser;
+        }
+        
+        console.log('📋 User permissions:', currentUser.permissions);
+        
         // Update UI for staff
         setupStaffUI();
         
@@ -1022,60 +1037,71 @@ async function handleStaffAccess(user, restaurantSlug) {
     }
 }
 
-// Handle admin access
-async function handleAdminAccess(user) {
-    try {
-        // Check if user is admin
-        const { data: adminUser, error: adminError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('email', user.email)
-            .eq('role', 'admin')
-            .single();
-            
-        if (adminError || !adminUser) {
-            // Check if user is staff for any restaurant
-            const { data: staffUser } = await supabaseClient
-                .from('staff_users')
-                .select('*, restaurants(*)')
-                .eq('user_id', user.id)
-                .eq('is_active', true)
-                .single();
-                
-            if (staffUser) {
-                // Redirect to staff view for their restaurant
-                window.location.href = `index.html?restaurant=${staffUser.restaurants.url_slug}&staff=true`;
-                return;
-            }
-            
-            alert('Access denied. Admin privileges required.');
-            await supabaseClient.auth.signOut();
-            showLoginModal();
-            return;
+// Function to set default permissions
+async function setDefaultPermissions(userId, role) {
+    const defaultPermissions = {
+        'owner': {
+            "addDish": true,
+            "editDish": true,
+            "deleteDish": true,
+            "manageStaff": true,
+            "viewRevenue": true,
+            "reserveTable": true,
+            "viewTableOrders": true,
+            "viewOrderHistoryName": true,
+            "viewOrderHistoryTable": true
+        },
+        'manager': {
+            "addDish": true,
+            "editDish": true,
+            "deleteDish": true,
+            "manageStaff": false,
+            "viewRevenue": true,
+            "reserveTable": true,
+            "viewTableOrders": true,
+            "viewOrderHistoryName": true,
+            "viewOrderHistoryTable": true
+        },
+        'chef': {
+            "addDish": true,
+            "editDish": true,
+            "deleteDish": true,
+            "manageStaff": false,
+            "viewRevenue": false,
+            "reserveTable": false,
+            "viewTableOrders": true,
+            "viewOrderHistoryName": true,
+            "viewOrderHistoryTable": true
+        },
+        'waiter': {
+            "addDish": false,
+            "editDish": false,
+            "deleteDish": false,
+            "manageStaff": false,
+            "viewRevenue": false,
+            "reserveTable": true,
+            "viewTableOrders": true,
+            "viewOrderHistoryName": true,
+            "viewOrderHistoryTable": true
         }
-        
-        currentUser = adminUser;
-        userRole = 'admin';
-        
-        // Update UI for admin
-        setupAdminUI();
-        
-        // Load admin data
-        await loadAdminData();
-        
-        // Load role permissions from database
-        await loadRolePermissionsFromDB();
-        
-        // Hide login modal, show dashboard
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        
-        console.log('✓ Admin dashboard initialized');
-        
-    } catch (error) {
-        console.error('❌ Admin access error:', error);
-        showLoginModal();
+    };
+    
+    const permissions = defaultPermissions[role] || defaultPermissions.waiter;
+    
+    const { error } = await supabaseClient
+        .from('staff_users')
+        .update({ 
+            permissions: permissions,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+    
+    if (error) {
+        console.error('Error setting default permissions:', error);
+        throw error;
     }
+    
+    console.log('✓ Default permissions set for', role);
 }
 
 // Load role permissions from database
