@@ -652,26 +652,31 @@
                                 </div>
                                 
                                 <!-- Option 3: Select from preloaded images -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from preloaded images</label>
-                                    <select id="preloadedImageSelect" onchange="selectPreloadedImage()" 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                        <option value="">Select an image</option>
-                                        <option value="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop">Burger</option>
-                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Salad</option>
-                                        <option value="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop">Pizza</option>
-                                        <option value="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop">Pasta</option>
-                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Dessert</option>
-                                        <option value="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop">Pizza 2</option>
-                                        <option value="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop">Burger 2</option>
-                                        <option value="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop">Healthy Food</option>
-                                        <option value="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop">Breakfast</option>
-                                        <option value="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=300&fit=crop">Dish</option>
-                                    </select>
-                                    <div class="mt-2">
-                                        <img id="preloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                    <!-- In the Add Dish Modal (around line where preloadedImageSelect is) -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
+                                        <select id="preloadedImageSelect" onchange="selectPreloadedImage()" 
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="">Select an image</option>
+                                            <!-- Options will be populated dynamically from Supabase -->
+                                        </select>
+                                        <div class="mt-2">
+                                            <img id="preloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                        </div>
                                     </div>
-                                </div>
+                                    
+                                    <!-- In the Edit Dish Modal (around line where editPreloadedImageSelect is) -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
+                                        <select id="editPreloadedImageSelect" onchange="selectEditPreloadedImage()" 
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="">Select an image</option>
+                                            <!-- Options will be populated dynamically from Supabase -->
+                                        </select>
+                                        <div class="mt-2">
+                                            <img id="editPreloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                         
@@ -2818,6 +2823,221 @@ async function loadActivities() {
     }
 }
 
+// Add this function to load images from Supabase Storage
+async function loadDishImagesFromStorage() {
+    try {
+        const { data: files, error } = await supabaseClient.storage
+            .from('dish-images')
+            .list('', {
+                limit: 100,
+                offset: 0,
+                sortBy: { column: 'name', order: 'asc' }
+            });
+        
+        if (error) {
+            console.error('Error loading images:', error);
+            return [];
+        }
+        
+        // Get public URLs for all images
+        const imageUrls = files.map(file => {
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from('dish-images')
+                .getPublicUrl(file.name);
+            return {
+                name: file.name,
+                url: publicUrl
+            };
+        });
+        
+        console.log(`Loaded ${imageUrls.length} images from storage`);
+        return imageUrls;
+        
+    } catch (error) {
+        console.error('Error in loadDishImagesFromStorage:', error);
+        return [];
+    }
+}
+
+// Update the showAddDishModal function
+async function showAddDishModal() {
+    if (!hasPermission('addDish')) {
+        alert('You do not have permission to add dishes');
+        return;
+    }
+    
+    // Reset form
+    document.getElementById('addDishForm').reset();
+    
+    // Clear image previews
+    document.getElementById('addDishImagePreview').classList.add('hidden');
+    document.getElementById('preloadedImagePreview').classList.add('hidden');
+    
+    // Reset uploaded image URL
+    uploadedImageUrl = null;
+    
+    // Load images from Supabase Storage
+    const images = await loadDishImagesFromStorage();
+    
+    // Populate preloaded images dropdown
+    const select = document.getElementById('preloadedImageSelect');
+    select.innerHTML = '<option value="">Select an image</option>';
+    
+    if (images.length > 0) {
+        images.forEach((image, index) => {
+            const option = document.createElement('option');
+            option.value = image.url;
+            option.textContent = `Image ${index + 1}: ${image.name}`;
+            select.appendChild(option);
+        });
+    } else {
+        // Fallback to sample images
+        const sampleImages = [
+            { url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', name: 'Burger' },
+            { url: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop', name: 'Salad' },
+            { url: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop', name: 'Pizza' },
+            { url: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop', name: 'Pasta' }
+        ];
+        
+        sampleImages.forEach(image => {
+            const option = document.createElement('option');
+            option.value = image.url;
+            option.textContent = image.name;
+            select.appendChild(option);
+        });
+    }
+    
+    // Show modal
+    document.getElementById('addDishModal').classList.remove('hidden');
+    console.log('Add Dish modal opened');
+}
+
+// Update the showEditDishModal function
+async function showEditDishModal() {
+    if (!hasPermission('editDish')) {
+        alert('You do not have permission to edit dishes');
+        return;
+    }
+    
+    // For demo, show the first dish - in real app, you'd select which dish to edit
+    if (dishes.length === 0) {
+        alert('No dishes available to edit');
+        return;
+    }
+    
+    // Let user select a dish to edit (for now, edit first dish)
+    const dish = dishes[0];
+    
+    // Fill form with dish data
+    document.getElementById('editDishId').value = dish.id;
+    document.getElementById('editDishName').value = dish.name;
+    document.getElementById('editDishDescription').value = dish.description || '';
+    document.getElementById('editDishCategory').value = dish.category;
+    document.getElementById('editDishPrice').value = dish.price;
+    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
+    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
+    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
+    
+    // Handle image
+    const currentImage = document.getElementById('currentDishImage');
+    const currentImageContainer = document.getElementById('currentImageContainer');
+    if (dish.image_url) {
+        currentImage.src = dish.image_url;
+        currentImageContainer.classList.remove('hidden');
+        document.getElementById('editDishImageUrl').value = dish.image_url;
+    } else {
+        currentImageContainer.classList.add('hidden');
+    }
+    
+    // Clear other image previews
+    document.getElementById('editDishImagePreview').classList.add('hidden');
+    document.getElementById('editPreloadedImagePreview').classList.add('hidden');
+    
+    // Reset uploaded image URL
+    uploadedImageUrl = null;
+    
+    // Load images from Supabase Storage
+    const images = await loadDishImagesFromStorage();
+    
+    // Populate preloaded images dropdown
+    const select = document.getElementById('editPreloadedImageSelect');
+    select.innerHTML = '<option value="">Select an image</option>';
+    
+    if (images.length > 0) {
+        images.forEach((image, index) => {
+            const option = document.createElement('option');
+            option.value = image.url;
+            option.textContent = `Image ${index + 1}: ${image.name}`;
+            select.appendChild(option);
+        });
+    } else {
+        // Fallback to sample images
+        const sampleImages = [
+            { url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', name: 'Burger' },
+            { url: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop', name: 'Salad' },
+            { url: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop', name: 'Pizza' },
+            { url: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop', name: 'Pasta' }
+        ];
+        
+        sampleImages.forEach(image => {
+            const option = document.createElement('option');
+            option.value = image.url;
+            option.textContent = image.name;
+            select.appendChild(option);
+        });
+    }
+    
+    // Show modal
+    document.getElementById('editDishModal').classList.remove('hidden');
+    console.log('Edit Dish modal opened for:', dish.name);
+}
+
+// Update the uploadImageToStorage function to handle existing images
+async function uploadImageToStorage(file, dishId) {
+    try {
+        console.log('Uploading image to storage...');
+        
+        // Create unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${dishId || Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+        const filePath = `dish-images/${fileName}`;
+        
+        // Upload to Supabase Storage
+        const { data, error } = await supabaseClient.storage
+            .from('dish-images')
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: true
+            });
+        
+        if (error) {
+            console.error('Error uploading image:', error);
+            
+            // If file exists, try to get public URL directly
+            if (error.message.includes('already exists')) {
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('dish-images')
+                    .getPublicUrl(fileName);
+                return publicUrl;
+            }
+            
+            return null;
+        }
+        
+        // Get public URL
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from('dish-images')
+            .getPublicUrl(filePath);
+        
+        console.log('Image uploaded successfully:', publicUrl);
+        return publicUrl;
+        
+    } catch (error) {
+        console.error('Error in uploadImageToStorage:', error);
+        return null;
+    }
+}
+    
 // Initialize the dashboard
 initDashboard();
 </script>
