@@ -1958,6 +1958,621 @@ function nextRestaurantPage() {
         loadRestaurantsTable();
     }
 }
+    // Update title and subtitle based on view and user role
+function updateViewTitle(viewName) {
+    try {
+        const viewTitle = document.getElementById('viewTitle');
+        const viewSubtitle = document.getElementById('viewSubtitle');
+        
+        if (!viewTitle || !viewSubtitle) return;
+        
+        switch(viewName) {
+            case 'dashboard':
+                if (userRole === 'admin') {
+                    viewTitle.textContent = 'Admin Dashboard';
+                    viewSubtitle.textContent = 'System Overview & Analytics';
+                } else {
+                    viewTitle.textContent = `${currentRestaurant?.name || 'Restaurant'} Dashboard`;
+                    viewSubtitle.textContent = 'Real-time Overview & Analytics';
+                }
+                break;
+                
+            case 'restaurants':
+                if (userRole === 'admin') {
+                    viewTitle.textContent = 'Restaurant Management';
+                    viewSubtitle.textContent = 'Manage all registered restaurants';
+                } else {
+                    viewTitle.textContent = 'Menu Management';
+                    viewSubtitle.textContent = 'Manage your restaurant menu items';
+                }
+                break;
+                
+            case 'subscriptions':
+                viewTitle.textContent = 'Subscription Management';
+                viewSubtitle.textContent = 'Manage restaurant subscriptions and plans';
+                break;
+                
+            case 'payments':
+                viewTitle.textContent = 'Payment Management';
+                viewSubtitle.textContent = 'View and manage payment transactions';
+                break;
+                
+            case 'users':
+                if (userRole === 'admin') {
+                    viewTitle.textContent = 'User Management';
+                    viewSubtitle.textContent = 'Manage all system users';
+                } else {
+                    viewTitle.textContent = 'Staff Management';
+                    viewSubtitle.textContent = 'Manage restaurant staff members';
+                }
+                break;
+                
+            case 'staff_permissions':
+                viewTitle.textContent = 'Staff Permissions';
+                viewSubtitle.textContent = 'Configure permissions for different roles';
+                break;
+                
+            case 'plans':
+                viewTitle.textContent = 'Plan Management';
+                viewSubtitle.textContent = 'Manage subscription plans and pricing';
+                break;
+                
+            case 'settings':
+                if (userRole === 'admin') {
+                    viewTitle.textContent = 'System Settings';
+                    viewSubtitle.textContent = 'Configure system-wide settings';
+                } else {
+                    viewTitle.textContent = 'Restaurant Settings';
+                    viewSubtitle.textContent = 'Configure your restaurant settings';
+                }
+                break;
+                
+            case 'terms':
+                viewTitle.textContent = 'Terms & Policies';
+                viewSubtitle.textContent = 'Manage terms, conditions, and policies';
+                break;
+                
+            default:
+                viewTitle.textContent = 'Dashboard';
+                viewSubtitle.textContent = 'Overview & Analytics';
+        }
+        
+        // Also update the page title
+        document.title = `${viewTitle.textContent} - DigitalMenuPro Admin`;
+        
+    } catch (error) {
+        console.error('Error updating view title:', error);
+        document.title = 'DigitalMenuPro Admin';
+    }
+}
+
+    // Load users table (all users for admin, staff for restaurant staff)
+async function loadUsersTable() {
+    try {
+        if (userRole === 'admin') {
+            await loadAllUsersTable();
+        } else {
+            await loadRestaurantStaffTable();
+        }
+    } catch (error) {
+        console.error('Error loading users table:', error);
+    }
+}
+
+// Load all users for admin
+async function loadAllUsersTable() {
+    let tableHTML = '';
+    
+    users.forEach(user => {
+        // Determine role badge class
+        let roleClass = 'role-admin';
+        let roleText = user.role;
+        
+        switch(user.role) {
+            case 'owner':
+                roleClass = 'role-owner';
+                break;
+            case 'manager':
+                roleClass = 'role-manager';
+                break;
+            case 'chef':
+                roleClass = 'role-chef';
+                break;
+            case 'waiter':
+                roleClass = 'role-waiter';
+                break;
+            case 'admin':
+                roleClass = 'role-admin';
+                break;
+        }
+        
+        // Status badge
+        const statusClass = user.is_active ? 'status-active' : 'status-inactive';
+        const statusText = user.is_active ? 'Active' : 'Inactive';
+        
+        // Last active time
+        let lastActive = 'Never';
+        if (user.last_login) {
+            const lastLogin = new Date(user.last_login);
+            const now = new Date();
+            const diffMs = now - lastLogin;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else if (diffMins > 0) {
+                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            } else {
+                lastActive = 'Just now';
+            }
+        }
+        
+        tableHTML += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                            <div class="text-sm text-gray-500">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${user.restaurants?.name || 'No Restaurant'}</div>
+                    <div class="text-sm text-gray-500">${user.restaurants?.url_slug || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="role-badge ${roleClass}">${roleText.toUpperCase()}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${lastActive}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="viewUserPermissions('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-user-shield"></i>
+                    </button>
+                    <button onclick="editUser('${user.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleUserStatus('${user.id}', ${user.is_active})" class="${user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                        <i class="fas ${user.is_active ? 'fa-ban' : 'fa-check'}"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('usersTable').innerHTML = tableHTML;
+}
+
+// Load restaurant staff for staff users
+async function loadRestaurantStaffTable() {
+    let tableHTML = '';
+    
+    // Filter users for current restaurant only
+    const restaurantStaff = users.filter(user => 
+        user.restaurant_id === currentRestaurant?.id || 
+        user.restaurants?.id === currentRestaurant?.id
+    );
+    
+    restaurantStaff.forEach(user => {
+        // Determine role badge class
+        let roleClass = 'role-admin';
+        let roleText = user.role;
+        
+        switch(user.role) {
+            case 'owner':
+                roleClass = 'role-owner';
+                break;
+            case 'manager':
+                roleClass = 'role-manager';
+                roleText = 'Manager';
+                break;
+            case 'chef':
+                roleClass = 'role-chef';
+                roleText = 'Chef';
+                break;
+            case 'waiter':
+                roleClass = 'role-waiter';
+                roleText = 'Waiter';
+                break;
+        }
+        
+        // Status badge
+        const statusClass = user.is_active ? 'status-active' : 'status-inactive';
+        const statusText = user.is_active ? 'Active' : 'Inactive';
+        
+        // Last active time
+        let lastActive = 'Never';
+        if (user.last_login) {
+            const lastLogin = new Date(user.last_login);
+            const now = new Date();
+            const diffMs = now - lastLogin;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else if (diffMins > 0) {
+                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            } else {
+                lastActive = 'Just now';
+            }
+        }
+        
+        // Don't show edit button for current user (they can't edit themselves)
+        const canEdit = user.id !== currentUser?.id;
+        
+        tableHTML += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                            <div class="text-sm text-gray-500">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${currentRestaurant?.name || 'Current Restaurant'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="role-badge ${roleClass}">${roleText.toUpperCase()}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${lastActive}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    ${canEdit ? `
+                        <button onclick="viewUserPermissions('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-user-shield"></i>
+                        </button>
+                        <button onclick="editUser('${user.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleUserStatus('${user.id}', ${user.is_active})" class="${user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                            <i class="fas ${user.is_active ? 'fa-ban' : 'fa-check'}"></i>
+                        </button>
+                    ` : `
+                        <span class="text-gray-400">Current User</span>
+                    `}
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('usersTable').innerHTML = tableHTML;
+}
+
+// Filter users
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    
+    const rows = document.querySelectorAll('#usersTable tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
+
+    // Toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"]');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        sidebar.classList.remove('collapsed');
+        mainContent.classList.remove('lg:ml-64');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i><span class="ml-3 sidebar-text">Collapse Sidebar</span>';
+    } else {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('lg:ml-64');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i><span class="ml-3 sidebar-text">Expand Sidebar</span>';
+    }
+}
+
+// Toggle notifications panel
+function toggleNotifications() {
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('hidden');
+}
+
+// Close notifications panel when clicking outside
+document.addEventListener('click', function(event) {
+    const notificationsPanel = document.getElementById('notificationsPanel');
+    const notificationsBtn = document.querySelector('[onclick="toggleNotifications()"]');
+    
+    if (notificationsPanel && !notificationsPanel.contains(event.target) && 
+        notificationsBtn && !notificationsBtn.contains(event.target)) {
+        notificationsPanel.classList.add('hidden');
+    }
+});
+
+// Load notifications
+async function loadNotifications() {
+    try {
+        const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) return;
+        
+        // For now, show a simple message
+        notificationsList.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-bell-slash text-3xl mb-3"></i>
+                <p>No new notifications</p>
+            </div>
+        `;
+        
+        // Update badge
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+    }
+}
+
+// Load activities
+async function loadActivities() {
+    try {
+        const activitiesList = document.getElementById('activitiesList');
+        if (!activitiesList) return;
+        
+        let activitiesHTML = '';
+        
+        // For staff, show restaurant-specific activities
+        if (userRole !== 'admin' && currentRestaurant) {
+            activitiesHTML = `
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
+                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            // For admin, show system activities
+            activitiesHTML = `
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium">System activities will appear here</p>
+                        <p class="text-xs text-gray-600">Recent restaurant registrations, payments, and updates</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        activitiesList.innerHTML = activitiesHTML;
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
+    }
+}
+
+// Show add dish modal (for staff)
+function showAddDishModal() {
+    alert('Add Dish functionality would open here. This is a placeholder.');
+}
+
+// Export restaurants (for admin)
+function exportRestaurants() {
+    alert('Export functionality would be implemented here. This is a placeholder.');
+}
+
+// Placeholder functions for actions
+function viewRestaurantDetails(restaurantId) {
+    alert(`View restaurant details for ID: ${restaurantId}`);
+}
+
+function editRestaurant(restaurantId) {
+    alert(`Edit restaurant with ID: ${restaurantId}`);
+}
+
+function toggleRestaurantStatus(restaurantId, isActive) {
+    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this restaurant?`)) {
+        alert(`Restaurant ${restaurantId} status would be toggled to ${!isActive}`);
+        // Here you would make an API call to update the restaurant status
+    }
+}
+
+function editDish(dishId) {
+    alert(`Edit dish with ID: ${dishId}`);
+}
+
+function toggleDishStatus(dishId, isAvailable) {
+    if (confirm(`Are you sure you want to mark this dish as ${isAvailable ? 'unavailable' : 'available'}?`)) {
+        alert(`Dish ${dishId} availability would be toggled to ${!isAvailable}`);
+        // Here you would make an API call to update the dish status
+    }
+}
+
+function viewUserPermissions(userId) {
+    // This should call your existing viewUserPermissions function
+    alert(`View permissions for user ID: ${userId}`);
+}
+
+function editUser(userId) {
+    alert(`Edit user with ID: ${userId}`);
+}
+
+function toggleUserStatus(userId, isActive) {
+    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this user?`)) {
+        alert(`User ${userId} status would be toggled to ${!isActive}`);
+        // Here you would make an API call to update the user status
+    }
+}
+
+    // Toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"]');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        sidebar.classList.remove('collapsed');
+        mainContent.classList.remove('lg:ml-64');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i><span class="ml-3 sidebar-text">Collapse Sidebar</span>';
+    } else {
+        sidebar.classList.add('collapsed');
+        mainContent.classList.add('lg:ml-64');
+        toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i><span class="ml-3 sidebar-text">Expand Sidebar</span>';
+    }
+}
+
+// Toggle notifications panel
+function toggleNotifications() {
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('hidden');
+}
+
+// Close notifications panel when clicking outside
+document.addEventListener('click', function(event) {
+    const notificationsPanel = document.getElementById('notificationsPanel');
+    const notificationsBtn = document.querySelector('[onclick="toggleNotifications()"]');
+    
+    if (notificationsPanel && !notificationsPanel.contains(event.target) && 
+        notificationsBtn && !notificationsBtn.contains(event.target)) {
+        notificationsPanel.classList.add('hidden');
+    }
+});
+
+// Load notifications
+async function loadNotifications() {
+    try {
+        const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) return;
+        
+        // For now, show a simple message
+        notificationsList.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-bell-slash text-3xl mb-3"></i>
+                <p>No new notifications</p>
+            </div>
+        `;
+        
+        // Update badge
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+    }
+}
+
+// Load activities
+async function loadActivities() {
+    try {
+        const activitiesList = document.getElementById('activitiesList');
+        if (!activitiesList) return;
+        
+        let activitiesHTML = '';
+        
+        // For staff, show restaurant-specific activities
+        if (userRole !== 'admin' && currentRestaurant) {
+            activitiesHTML = `
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
+                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            // For admin, show system activities
+            activitiesHTML = `
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium">System activities will appear here</p>
+                        <p class="text-xs text-gray-600">Recent restaurant registrations, payments, and updates</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        activitiesList.innerHTML = activitiesHTML;
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
+    }
+}
+
+// Show add dish modal (for staff)
+function showAddDishModal() {
+    alert('Add Dish functionality would open here. This is a placeholder.');
+}
+
+// Export restaurants (for admin)
+function exportRestaurants() {
+    alert('Export functionality would be implemented here. This is a placeholder.');
+}
+
+// Placeholder functions for actions
+function viewRestaurantDetails(restaurantId) {
+    alert(`View restaurant details for ID: ${restaurantId}`);
+}
+
+function editRestaurant(restaurantId) {
+    alert(`Edit restaurant with ID: ${restaurantId}`);
+}
+
+function toggleRestaurantStatus(restaurantId, isActive) {
+    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this restaurant?`)) {
+        alert(`Restaurant ${restaurantId} status would be toggled to ${!isActive}`);
+        // Here you would make an API call to update the restaurant status
+    }
+}
+
+function editDish(dishId) {
+    alert(`Edit dish with ID: ${dishId}`);
+}
+
+function toggleDishStatus(dishId, isAvailable) {
+    if (confirm(`Are you sure you want to mark this dish as ${isAvailable ? 'unavailable' : 'available'}?`)) {
+        alert(`Dish ${dishId} availability would be toggled to ${!isAvailable}`);
+        // Here you would make an API call to update the dish status
+    }
+}
+
+function viewUserPermissions(userId) {
+    // This should call your existing viewUserPermissions function
+    alert(`View permissions for user ID: ${userId}`);
+}
+
+function editUser(userId) {
+    alert(`Edit user with ID: ${userId}`);
+}
+
+function toggleUserStatus(userId, isActive) {
+    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this user?`)) {
+        alert(`User ${userId} status would be toggled to ${!isActive}`);
+        // Here you would make an API call to update the user status
+    }
+}
     
 // Initialize the dashboard
 initDashboard();
