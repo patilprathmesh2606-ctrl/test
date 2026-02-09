@@ -2573,6 +2573,337 @@ function toggleUserStatus(userId, isActive) {
         // Here you would make an API call to update the user status
     }
 }
+
+    // Update all UI elements based on staff permissions
+function updateUIBasedOnPermissions() {
+    if (userRole === 'admin') return; // Only apply to staff
+    
+    try {
+        // Get current staff user's role and permissions
+        const role = currentUser?.role || 'waiter';
+        const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
+        
+        console.log('🔧 Applying permissions for role:', role, permissions);
+        
+        // 1. Update Dashboard Stats visibility
+        updateDashboardPermissions(permissions);
+        
+        // 2. Update Sidebar Navigation
+        updateSidebarPermissions(permissions);
+        
+        // 3. Update Restaurant/Menu View buttons
+        updateMenuManagementPermissions(permissions);
+        
+        // 4. Update Users/Staff View
+        updateStaffManagementPermissions(permissions);
+        
+        // 5. Update specific feature buttons
+        updateFeatureButtons(permissions);
+        
+        console.log('✓ UI permissions applied');
+        
+    } catch (error) {
+        console.error('Error updating UI permissions:', error);
+    }
+}
+
+// Update dashboard elements based on permissions
+function updateDashboardPermissions(permissions) {
+    // Show/hide dashboard elements
+    const dashboardElements = {
+        'view_analytics': ['#chart1Title', '#chart2Title', '#revenueChart', '#planChart'],
+        'export_reports': ['button[onclick*="export"]', 'button[onclick*="download"]']
+    };
+    
+    Object.keys(dashboardElements).forEach(permission => {
+        const show = permissions[permission] === true;
+        dashboardElements[permission].forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                el.style.display = show ? 'block' : 'none';
+            });
+        });
+    });
+}
+
+// Update sidebar navigation based on permissions
+function updateSidebarPermissions(permissions) {
+    const sidebarItems = {
+        // Map permission to sidebar items
+        'view_analytics': ['a[onclick="showView(\'dashboard\')"]'],
+        'manage_menu': ['a[onclick="showView(\'restaurants\')"]'],
+        'manage_staff': ['a[onclick="showView(\'users\')"]'],
+        'manage_settings': ['a[onclick="showView(\'settings\')"]']
+    };
+    
+    Object.keys(sidebarItems).forEach(permission => {
+        const show = permissions[permission] === true;
+        sidebarItems[permission].forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                if (!show) {
+                    el.style.display = 'none';
+                    // Also remove from parent li
+                    const parentLi = el.closest('li');
+                    if (parentLi) parentLi.style.display = 'none';
+                }
+            });
+        });
+    });
+}
+
+// Update menu management permissions
+function updateMenuManagementPermissions(permissions) {
+    // Add Dish button
+    const addDishBtn = document.querySelector('button[onclick="showAddDishModal()"]');
+    if (addDishBtn) {
+        addDishBtn.style.display = permissions.add_dishes ? 'block' : 'none';
+    }
+    
+    // Edit/Delete dish buttons in table
+    const editButtons = document.querySelectorAll('button[onclick*="editDish"]');
+    const deleteButtons = document.querySelectorAll('button[onclick*="toggleDishStatus"]');
+    
+    editButtons.forEach(btn => {
+        btn.style.display = permissions.edit_dishes ? 'inline-block' : 'none';
+    });
+    
+    deleteButtons.forEach(btn => {
+        btn.style.display = permissions.delete_dishes ? 'inline-block' : 'none';
+    });
+    
+    // Manage categories/specials
+    if (!permissions.manage_categories) {
+        // Hide category management features
+        const categoryHeaders = document.querySelectorAll('th:contains("Category")');
+        categoryHeaders.forEach(th => {
+            if (th.textContent.includes('Category')) {
+                th.style.display = 'none';
+            }
+        });
+        
+        const categoryCells = document.querySelectorAll('.category-badge');
+        categoryCells.forEach(cell => cell.style.display = 'none');
+    }
+}
+
+// Update staff management permissions
+function updateStaffManagementPermissions(permissions) {
+    if (!permissions.manage_staff) {
+        // Hide staff management section
+        const staffNav = document.querySelector('a[onclick="showView(\'users\')"]');
+        if (staffNav) {
+            const parentLi = staffNav.closest('li');
+            if (parentLi) parentLi.style.display = 'none';
+        }
+    }
+    
+    // Hide add/edit staff buttons if not allowed
+    if (!permissions.add_staff) {
+        const addStaffButtons = document.querySelectorAll('button[onclick*="addStaff"]');
+        addStaffButtons.forEach(btn => btn.style.display = 'none');
+    }
+    
+    if (!permissions.edit_staff) {
+        const editStaffButtons = document.querySelectorAll('button[onclick*="editUser"]');
+        editStaffButtons.forEach(btn => btn.style.display = 'none');
+    }
+}
+
+// Update specific feature buttons
+function updateFeatureButtons(permissions) {
+    // View Revenue button/feature
+    const revenueElements = document.querySelectorAll('*[class*="revenue"], *[id*="revenue"]');
+    revenueElements.forEach(el => {
+        el.style.display = permissions.view_revenue ? 'block' : 'none';
+    });
+    
+    // Reserve Table feature
+    if (!permissions.manage_reservations) {
+        const reservationElements = document.querySelectorAll('*[class*="reservation"], *[id*="reservation"]');
+        reservationElements.forEach(el => el.style.display = 'none');
+    }
+    
+    // View Orders
+    if (!permissions.view_orders) {
+        const orderElements = document.querySelectorAll('*[class*="order"], *[id*="order"]');
+        orderElements.forEach(el => el.style.display = 'none');
+    }
+    
+    // Order History (Name)
+    const historyNameElements = document.querySelectorAll('*[class*="history-name"], *[id*="history-name"]');
+    historyNameElements.forEach(el => {
+        el.style.display = permissions.view_order_history ? 'block' : 'none';
+    });
+    
+    // Order History (Table)
+    const historyTableElements = document.querySelectorAll('*[class*="history-table"], *[id*="history-table"]');
+    historyTableElements.forEach(el => {
+        el.style.display = permissions.view_order_history ? 'block' : 'none';
+    });
+}
+
+    // View Navigation with permission checks
+function showView(viewName) {
+    // Check if user has permission to view this section
+    if (!hasPermissionForView(viewName)) {
+        alert('You do not have permission to access this section.');
+        return;
+    }
+    
+    // Hide all views
+    document.querySelectorAll('.view').forEach(view => {
+        view.classList.add('hidden');
+    });
+    
+    // Remove active class from all nav items
+    document.querySelectorAll('nav a').forEach(navItem => {
+        navItem.classList.remove('active-nav', 'bg-gray-700');
+    });
+    
+    // Add active class to clicked nav item
+    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
+    if (activeNav) {
+        activeNav.classList.add('active-nav', 'bg-gray-700');
+    }
+    
+    // Show selected view
+    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1).replace(/_/g, '')}`);
+    if (viewElement) {
+        viewElement.classList.remove('hidden');
+    }
+    
+    // Update title and subtitle based on user role
+    updateViewTitle(viewName);
+    
+    // Apply permissions to the view
+    if (userRole !== 'admin') {
+        updateUIBasedOnPermissions();
+    }
+    
+    // Load view-specific data
+    switch(viewName) {
+        case 'dashboard':
+            updateDashboardStats();
+            break;
+        case 'restaurants':
+            loadRestaurantsTable();
+            break;
+        case 'staff_permissions':
+            if (userRole === 'admin') {
+                loadRolePermissions('owner');
+            }
+            break;
+        case 'users':
+            loadUsersTable();
+            break;
+    }
+}
+
+// Check if user has permission to view a specific section
+function hasPermissionForView(viewName) {
+    if (userRole === 'admin') return true;
+    
+    const role = currentUser?.role || 'waiter';
+    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
+    
+    switch(viewName) {
+        case 'dashboard':
+            return permissions.view_dashboard === true;
+        case 'restaurants':
+            return permissions.manage_menu === true;
+        case 'users':
+            return permissions.manage_staff === true;
+        case 'settings':
+            return permissions.manage_settings === true;
+        default:
+            return true;
+    }
+}
+
+    // Staff action functions
+function showAddDishModal() {
+    if (!checkPermission('add_dishes')) return;
+    
+    // Your add dish modal logic here
+    alert('Add Dish modal would open here');
+    // You would typically show a modal with a form to add a new dish
+}
+
+function showEditDishModal() {
+    if (!checkPermission('edit_dishes')) return;
+    
+    alert('Edit Dish modal would open here. Select a dish to edit.');
+}
+
+function showDeleteDishModal() {
+    if (!checkPermission('delete_dishes')) return;
+    
+    alert('Delete Dish modal would open here. Select a dish to delete.');
+}
+
+function showRevenueReport() {
+    if (!checkPermission('view_revenue')) return;
+    
+    // Open revenue report
+    alert('Revenue report would open here');
+    // You could open a new view or modal with revenue charts and data
+}
+
+function showReserveTable() {
+    if (!checkPermission('manage_reservations')) return;
+    
+    alert('Table reservation system would open here');
+}
+
+function showOrders() {
+    if (!checkPermission('view_orders')) return;
+    
+    alert('Order management view would open here');
+}
+
+// Check specific permission
+function checkPermission(permission) {
+    if (userRole === 'admin') return true;
+    
+    const role = currentUser?.role || 'waiter';
+    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
+    
+    if (permissions[permission] !== true) {
+        alert(`You don't have permission to ${permission.replace(/_/g, ' ')}`);
+        return false;
+    }
+    
+    return true;
+}
+
+    async function loadRestaurantData(restaurantId) {
+    try {
+        // ... existing code ...
+        
+        // Update UI based on loaded data
+        updateStaffUIAfterDataLoad();
+        
+        // Apply permissions to UI
+        updateUIBasedOnPermissions();
+        
+        console.log('✓ Restaurant data loaded successfully');
+        
+    } catch (error) {
+        console.error('❌ Error loading restaurant data:', error);
+        dishes = [];
+        users = [];
+        updateStaffUIAfterDataLoad();
+    }
+}
+
+    // Setup UI for staff
+function setupStaffUI() {
+    // ... existing code ...
+    
+    // Apply permissions immediately
+    updateUIBasedOnPermissions();
+}
     
 // Initialize the dashboard
 initDashboard();
