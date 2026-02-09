@@ -522,7 +522,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
                             <div class="space-y-4">
-                                <!-- Option 1: Upload from computer -->
+                                /<!-- Option 1: Upload from computer 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Upload Image</label>
                                     <input type="file" id="dishImageFile" accept="image/*" 
@@ -540,19 +540,152 @@
                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                            placeholder="https://example.com/dish-image.jpg">
                                 </div>
+
+                                -->
                                 
                                 <!-- Option 3: Image Grid from Supabase -->
-                                <div id="addDishImageGridContainer">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
-                                    <div id="addDishImageGrid" class="bg-gray-50 p-4 rounded-lg max-h-80 overflow-y-auto">
-                                        <div class="text-center py-8">
-                                            <div class="loading inline-block"></div>
-                                            <p class="text-gray-600 mt-2">Loading images...</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <img id="addDishGridPreview" class="image-preview hidden" src="" alt="Selected image">
-                                    </div>
+                                
+                                    // Replace the loadDishImagesFromStorage function with this:
+async function loadDishImagesFromStorage() {
+    try {
+        const { data: files, error } = await supabaseClient.storage
+            .from('dish-images')
+            .list('', {
+                limit: 100,
+                offset: 0,
+                sortBy: { column: 'name', order: 'asc' }
+            });
+        
+        if (error) {
+            console.error('Error loading images:', error);
+            return [];
+        }
+        
+        // Filter out folders and get public URLs
+        const imageUrls = files
+            .filter(file => !file.id) // Filter out folders (folders have id)
+            .map(file => {
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('dish-images')
+                    .getPublicUrl(file.name);
+                return {
+                    name: file.name,
+                    url: publicUrl,
+                    selected: false
+                };
+            });
+        
+        console.log(`Loaded ${imageUrls.length} images from storage`);
+        return imageUrls;
+        
+    } catch (error) {
+        console.error('Error in loadDishImagesFromStorage:', error);
+        return [];
+    }
+}
+
+// Add this function to render image grid
+function renderImageGrid(images, containerId, isEditModal = false) {
+    const container = document.getElementById(containerId);
+    
+    if (!images || images.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-image text-3xl mb-2"></i>
+                <p>No images found in storage</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-2">Select an image by clicking on it:</p>
+            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-60 overflow-y-auto p-2 border rounded-lg bg-gray-50">
+    `;
+    
+    images.forEach((image, index) => {
+        const fileName = image.name.length > 15 ? image.name.substring(0, 12) + '...' : image.name;
+        html += `
+            <div class="relative group cursor-pointer" onclick="selectImageFromGrid('${image.url}', ${index}, ${isEditModal})">
+                <div class="aspect-square overflow-hidden rounded-lg border-2 ${image.selected ? 'border-blue-500' : 'border-gray-200'} hover:border-blue-400 transition-all">
+                    <img src="${image.url}" 
+                         alt="${image.name}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                         loading="lazy">
+                </div>
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-white text-xl opacity-0 group-hover:opacity-100 ${image.selected ? 'opacity-100' : ''}"></i>
+                </div>
+                <div class="mt-1 text-xs text-gray-600 truncate text-center" title="${image.name}">
+                    ${fileName}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 mt-2">
+            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+            <span class="text-xs text-gray-600">Selected image</span>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Add this function to handle image selection from grid
+function selectImageFromGrid(imageUrl, index, isEditModal = false) {
+    const urlInput = isEditModal ? 
+        document.getElementById('editDishImageUrl') : 
+        document.getElementById('dishImageUrl');
+    
+    // Update the URL input
+    urlInput.value = imageUrl;
+    uploadedImageUrl = imageUrl;
+    
+    // Show preview
+    const previewId = isEditModal ? 'editPreloadedImagePreview' : 'preloadedImagePreview';
+    const preview = document.getElementById(previewId);
+    preview.src = imageUrl;
+    preview.classList.remove('hidden');
+    
+    // Show selection feedback (you'll need to track selected state in your images array)
+    // For now, just log the selection
+    console.log(`Selected image ${index}: ${imageUrl}`);
+    
+    // Scroll preview into view
+    preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Update the showAddDishModal function
+async function showAddDishModal() {
+    if (!hasPermission('addDish')) {
+        alert('You do not have permission to add dishes');
+        return;
+    }
+    
+    // Reset form
+    document.getElementById('addDishForm').reset();
+    
+    // Clear image previews
+    document.getElementById('addDishImagePreview').classList.add('hidden');
+    document.getElementById('preloadedImagePreview').classList.add('hidden');
+    document.getElementById('preloadedImagePreview').src = '';
+    
+    // Reset uploaded image URL
+    uploadedImageUrl = null;
+    
+    // Load images from Supabase Storage
+    const images = await loadDishImagesFromStorage();
+    
+    // Render image grid
+    renderImageGrid(images, 'addDishImageGrid', false);
+    
+    // Hide the old dropdown and show the grid container
+    document.getElementById('preloadedImage
                                 </div>
                             </div>
                         </div>
