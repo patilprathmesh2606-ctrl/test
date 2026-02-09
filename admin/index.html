@@ -64,41 +64,35 @@
             color: #991b1b;
         }
         
-        .payment-status-paid {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .payment-status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .payment-status-failed {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.5);
         }
         
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+        .hidden {
+            display: none !important;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px dashed #d1d5db;
         }
         
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -531,7 +525,7 @@
     </div>
     
     <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div id="adminLoginModal" class="modal-overlay fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-xl p-8 w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
@@ -558,18 +552,11 @@
         </div>
     </div>
 
-    <!-- Restaurant Details Modal -->
-    <div id="restaurantDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <!-- Modal content will be loaded dynamically -->
-        </div>
-    </div>
-
     <!-- MODALS FOR QUICK ACTIONS -->
 
     <!-- Add Dish Modal -->
-    <div id="addDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+    <div id="addDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Add New Dish</h3>
@@ -598,11 +585,15 @@
                                 <select id="dishCategory" required 
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">Select Category</option>
-                                    <option value="starters">Starters</option>
-                                    <option value="main-course">Main Course</option>
-                                    <option value="desserts">Desserts</option>
-                                    <option value="beverages">Beverages</option>
-                                    <option value="specials">Specials</option>
+                                    <option value="Starters">Starters</option>
+                                    <option value="Main Course">Main Course</option>
+                                    <option value="Desserts">Desserts</option>
+                                    <option value="Beverages">Beverages</option>
+                                    <option value="Specials">Specials</option>
+                                    <option value="Appetizers">Appetizers</option>
+                                    <option value="Soups">Soups</option>
+                                    <option value="Salads">Salads</option>
+                                    <option value="Breads">Breads</option>
                                 </select>
                             </div>
                             
@@ -637,21 +628,64 @@
                                    placeholder="e.g., spicy, vegan, gluten-free">
                         </div>
                         
+                        <!-- Image Upload Section -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image URL</label>
-                            <input type="url" id="dishImageUrl" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="https://example.com/dish-image.jpg">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
+                            <div class="space-y-4">
+                                <!-- Option 1: Upload from computer -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Image</label>
+                                    <input type="file" id="dishImageFile" accept="image/*" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           onchange="previewImage(this, 'addDishImagePreview')">
+                                    <div class="mt-2">
+                                        <img id="addDishImagePreview" class="image-preview hidden" src="" alt="Image preview">
+                                    </div>
+                                </div>
+                                
+                                <!-- Option 2: Use URL -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or enter Image URL</label>
+                                    <input type="url" id="dishImageUrl" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="https://example.com/dish-image.jpg">
+                                </div>
+                                
+                                <!-- Option 3: Select from preloaded images -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from preloaded images</label>
+                                    <select id="preloadedImageSelect" onchange="selectPreloadedImage()" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Select an image</option>
+                                        <option value="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop">Burger</option>
+                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Salad</option>
+                                        <option value="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop">Pizza</option>
+                                        <option value="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop">Pasta</option>
+                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Dessert</option>
+                                        <option value="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop">Pizza 2</option>
+                                        <option value="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop">Burger 2</option>
+                                        <option value="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop">Healthy Food</option>
+                                        <option value="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop">Breakfast</option>
+                                        <option value="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=300&fit=crop">Dish</option>
+                                    </select>
+                                    <div class="mt-2">
+                                        <img id="preloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <div id="imageUploadStatus" class="hidden text-sm"></div>
                         
                         <div class="flex justify-end space-x-3 pt-4 border-t">
                             <button type="button" onclick="closeAddDishModal()" 
                                     class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Cancel
                             </button>
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                Save Dish
+                            <button type="submit" id="saveDishBtn" 
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center">
+                                <span>Save Dish</span>
+                                <div id="saveDishLoading" class="loading ml-2 hidden"></div>
                             </button>
                         </div>
                     </div>
@@ -661,8 +695,8 @@
     </div>
 
     <!-- Edit Dish Modal -->
-    <div id="editDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+    <div id="editDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Edit Dish</h3>
@@ -693,11 +727,11 @@
                                 <select id="editDishCategory" required 
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">Select Category</option>
-                                    <option value="starters">Starters</option>
-                                    <option value="main-course">Main Course</option>
-                                    <option value="desserts">Desserts</option>
-                                    <option value="beverages">Beverages</option>
-                                    <option value="specials">Specials</option>
+                                    <option value="Starters">Starters</option>
+                                    <option value="Main Course">Main Course</option>
+                                    <option value="Desserts">Desserts</option>
+                                    <option value="Beverages">Beverages</option>
+                                    <option value="Specials">Specials</option>
                                 </select>
                             </div>
                             
@@ -731,20 +765,64 @@
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         
+                        <!-- Image Upload Section for Edit -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image URL</label>
-                            <input type="url" id="editDishImageUrl" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
+                            <div class="space-y-4">
+                                <!-- Current Image Preview -->
+                                <div id="currentImageContainer" class="hidden">
+                                    <p class="text-sm text-gray-600 mb-2">Current Image:</p>
+                                    <img id="currentDishImage" class="image-preview" src="" alt="Current dish image">
+                                </div>
+                                
+                                <!-- Option 1: Upload from computer -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload New Image</label>
+                                    <input type="file" id="editDishImageFile" accept="image/*" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           onchange="previewImage(this, 'editDishImagePreview')">
+                                    <div class="mt-2">
+                                        <img id="editDishImagePreview" class="image-preview hidden" src="" alt="Image preview">
+                                    </div>
+                                </div>
+                                
+                                <!-- Option 2: Use URL -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or enter New Image URL</label>
+                                    <input type="url" id="editDishImageUrl" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                
+                                <!-- Option 3: Select from preloaded images -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from preloaded images</label>
+                                    <select id="editPreloadedImageSelect" onchange="selectEditPreloadedImage()" 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Select an image</option>
+                                        <option value="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop">Burger</option>
+                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Salad</option>
+                                        <option value="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w-400&h=300&fit=crop">Pizza</option>
+                                        <option value="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop">Pasta</option>
+                                        <option value="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop">Dessert</option>
+                                    </select>
+                                    <div class="mt-2">
+                                        <img id="editPreloadedImagePreview" class="image-preview hidden" src="" alt="Selected image">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <div id="editImageUploadStatus" class="hidden text-sm"></div>
                         
                         <div class="flex justify-end space-x-3 pt-4 border-t">
                             <button type="button" onclick="closeEditDishModal()" 
                                     class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Cancel
                             </button>
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                Update Dish
+                            <button type="submit" id="updateDishBtn" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                                <span>Update Dish</span>
+                                <div id="updateDishLoading" class="loading ml-2 hidden"></div>
                             </button>
                         </div>
                     </div>
@@ -754,8 +832,8 @@
     </div>
 
     <!-- Delete Dish Confirmation Modal -->
-    <div id="deleteDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-md slide-in">
+    <div id="deleteDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-md">
             <div class="p-6">
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
@@ -782,8 +860,8 @@
     </div>
 
     <!-- Revenue Report Modal -->
-    <div id="revenueReportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto slide-in">
+    <div id="revenueReportModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Revenue Report</h3>
@@ -868,8 +946,8 @@
     </div>
 
     <!-- Table Reservation Modal -->
-    <div id="reserveTableModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+    <div id="reserveTableModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Reserve Table</h3>
@@ -968,8 +1046,8 @@
     </div>
 
     <!-- Orders Modal -->
-    <div id="ordersModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
-        <div class="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto slide-in">
+    <div id="ordersModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Current Orders</h3>
@@ -1000,7 +1078,7 @@
                 </div>
                 
                 <!-- No Orders Message -->
-                <div id="noOrdersMessage" class="text-center py-12">
+                <div id="noOrdersMessage" class="text-center py-12 hidden">
                     <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
                     <p class="text-gray-500">No orders found</p>
                 </div>
@@ -1044,6 +1122,9 @@ let revenueReportChart = null;
 // Current orders data
 let currentOrders = [];
 
+// Image upload handling
+let uploadedImageUrl = null;
+
 // Initialize dashboard
 async function initDashboard() {
     try {
@@ -1066,11 +1147,106 @@ async function initDashboard() {
                 await handleAdminAccess(user);
             }
         } else {
-            document.getElementById('adminLoginModal').style.display = 'flex';
+            document.getElementById('adminLoginModal').classList.remove('hidden');
         }
     } catch (error) {
         console.error('❌ Dashboard initialization error:', error);
-        document.getElementById('adminLoginModal').style.display = 'flex';
+        document.getElementById('adminLoginModal').classList.remove('hidden');
+    }
+}
+
+// Image preview function
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    const file = input.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '';
+        preview.classList.add('hidden');
+    }
+}
+
+// Select preloaded image for add dish
+function selectPreloadedImage() {
+    const select = document.getElementById('preloadedImageSelect');
+    const preview = document.getElementById('preloadedImagePreview');
+    const urlInput = document.getElementById('dishImageUrl');
+    
+    if (select.value) {
+        preview.src = select.value;
+        preview.classList.remove('hidden');
+        urlInput.value = select.value;
+        uploadedImageUrl = select.value;
+    } else {
+        preview.src = '';
+        preview.classList.add('hidden');
+        urlInput.value = '';
+        uploadedImageUrl = null;
+    }
+}
+
+// Select preloaded image for edit dish
+function selectEditPreloadedImage() {
+    const select = document.getElementById('editPreloadedImageSelect');
+    const preview = document.getElementById('editPreloadedImagePreview');
+    const urlInput = document.getElementById('editDishImageUrl');
+    
+    if (select.value) {
+        preview.src = select.value;
+        preview.classList.remove('hidden');
+        urlInput.value = select.value;
+        uploadedImageUrl = select.value;
+    } else {
+        preview.src = '';
+        preview.classList.add('hidden');
+        urlInput.value = '';
+        uploadedImageUrl = null;
+    }
+}
+
+// Upload image to Supabase Storage
+async function uploadImageToStorage(file, dishId) {
+    try {
+        console.log('Uploading image to storage...');
+        
+        // Create unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${dishId || 'temp'}_${Date.now()}.${fileExt}`;
+        const filePath = `dish-images/${fileName}`;
+        
+        // Upload to Supabase Storage
+        const { data, error } = await supabaseClient.storage
+            .from('dish-images')
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: true
+            });
+        
+        if (error) {
+            console.error('Error uploading image:', error);
+            return null;
+        }
+        
+        // Get public URL
+        const { data: { publicUrl } } = supabaseClient.storage
+            .from('dish-images')
+            .getPublicUrl(filePath);
+        
+        console.log('Image uploaded successfully:', publicUrl);
+        return publicUrl;
+        
+    } catch (error) {
+        console.error('Error in uploadImageToStorage:', error);
+        return null;
     }
 }
 
@@ -1131,14 +1307,14 @@ async function handleStaffAccess(user, restaurantSlug) {
         
         setupStaffUI();
         await loadRestaurantData(restaurant.id);
-        document.getElementById('adminLoginModal').style.display = 'none';
+        document.getElementById('adminLoginModal').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         
         console.log('✓ Staff dashboard initialized');
         
     } catch (error) {
         console.error('❌ Staff access error:', error);
-        document.getElementById('adminLoginModal').style.display = 'flex';
+        document.getElementById('adminLoginModal').classList.remove('hidden');
     }
 }
 
@@ -1242,13 +1418,18 @@ function updateUIBasedOnPermissions() {
     
     const staffActionsSection = document.getElementById('staffActionsSection');
     if (staffActionsSection) {
-        staffActionsSection.style.display = 'block';
+        staffActionsSection.classList.remove('hidden');
     }
     
     document.querySelectorAll('[data-permission]').forEach(element => {
         const permissionName = element.getAttribute('data-permission');
         const hasPerm = hasPermission(permissionName);
-        element.style.display = hasPerm ? 'block' : 'none';
+        
+        if (hasPerm) {
+            element.classList.remove('hidden');
+        } else {
+            element.classList.add('hidden');
+        }
         
         if (element.tagName === 'BUTTON') {
             element.disabled = !hasPerm;
@@ -1257,7 +1438,7 @@ function updateUIBasedOnPermissions() {
     
     if (userRole === 'owner') {
         document.querySelectorAll('.staff-action').forEach(el => {
-            el.style.display = 'block';
+            el.classList.remove('hidden');
             if (el.tagName === 'BUTTON') {
                 el.disabled = false;
             }
@@ -1277,12 +1458,21 @@ function showAddDishModal() {
     // Reset form
     document.getElementById('addDishForm').reset();
     
+    // Clear image previews
+    document.getElementById('addDishImagePreview').classList.add('hidden');
+    document.getElementById('preloadedImagePreview').classList.add('hidden');
+    
+    // Reset uploaded image URL
+    uploadedImageUrl = null;
+    
     // Show modal
     document.getElementById('addDishModal').classList.remove('hidden');
+    console.log('Add Dish modal opened');
 }
 
 function closeAddDishModal() {
     document.getElementById('addDishModal').classList.add('hidden');
+    uploadedImageUrl = null;
 }
 
 async function saveNewDish() {
@@ -1291,27 +1481,77 @@ async function saveNewDish() {
         return;
     }
     
-    const dishData = {
-        restaurant_id: currentRestaurant.id,
-        name: document.getElementById('dishName').value,
-        description: document.getElementById('dishDescription').value,
-        category: document.getElementById('dishCategory').value,
-        price: parseFloat(document.getElementById('dishPrice').value),
-        preparation_time: parseInt(document.getElementById('dishPrepTime').value) || null,
-        is_available: document.getElementById('dishAvailability').value === 'true',
-        tags: document.getElementById('dishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-        image_url: document.getElementById('dishImageUrl').value || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
+    // Get form values
+    const dishName = document.getElementById('dishName').value;
+    const dishPrice = document.getElementById('dishPrice').value;
+    const dishCategory = document.getElementById('dishCategory').value;
+    
+    // Validate required fields
+    if (!dishName || !dishPrice || !dishCategory) {
+        alert('Please fill in all required fields (Name, Price, Category)');
+        return;
+    }
+    
+    // Show loading state
+    const saveBtn = document.getElementById('saveDishBtn');
+    const loading = document.getElementById('saveDishLoading');
+    saveBtn.disabled = true;
+    loading.classList.remove('hidden');
     
     try {
+        let finalImageUrl = null;
+        
+        // Check for uploaded file
+        const fileInput = document.getElementById('dishImageFile');
+        const urlInput = document.getElementById('dishImageUrl').value;
+        
+        if (fileInput.files && fileInput.files[0]) {
+            // Upload file to storage
+            console.log('Uploading image file...');
+            const file = fileInput.files[0];
+            
+            // Create temporary dish ID for file naming
+            const tempDishId = Date.now().toString();
+            finalImageUrl = await uploadImageToStorage(file, tempDishId);
+            
+            if (!finalImageUrl) {
+                throw new Error('Failed to upload image');
+            }
+        } else if (urlInput) {
+            // Use URL if provided
+            finalImageUrl = urlInput;
+        } else if (uploadedImageUrl) {
+            // Use preloaded image if selected
+            finalImageUrl = uploadedImageUrl;
+        }
+        
+        // Prepare dish data
+        const dishData = {
+            restaurant_id: currentRestaurant.id,
+            name: dishName,
+            description: document.getElementById('dishDescription').value,
+            category: dishCategory,
+            price: parseFloat(dishPrice),
+            preparation_time: parseInt(document.getElementById('dishPrepTime').value) || null,
+            is_available: document.getElementById('dishAvailability').value === 'true',
+            tags: document.getElementById('dishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+            image_url: finalImageUrl,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        console.log('Saving dish:', dishData);
+        
+        // Save to database
         const { data, error } = await supabaseClient
             .from('dishes')
             .insert([dishData])
             .select();
         
-        if (error) throw error;
+        if (error) {
+            console.error('Database error:', error);
+            throw error;
+        }
         
         // Refresh dishes list
         await loadRestaurantData(currentRestaurant.id);
@@ -1321,13 +1561,17 @@ async function saveNewDish() {
         closeAddDishModal();
         
         // Update UI
-        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
         
     } catch (error) {
         console.error('Error adding dish:', error);
-        alert('Error adding dish: ' + error.message);
+        alert('Error adding dish: ' + (error.message || 'Unknown error'));
+    } finally {
+        // Reset loading state
+        saveBtn.disabled = false;
+        loading.classList.add('hidden');
     }
 }
 
@@ -1356,14 +1600,33 @@ function showEditDishModal() {
     document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
     document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
     document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
-    document.getElementById('editDishImageUrl').value = dish.image_url || '';
+    
+    // Handle image
+    const currentImage = document.getElementById('currentDishImage');
+    const currentImageContainer = document.getElementById('currentImageContainer');
+    if (dish.image_url) {
+        currentImage.src = dish.image_url;
+        currentImageContainer.classList.remove('hidden');
+        document.getElementById('editDishImageUrl').value = dish.image_url;
+    } else {
+        currentImageContainer.classList.add('hidden');
+    }
+    
+    // Clear other image previews
+    document.getElementById('editDishImagePreview').classList.add('hidden');
+    document.getElementById('editPreloadedImagePreview').classList.add('hidden');
+    
+    // Reset uploaded image URL
+    uploadedImageUrl = null;
     
     // Show modal
     document.getElementById('editDishModal').classList.remove('hidden');
+    console.log('Edit Dish modal opened for:', dish.name);
 }
 
 function closeEditDishModal() {
     document.getElementById('editDishModal').classList.add('hidden');
+    uploadedImageUrl = null;
 }
 
 async function updateDish() {
@@ -1373,26 +1636,67 @@ async function updateDish() {
     }
     
     const dishId = document.getElementById('editDishId').value;
-    const dishData = {
-        name: document.getElementById('editDishName').value,
-        description: document.getElementById('editDishDescription').value,
-        category: document.getElementById('editDishCategory').value,
-        price: parseFloat(document.getElementById('editDishPrice').value),
-        preparation_time: parseInt(document.getElementById('editDishPrepTime').value) || null,
-        is_available: document.getElementById('editDishAvailability').value === 'true',
-        tags: document.getElementById('editDishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-        image_url: document.getElementById('editDishImageUrl').value || null,
-        updated_at: new Date().toISOString()
-    };
+    
+    // Validate required fields
+    if (!dishId || !document.getElementById('editDishName').value || 
+        !document.getElementById('editDishPrice').value || 
+        !document.getElementById('editDishCategory').value) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // Show loading state
+    const updateBtn = document.getElementById('updateDishBtn');
+    const loading = document.getElementById('updateDishLoading');
+    updateBtn.disabled = true;
+    loading.classList.remove('hidden');
     
     try {
+        let finalImageUrl = document.getElementById('editDishImageUrl').value;
+        
+        // Check for uploaded file
+        const fileInput = document.getElementById('editDishImageFile');
+        
+        if (fileInput.files && fileInput.files[0]) {
+            // Upload file to storage
+            console.log('Uploading new image file...');
+            const file = fileInput.files[0];
+            const newImageUrl = await uploadImageToStorage(file, dishId);
+            
+            if (newImageUrl) {
+                finalImageUrl = newImageUrl;
+            }
+        } else if (uploadedImageUrl) {
+            // Use preloaded image if selected
+            finalImageUrl = uploadedImageUrl;
+        }
+        
+        // Prepare dish data
+        const dishData = {
+            name: document.getElementById('editDishName').value,
+            description: document.getElementById('editDishDescription').value,
+            category: document.getElementById('editDishCategory').value,
+            price: parseFloat(document.getElementById('editDishPrice').value),
+            preparation_time: parseInt(document.getElementById('editDishPrepTime').value) || null,
+            is_available: document.getElementById('editDishAvailability').value === 'true',
+            tags: document.getElementById('editDishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+            image_url: finalImageUrl || null,
+            updated_at: new Date().toISOString()
+        };
+        
+        console.log('Updating dish:', dishId, dishData);
+        
+        // Update in database
         const { data, error } = await supabaseClient
             .from('dishes')
             .update(dishData)
             .eq('id', dishId)
             .select();
         
-        if (error) throw error;
+        if (error) {
+            console.error('Database error:', error);
+            throw error;
+        }
         
         // Refresh dishes list
         await loadRestaurantData(currentRestaurant.id);
@@ -1402,13 +1706,17 @@ async function updateDish() {
         closeEditDishModal();
         
         // Update UI
-        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
         
     } catch (error) {
         console.error('Error updating dish:', error);
-        alert('Error updating dish: ' + error.message);
+        alert('Error updating dish: ' + (error.message || 'Unknown error'));
+    } finally {
+        // Reset loading state
+        updateBtn.disabled = false;
+        loading.classList.add('hidden');
     }
 }
 
@@ -1461,7 +1769,7 @@ async function confirmDeleteDish() {
         closeDeleteDishModal();
         
         // Update UI
-        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
             loadRestaurantsTable();
         }
         
@@ -1995,7 +2303,7 @@ async function handleAdminAccess(user) {
             
             alert('Access denied. Admin privileges required.');
             await supabaseClient.auth.signOut();
-            document.getElementById('adminLoginModal').style.display = 'flex';
+            document.getElementById('adminLoginModal').classList.remove('hidden');
             return;
         }
         
@@ -2004,14 +2312,14 @@ async function handleAdminAccess(user) {
         
         setupAdminUI();
         await loadAdminData();
-        document.getElementById('adminLoginModal').style.display = 'none';
+        document.getElementById('adminLoginModal').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         
         console.log('✓ Admin dashboard initialized');
         
     } catch (error) {
         console.error('❌ Admin access error:', error);
-        document.getElementById('adminLoginModal').style.display = 'flex';
+        document.getElementById('adminLoginModal').classList.remove('hidden');
     }
 }
 
@@ -2032,7 +2340,7 @@ function setupAdminUI() {
 
 // Show admin login modal
 function showAdminLogin() {
-    document.getElementById('adminLoginModal').style.display = 'flex';
+    document.getElementById('adminLoginModal').classList.remove('hidden');
 }
 
 // Handle login
@@ -2508,365 +2816,6 @@ async function loadActivities() {
     } catch (error) {
         console.error('Error loading activities:', error);
     }
-}
-
-// View Navigation
-function showView(viewName) {
-    document.querySelectorAll('.view').forEach(view => {
-        view.classList.add('hidden');
-    });
-    
-    document.querySelectorAll('nav a').forEach(navItem => {
-        navItem.classList.remove('active-nav', 'bg-gray-700');
-    });
-    
-    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
-    if (activeNav) {
-        activeNav.classList.add('active-nav', 'bg-gray-700');
-    }
-    
-    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
-    if (viewElement) {
-        viewElement.classList.remove('hidden');
-    }
-    
-    updateViewTitle(viewName);
-    
-    switch(viewName) {
-        case 'restaurants':
-            loadRestaurantsTable();
-            break;
-        case 'users':
-            loadUsersTable();
-            break;
-    }
-}
-
-function updateViewTitle(viewName) {
-    const titles = {
-        'dashboard': { 
-            title: userRole === 'admin' ? 'Admin Dashboard' : `${currentRestaurant?.name || 'Restaurant'} Dashboard`, 
-            subtitle: userRole === 'admin' ? 'System Overview & Analytics' : 'Real-time Overview & Analytics' 
-        },
-        'restaurants': { 
-            title: userRole === 'admin' ? 'Restaurant Management' : 'Menu Management', 
-            subtitle: userRole === 'admin' ? 'Manage all registered restaurants' : 'Manage your restaurant menu items' 
-        },
-        'users': { 
-            title: userRole === 'admin' ? 'User Management' : 'Staff Management', 
-            subtitle: userRole === 'admin' ? 'Manage all system users across restaurants' : 'Manage restaurant staff members' 
-        }
-    };
-    
-    const viewInfo = titles[viewName] || titles.dashboard;
-    document.getElementById('viewTitle').textContent = viewInfo.title;
-    document.getElementById('viewSubtitle').textContent = viewInfo.subtitle;
-}
-
-// Sidebar Toggle
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"] i');
-    
-    sidebar.classList.toggle('collapsed');
-    
-    if (sidebar.classList.contains('collapsed')) {
-        mainContent.style.marginLeft = '80px';
-        toggleBtn.classList.remove('fa-chevron-left');
-        toggleBtn.classList.add('fa-chevron-right');
-        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Expand Sidebar';
-    } else {
-        mainContent.style.marginLeft = '256px';
-        toggleBtn.classList.remove('fa-chevron-right');
-        toggleBtn.classList.add('fa-chevron-left');
-        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Collapse Sidebar';
-    }
-}
-
-// Notifications Toggle
-function toggleNotifications() {
-    const panel = document.getElementById('notificationsPanel');
-    panel.classList.toggle('hidden');
-}
-
-// Restaurant Management
-async function loadRestaurantsTable() {
-    try {
-        if (userRole === 'admin') {
-            await loadAdminRestaurantsTable();
-        } else {
-            await loadStaffMenuTable();
-        }
-    } catch (error) {
-        console.error('Error loading table:', error);
-    }
-}
-
-// Load admin restaurants table
-async function loadAdminRestaurantsTable() {
-    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedRestaurants = restaurants.slice(startIndex, endIndex);
-    
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-    `;
-    
-    let tableHTML = '';
-    paginatedRestaurants.forEach(restaurant => {
-        const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
-        
-        tableHTML += `
-            <tr class="restaurant-row hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-utensils text-blue-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${restaurant.name}</div>
-                            <div class="text-sm text-gray-500">${restaurant.url_slug}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${restaurant.owner_name || restaurant.owner_email}</div>
-                    <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 text-xs font-medium rounded-full ${subscription?.plan === 'pro' ? 'bg-blue-100 text-blue-800' : subscription?.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
-                        ${subscription?.plan ? subscription.plan.toUpperCase() : 'No Plan'}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
-                        ${restaurant.status.toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${subscription ? (subscription.auto_pay ? 'Auto-Pay Enabled' : 'Manual Payment') : 'No Subscription'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${new Date(restaurant.created_at).toLocaleDateString()}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="editRestaurant('${restaurant.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                        <i class="fas fa-power-off"></i>
-                    </button>
-                    <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                No restaurants found
-            </td>
-        </tr>
-    `;
-    
-    document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
-    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
-    document.getElementById('restaurantTotal').textContent = restaurants.length;
-    document.getElementById('restaurantLabel').textContent = 'restaurants';
-}
-
-// Load staff menu table
-async function loadStaffMenuTable() {
-    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedDishes = dishes.slice(startIndex, endIndex);
-    
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-    `;
-    
-    let tableHTML = '';
-    paginatedDishes.forEach(dish => {
-        const statusClass = dish.is_available ? 'status-active' : 'status-suspended';
-        const statusText = dish.is_available ? 'Available' : 'Unavailable';
-        
-        tableHTML += `
-            <tr class="dish-row">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-utensil-spoon text-gray-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
-                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">${dish.category || 'Uncategorized'}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ₹${dish.price || '0'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="editDishRow('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                No dishes found
-            </td>
-        </tr>
-    `;
-    
-    document.getElementById('restaurantStart').textContent = dishes.length > 0 ? startIndex + 1 : 0;
-    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, dishes.length);
-    document.getElementById('restaurantTotal').textContent = dishes.length;
-    document.getElementById('restaurantLabel').textContent = 'menu items';
-}
-
-// Filter restaurants/menu items
-function filterRestaurants() {
-    if (userRole === 'admin') {
-        const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
-        const statusFilter = document.getElementById('statusFilter').value;
-        const planFilter = document.getElementById('planFilter').value;
-        console.log('Filtering restaurants by:', searchTerm, statusFilter, planFilter);
-    } else {
-        const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
-        console.log('Filtering dishes by:', searchTerm);
-    }
-}
-
-// Pagination functions
-function prevRestaurantPage() {
-    if (currentRestaurantPage > 1) {
-        currentRestaurantPage--;
-        loadRestaurantsTable();
-    }
-}
-
-function nextRestaurantPage() {
-    const totalItems = userRole === 'admin' ? restaurants.length : dishes.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
-    if (currentRestaurantPage < totalPages) {
-        currentRestaurantPage++;
-        loadRestaurantsTable();
-    }
-}
-
-// Edit dish from table row
-async function editDishRow(dishId) {
-    if (!hasPermission('editDish')) {
-        alert('You do not have permission to edit dishes');
-        return;
-    }
-    
-    const dish = dishes.find(d => d.id === dishId);
-    if (!dish) return;
-    
-    // Fill form with dish data
-    document.getElementById('editDishId').value = dish.id;
-    document.getElementById('editDishName').value = dish.name;
-    document.getElementById('editDishDescription').value = dish.description || '';
-    document.getElementById('editDishCategory').value = dish.category;
-    document.getElementById('editDishPrice').value = dish.price;
-    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
-    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
-    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
-    document.getElementById('editDishImageUrl').value = dish.image_url || '';
-    
-    // Show modal
-    document.getElementById('editDishModal').classList.remove('hidden');
-}
-
-// Toggle dish status
-async function toggleDishStatus(dishId, currentStatus) {
-    if (!hasPermission('editDish')) {
-        alert('You do not have permission to edit dishes');
-        return;
-    }
-    
-    const newStatus = !currentStatus;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('dishes')
-            .update({ 
-                is_available: newStatus,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', dishId)
-            .select();
-        
-        if (error) throw error;
-        
-        // Refresh dishes list
-        await loadRestaurantData(currentRestaurant.id);
-        
-        // Update UI
-        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
-            loadRestaurantsTable();
-        }
-        
-        alert(`Dish ${newStatus ? 'enabled' : 'disabled'} successfully!`);
-        
-    } catch (error) {
-        console.error('Error toggling dish status:', error);
-        alert('Error updating dish status: ' + error.message);
-    }
-}
-
-// Placeholder functions for other actions
-function viewRestaurantDetails(restaurantId) {
-    alert(`View restaurant details for ID: ${restaurantId}`);
-}
-
-function editRestaurant(restaurantId) {
-    alert(`Edit restaurant with ID: ${restaurantId}`);
-}
-
-function toggleRestaurantStatus(restaurantId) {
-    alert(`Toggle restaurant status for ID: ${restaurantId}`);
-}
-
-function deleteRestaurant(restaurantId) {
-    alert(`Delete restaurant with ID: ${restaurantId}`);
-}
-
-function exportRestaurants() {
-    alert('Export functionality would be implemented here');
 }
 
 // Initialize the dashboard
