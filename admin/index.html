@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <th data-column="category">Category</th>
     <style>
         .sidebar {
             transition: all 0.3s ease;
@@ -2985,6 +2986,8 @@ if (!permissions.manage_categories) {
     const categoryCells = document.querySelectorAll('.category-badge');
     categoryCells.forEach(cell => cell.style.display = 'none');
 }
+
+    document.querySelectorAll('th[data-column="category"]');
     
 // Initialize the dashboard
 initDashboard();
