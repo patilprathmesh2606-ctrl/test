@@ -1532,6 +1532,433 @@ function showView(viewName) {
     }
 }
 
+    // Load restaurant data for staff dashboard
+async function loadRestaurantData(restaurantId) {
+    try {
+        console.log(`📋 Loading data for restaurant: ${restaurantId}`);
+        
+        // Load dishes for this restaurant
+        const { data: dishesData, error: dishesError } = await supabaseClient
+            .from('dishes')
+            .select('*')
+            .eq('restaurant_id', restaurantId)
+            .order('category', { ascending: true });
+        
+        if (!dishesError) {
+            dishes = dishesData || [];
+            console.log(`✓ Loaded ${dishes.length} dishes`);
+        } else {
+            console.error('Error loading dishes:', dishesError);
+            dishes = [];
+        }
+        
+        // Load orders for this restaurant (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const { data: ordersData, error: ordersError } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('restaurant_id', restaurantId)
+            .gte('created_at', thirtyDaysAgo.toISOString())
+            .order('created_at', { ascending: false });
+        
+        if (!ordersError) {
+            // You might want to store this in a global variable
+            console.log(`✓ Loaded ${ordersData.length} recent orders`);
+            
+            // Calculate some stats for staff dashboard
+            const todayOrders = ordersData.filter(order => {
+                const orderDate = new Date(order.created_at);
+                const today = new Date();
+                return orderDate.toDateString() === today.toDateString();
+            });
+            
+            // Update staff dashboard stats
+            updateStaffDashboardStats(dishes.length, todayOrders.length);
+        }
+        
+        // Load staff members for this restaurant
+        const { data: staffData, error: staffError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .eq('restaurant_id', restaurantId)
+            .eq('is_active', true);
+        
+        if (!staffError) {
+            users = staffData || [];
+            console.log(`✓ Loaded ${users.length} active staff members`);
+        }
+        
+        // Update UI based on loaded data
+        updateStaffUIAfterDataLoad();
+        
+        console.log('✓ Restaurant data loaded successfully');
+        
+    } catch (error) {
+        console.error('❌ Error loading restaurant data:', error);
+        // Initialize with empty data to prevent further errors
+        dishes = [];
+        users = [];
+        updateStaffUIAfterDataLoad();
+    }
+}
+
+// Update staff dashboard stats
+function updateStaffDashboardStats(totalDishes, todayOrders) {
+    try {
+        // Update the dashboard stats for staff view
+        document.getElementById('totalRestaurants').textContent = '1';
+        document.getElementById('activeSubscriptions').textContent = '1';
+        document.getElementById('monthlyRevenue').textContent = 'Loading...';
+        document.getElementById('pendingPayments').textContent = todayOrders || '0';
+        
+        // Update chart titles for staff context
+        document.getElementById('chart1Title').textContent = 'Today\'s Orders';
+        document.getElementById('chart2Title').textContent = 'Menu Categories';
+        document.getElementById('stat1Title').textContent = 'Total Menu Items';
+        document.getElementById('stat2Title').textContent = 'Today\'s Orders';
+        document.getElementById('stat3Title').textContent = 'Active Staff';
+        document.getElementById('stat4Title').textContent = 'Table Occupancy';
+        
+        // Update stat values
+        document.getElementById('totalRestaurants').textContent = dishes.length || '0';
+        document.getElementById('activeSubscriptions').textContent = todayOrders || '0';
+        document.getElementById('monthlyRevenue').textContent = users.length || '0';
+        
+        // Update subtitles
+        document.getElementById('stat1Subtitle').textContent = 'in menu';
+        document.getElementById('stat2Subtitle').textContent = 'today';
+        document.getElementById('stat3Subtitle').textContent = 'active members';
+        document.getElementById('stat4Subtitle').textContent = 'estimated';
+        
+    } catch (error) {
+        console.error('Error updating staff dashboard:', error);
+    }
+}
+
+// Update UI after loading data
+function updateStaffUIAfterDataLoad() {
+    try {
+        // Update restaurant name in sidebar
+        document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
+        document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
+        
+        // Update user info in sidebar
+        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
+        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
+        
+        // Update the view titles
+        document.getElementById('restaurantsViewTitle').textContent = 'Menu Management';
+        document.getElementById('restaurantsViewSubtitle').textContent = 'Manage your restaurant menu';
+        document.getElementById('usersViewTitle').textContent = 'Staff Management';
+        document.getElementById('usersViewSubtitle').textContent = 'Manage restaurant staff';
+        
+        // Update labels
+        document.getElementById('restaurantLabel').textContent = 'menu items';
+        
+        // Show/hide appropriate buttons based on permissions
+        updateButtonVisibility();
+        
+        // Initialize charts with restaurant data
+        if (typeof initializeStaffCharts === 'function') {
+            initializeStaffCharts();
+        }
+        
+        console.log('✓ Staff UI updated with loaded data');
+        
+    } catch (error) {
+        console.error('Error updating staff UI:', error);
+    }
+}
+
+// Update button visibility based on staff permissions
+function updateButtonVisibility() {
+    // Get current user's role and permissions
+    const role = currentUser?.role || 'waiter';
+    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
+    
+    // Show/hide admin-only elements
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Show/hide staff-only elements
+    const staffElements = document.querySelectorAll('.staff-only');
+    staffElements.forEach(el => {
+        el.style.display = 'block';
+    });
+    
+    // Check specific permissions
+    const addDishBtn = document.querySelector('button[onclick="showAddDishModal()"]');
+    if (addDishBtn) {
+        addDishBtn.style.display = permissions.add_dishes ? 'block' : 'none';
+    }
+    
+    // Update export buttons
+    document.querySelectorAll('button[onclick*="export"]').forEach(btn => {
+        btn.style.display = permissions.export_reports ? 'block' : 'none';
+    });
+    
+    // Update search placeholder based on view
+    const restaurantSearch = document.getElementById('restaurantSearch');
+    if (restaurantSearch) {
+        restaurantSearch.placeholder = 'Search menu items...';
+    }
+}
+
+// Initialize staff charts
+function initializeStaffCharts() {
+    try {
+        // Revenue/Today's Orders Chart
+        const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
+        if (revenueCtx) {
+            // Simple chart for today's orders (you can customize this)
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
+                    datasets: [{
+                        label: 'Today\'s Orders',
+                        data: [5, 12, 8, 15, 10, 20, 18],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Plan Distribution/Categories Chart
+        const planCtx = document.getElementById('planChart')?.getContext('2d');
+        if (planCtx) {
+            // Show menu categories distribution
+            const categoryCount = {};
+            dishes.forEach(dish => {
+                categoryCount[dish.category] = (categoryCount[dish.category] || 0) + 1;
+            });
+            
+            new Chart(planCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCount),
+                    datasets: [{
+                        data: Object.values(categoryCount),
+                        backgroundColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)',
+                            'rgb(139, 92, 246)',
+                            'rgb(236, 72, 153)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing staff charts:', error);
+    }
+}
+
+// Load restaurants table (for admin) or menu items (for staff)
+async function loadRestaurantsTable() {
+    try {
+        if (userRole === 'admin') {
+            // Admin sees all restaurants
+            await loadAdminRestaurantsTable();
+        } else {
+            // Staff sees their restaurant's menu
+            await loadStaffMenuTable();
+        }
+    } catch (error) {
+        console.error('Error loading table:', error);
+    }
+}
+
+// Load admin restaurants table
+async function loadAdminRestaurantsTable() {
+    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedRestaurants = restaurants.slice(startIndex, endIndex);
+    
+    // Update table headers for admin
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    `;
+    
+    let tableHTML = '';
+    paginatedRestaurants.forEach(restaurant => {
+        const statusClass = restaurant.is_active ? 'status-active' : 'status-inactive';
+        const statusText = restaurant.is_active ? 'Active' : 'Inactive';
+        
+        tableHTML += `
+            <tr class="restaurant-row">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-utensils text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${restaurant.name}</div>
+                            <div class="text-sm text-gray-500">${restaurant.url_slug || 'No slug'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${restaurant.owner_name || 'Not set'}</div>
+                    <div class="text-sm text-gray-500">${restaurant.owner_email || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${restaurant.plan || 'Free'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${new Date(restaurant.created_at).toLocaleDateString()}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editRestaurant('${restaurant.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleRestaurantStatus('${restaurant.id}', ${restaurant.is_active})" class="${restaurant.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                        <i class="fas ${restaurant.is_active ? 'fa-ban' : 'fa-check'}"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML;
+    
+    // Update pagination info
+    document.getElementById('restaurantStart').textContent = startIndex + 1;
+    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
+    document.getElementById('restaurantTotal').textContent = restaurants.length;
+}
+
+// Load staff menu table
+async function loadStaffMenuTable() {
+    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedDishes = dishes.slice(startIndex, endIndex);
+    
+    // Update table headers for staff (menu items)
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    `;
+    
+    let tableHTML = '';
+    paginatedDishes.forEach(dish => {
+        const statusClass = dish.is_available ? 'status-active' : 'status-inactive';
+        const statusText = dish.is_available ? 'Available' : 'Unavailable';
+        
+        tableHTML += `
+            <tr class="dish-row">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-utensil-spoon text-gray-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="category-badge">${dish.category || 'Uncategorized'}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ₹${dish.price || '0'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="editDish('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML;
+    
+    // Update pagination info
+    document.getElementById('restaurantStart').textContent = startIndex + 1;
+    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, dishes.length);
+    document.getElementById('restaurantTotal').textContent = dishes.length;
+}
+
+// Filter restaurants/menu items
+function filterRestaurants() {
+    const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
+    
+    if (userRole === 'admin') {
+        // Filter restaurants for admin
+        // You might want to implement actual filtering logic here
+        console.log('Filtering restaurants by:', searchTerm);
+    } else {
+        // Filter dishes for staff
+        // You might want to implement actual filtering logic here
+        console.log('Filtering dishes by:', searchTerm);
+    }
+}
+
+// Pagination functions
+function prevRestaurantPage() {
+    if (currentRestaurantPage > 1) {
+        currentRestaurantPage--;
+        loadRestaurantsTable();
+    }
+}
+
+function nextRestaurantPage() {
+    const totalItems = userRole === 'admin' ? restaurants.length : dishes.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (currentRestaurantPage < totalPages) {
+        currentRestaurantPage++;
+        loadRestaurantsTable();
+    }
+}
+    
 // Initialize the dashboard
 initDashboard();
 </script>
