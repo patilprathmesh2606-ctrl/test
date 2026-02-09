@@ -42,10 +42,6 @@
             background-color: #f8fafc;
         }
         
-        .dish-row:hover {
-            background-color: #f8fafc;
-        }
-        
         .status-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -56,11 +52,6 @@
         .status-active {
             background-color: #d1fae5;
             color: #065f46;
-        }
-        
-        .status-inactive {
-            background-color: #fee2e2;
-            color: #991b1b;
         }
         
         .status-pending {
@@ -84,86 +75,6 @@
         }
         
         .payment-status-failed {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .category-badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            background-color: #e0e7ff;
-            color: #3730a3;
-        }
-        
-        .permission-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .permission-item {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .radio-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 8px;
-        }
-        
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        
-        .radio-option input[type="radio"] {
-            cursor: pointer;
-        }
-        
-        .permission-enabled {
-            color: #10b981;
-            font-weight: 600;
-        }
-        
-        .permission-disabled {
-            color: #ef4444;
-            font-weight: 600;
-        }
-        
-        .role-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .role-owner {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .role-manager {
-            background-color: #e0e7ff;
-            color: #3730a3;
-        }
-        
-        .role-chef {
-            background-color: #fce7f3;
-            color: #9d174d;
-        }
-        
-        .role-waiter {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .role-admin {
             background-color: #fee2e2;
             color: #991b1b;
         }
@@ -275,8 +186,8 @@
             <header class="bg-white shadow-sm border-b px-6 py-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800" id="viewTitle">Loading...</h2>
-                        <p class="text-sm text-gray-600" id="viewSubtitle">Loading...</p>
+                        <h2 class="text-xl font-bold text-gray-800" id="viewTitle">Admin Dashboard</h2>
+                        <p class="text-sm text-gray-600" id="viewSubtitle">System Overview & Analytics</p>
                     </div>
                     
                     <div class="flex items-center space-x-4">
@@ -284,7 +195,7 @@
                         <div class="relative">
                             <button onclick="toggleNotifications()" class="p-2 rounded-full hover:bg-gray-100 relative">
                                 <i class="fas fa-bell text-gray-600"></i>
-                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" id="notificationBadge"></span>
+                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
                             <div id="notificationsPanel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 border">
                                 <div class="p-4 border-b">
@@ -329,13 +240,63 @@
                             </div>
                             <div class="mt-4">
                                 <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> <span id="stat1Change">12%</span></span>
-                                    <span class="text-gray-500 ml-2" id="stat1Subtitle">from last month</span>
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 12%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Quick Actions -->
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm" id="stat2Title">Active Subscriptions</p>
+                                    <p class="text-3xl font-bold" id="activeSubscriptions">0</p>
+                                </div>
+                                <i class="fas fa-credit-card text-4xl text-green-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 8%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm" id="stat3Title">Monthly Revenue</p>
+                                    <p class="text-3xl font-bold" id="monthlyRevenue">₹0</p>
+                                </div>
+                                <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 15%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm" id="stat4Title">Pending Payments</p>
+                                    <p class="text-3xl font-bold" id="pendingPayments">0</p>
+                                </div>
+                                <i class="fas fa-clock text-4xl text-yellow-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-red-600"><i class="fas fa-arrow-down mr-1"></i> 3%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Staff Actions Section (Visible only to staff) -->
+                    <div id="staffActionsSection" class="hidden">
                         <div class="bg-white rounded-xl shadow-lg p-6">
                             <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
                             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -370,9 +331,9 @@
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Add History section -->
-                        <div class="bg-white rounded-xl shadow-lg p-6">
+                        
+                        <!-- Order History Section -->
+                        <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
                             <h3 class="text-lg font-bold mb-4">Order History</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="staff-action" data-permission="viewOrderHistoryName">
@@ -390,35 +351,19 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm" id="stat2Title">Active Subscriptions</p>
-                                    <p class="text-3xl font-bold" id="activeSubscriptions">0</p>
-                                </div>
-                                <i class="fas fa-credit-card text-4xl text-green-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> <span id="stat2Change">8%</span></span>
-                                    <span class="text-gray-500 ml-2" id="stat2Subtitle">from last month</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     
                     <!-- Charts -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4" id="chart1Title">Revenue Trend</h3>
+                            <h3 class="text-lg font-bold mb-4">Revenue Trend</h3>
                             <div class="h-80">
                                 <canvas id="revenueChart"></canvas>
                             </div>
                         </div>
                         
                         <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4" id="chart2Title">Plan Distribution</h3>
+                            <h3 class="text-lg font-bold mb-4">Plan Distribution</h3>
                             <div class="h-80">
                                 <canvas id="planChart"></canvas>
                             </div>
@@ -441,7 +386,6 @@
                 
                 <!-- Restaurants View -->
                 <div id="viewRestaurants" class="view hidden">
-                    <!-- Restaurant management content -->
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h2 class="text-2xl font-bold" id="restaurantsViewTitle">Restaurant Management</h2>
@@ -456,6 +400,36 @@
                             <button onclick="showAddDishModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 staff-only hidden">
                                 <i class="fas fa-plus mr-2"></i>Add Dish
                             </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6 admin-only">
+                        <div class="flex flex-wrap gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="statusFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                                <select id="planFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Plans</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="pro">Pro</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                <input type="date" id="dateFrom" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                <span class="mx-2">to</span>
+                                <input type="date" id="dateTo" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                            </div>
                         </div>
                     </div>
                     
@@ -484,79 +458,6 @@
                                 <button onclick="nextRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
                                     <i class="fas fa-chevron-right"></i>
                                 </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Staff Permissions View (New) -->
-                <div id="viewStaff_permissions" class="view hidden admin-only">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">Staff Permissions Management</h2>
-                            <p class="text-gray-600">Configure permissions for different staff roles</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button onclick="saveAllPermissions()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                <i class="fas fa-save mr-2"></i>Save All Permissions
-                            </button>
-                            <button onclick="loadDefaultPermissions()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-undo mr-2"></i>Load Defaults
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Role Selection -->
-                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                        <h3 class="text-lg font-bold mb-4">Select Role to Configure</h3>
-                        <div class="flex space-x-4">
-                            <button onclick="loadRolePermissions('owner')" class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200">
-                                <i class="fas fa-crown mr-2"></i>Owner
-                            </button>
-                            <button onclick="loadRolePermissions('manager')" class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200">
-                                <i class="fas fa-user-tie mr-2"></i>Manager
-                            </button>
-                            <button onclick="loadRolePermissions('chef')" class="px-4 py-2 bg-pink-100 text-pink-800 rounded-lg hover:bg-pink-200">
-                                <i class="fas fa-utensils mr-2"></i>Chef
-                            </button>
-                            <button onclick="loadRolePermissions('waiter')" class="px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200">
-                                <i class="fas fa-concierge-bell mr-2"></i>Waiter
-                            </button>
-                        </div>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-600" id="currentRoleInfo">Select a role to configure its permissions</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Permissions Grid -->
-                    <div id="permissionsContainer">
-                        <!-- Permissions will be loaded here dynamically -->
-                    </div>
-                    
-                    <!-- Permission Statistics -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Total Permissions</p>
-                                <p class="text-2xl font-bold" id="totalPermissions">0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Enabled</p>
-                                <p class="text-2xl font-bold text-green-600" id="enabledPermissions">0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Disabled</p>
-                                <p class="text-2xl font-bold text-red-600" id="disabledPermissions">0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Staff with Role</p>
-                                <p class="text-2xl font-bold" id="staffCount">0</p>
                             </div>
                         </div>
                     </div>
@@ -600,29 +501,45 @@
                     </div>
                 </div>
                 
-                <!-- Other views remain the same -->
-                <!-- Subscriptions View, Payments View, Plans View, Settings View, Terms View -->
+                <!-- Other views (Subscriptions, Payments, Plans, Settings, Terms) -->
+                <!-- These remain mostly the same as your old dashboard -->
                 
             </main>
         </div>
     </div>
     
-    <!-- Login Modal -->
-    <div id="loginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <!-- Login form remains the same -->
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Admin Login</h3>
+                <p class="text-gray-600 mt-2">DigitalMenuPro Control Panel</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="email" id="adminEmailInput" placeholder="Admin Email" 
+                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="password" id="adminPassword" placeholder="Password" 
+                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <button onclick="handleAdminLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
+                    Login as Admin
+                </button>
+                
+                <p class="text-sm text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Admin access requires special privileges
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Restaurant Details Modal -->
     <div id="restaurantDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <!-- Modal content will be loaded dynamically -->
-        </div>
-    </div>
-
-    <!-- User Permissions Modal -->
-    <div id="userPermissionsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <!-- Permissions content will be loaded here -->
         </div>
     </div>
 
@@ -654,62 +571,9 @@ let currentRestaurantPage = 1;
 let currentPaymentPage = 1;
 const itemsPerPage = 10;
 
-// Staff Permissions Management
-let currentEditingRole = null;
-let rolePermissions = {
-    owner: {},
-    manager: {},
-    chef: {},
-    waiter: {}
-};
-
-// Default permissions for each role (using camelCase to match your database)
-const DEFAULT_PERMISSIONS = {
-    owner: {
-        "addDish": true,
-        "editDish": true,
-        "deleteDish": true,
-        "manageStaff": true,
-        "viewRevenue": true,
-        "reserveTable": true,
-        "viewTableOrders": true,
-        "viewOrderHistoryName": true,
-        "viewOrderHistoryTable": true
-    },
-    manager: {
-        "addDish": true,
-        "editDish": true,
-        "deleteDish": true,
-        "manageStaff": false,
-        "viewRevenue": true,
-        "reserveTable": true,
-        "viewTableOrders": true,
-        "viewOrderHistoryName": true,
-        "viewOrderHistoryTable": true
-    },
-    chef: {
-        "addDish": true,
-        "editDish": true,
-        "deleteDish": true,
-        "manageStaff": false,
-        "viewRevenue": false,
-        "reserveTable": false,
-        "viewTableOrders": true,
-        "viewOrderHistoryName": true,
-        "viewOrderHistoryTable": true
-    },
-    waiter: {
-        "addDish": false,
-        "editDish": false,
-        "deleteDish": false,
-        "manageStaff": false,
-        "viewRevenue": false,
-        "reserveTable": true,
-        "viewTableOrders": true,
-        "viewOrderHistoryName": true,
-        "viewOrderHistoryTable": true
-    }
-};
+// Chart instances
+let revenueChart = null;
+let planChart = null;
 
 // Check URL parameters for staff mode
 function checkUrlParams() {
@@ -742,11 +606,11 @@ async function initDashboard() {
             }
         } else {
             // No user logged in, show login modal
-            showLoginModal();
+            document.getElementById('adminLoginModal').style.display = 'flex';
         }
     } catch (error) {
         console.error('❌ Dashboard initialization error:', error);
-        showLoginModal();
+        document.getElementById('adminLoginModal').style.display = 'flex';
     }
 }
 
@@ -814,14 +678,14 @@ async function handleStaffAccess(user, restaurantSlug) {
         await loadRestaurantData(restaurant.id);
         
         // Hide login modal, show dashboard
-        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('adminLoginModal').style.display = 'none';
         document.getElementById('adminDashboard').classList.remove('hidden');
         
         console.log('✓ Staff dashboard initialized');
         
     } catch (error) {
         console.error('❌ Staff access error:', error);
-        showLoginModal();
+        document.getElementById('adminLoginModal').style.display = 'flex';
     }
 }
 
@@ -925,6 +789,12 @@ function updateUIBasedOnPermissions() {
     const permissions = getUserPermissions();
     console.log('🔧 Applying user permissions:', permissions);
     
+    // Show staff actions section
+    const staffActionsSection = document.getElementById('staffActionsSection');
+    if (staffActionsSection) {
+        staffActionsSection.style.display = 'block';
+    }
+    
     // Update each button/feature based on permissions
     document.querySelectorAll('[data-permission]').forEach(element => {
         const permissionName = element.getAttribute('data-permission');
@@ -999,12 +869,29 @@ function showOrders() {
 
 // Setup UI for staff
 function setupStaffUI() {
-    // Show/hide admin-only elements
+    // Hide admin-only elements
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = 'none';
     });
     
-    // Update UI with permissions
+    // Show staff-only elements
+    document.querySelectorAll('.staff-only').forEach(el => {
+        el.style.display = 'block';
+    });
+    
+    // Update UI text
+    document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
+    document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
+    
+    document.getElementById('restaurantsViewTitle').textContent = 'Menu Management';
+    document.getElementById('restaurantsViewSubtitle').textContent = 'Manage your restaurant menu';
+    
+    document.getElementById('usersViewTitle').textContent = 'Staff Management';
+    document.getElementById('usersViewSubtitle').textContent = 'Manage restaurant staff members';
+    
+    document.getElementById('restaurantLabel').textContent = 'menu items';
+    
+    // Apply permissions
     updateUIBasedOnPermissions();
 }
 
@@ -1036,7 +923,7 @@ async function handleAdminAccess(user) {
             
             alert('Access denied. Admin privileges required.');
             await supabaseClient.auth.signOut();
-            showLoginModal();
+            document.getElementById('adminLoginModal').style.display = 'flex';
             return;
         }
         
@@ -1050,14 +937,14 @@ async function handleAdminAccess(user) {
         await loadAdminData();
         
         // Hide login modal, show dashboard
-        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('adminLoginModal').style.display = 'none';
         document.getElementById('adminDashboard').classList.remove('hidden');
         
         console.log('✓ Admin dashboard initialized');
         
     } catch (error) {
         console.error('❌ Admin access error:', error);
-        showLoginModal();
+        document.getElementById('adminLoginModal').style.display = 'flex';
     }
 }
 
@@ -1073,39 +960,109 @@ function setupAdminUI() {
         el.style.display = 'none';
     });
     
+    // Hide staff actions section
+    document.getElementById('staffActionsSection').style.display = 'none';
+    
     // Update dashboard title
     document.getElementById('dashboardTitle').textContent = 'Admin Panel';
     document.getElementById('dashboardSubtitle').textContent = 'DigitalMenuPro';
 }
 
-// Show login modal
-function showLoginModal() {
-    document.getElementById('loginModal').style.display = 'flex';
+// Show admin login modal
+function showAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'flex';
 }
 
 // Handle login
-async function handleLogin() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+async function handleAdminLogin() {
+    const email = document.getElementById('adminEmailInput').value;
+    const password = document.getElementById('adminPassword').value;
     
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-    });
-    
-    if (error) {
-        alert('Login failed: ' + error.message);
+    if (!email || !password) {
+        alert('Please enter email and password');
         return;
     }
     
-    // Reload to initialize dashboard with new user
-    window.location.reload();
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) throw error;
+        
+        // Reload to initialize dashboard with new user
+        window.location.reload();
+        
+    } catch (error) {
+        console.error('Admin login error:', error);
+        alert('Login failed: ' + error.message);
+    }
 }
 
 // Logout
 async function adminLogout() {
-    await supabaseClient.auth.signOut();
-    window.location.reload();
+    try {
+        await supabaseClient.auth.signOut();
+        currentUser = null;
+        showAdminLogin();
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+}
+
+// Load admin data
+async function loadAdminData() {
+    try {
+        console.log('📊 Loading admin data...');
+        
+        // Load restaurants
+        const { data: restaurantsData, error: resError } = await supabaseClient
+            .from('restaurants')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (!resError) restaurants = restaurantsData || [];
+        
+        // Load subscriptions
+        const { data: subsData, error: subsError } = await supabaseClient
+            .from('subscriptions')
+            .select('*, restaurants(name)')
+            .order('created_at', { ascending: false });
+        
+        if (!subsError) subscriptions = subsData || [];
+        
+        // Load payments
+        const { data: paymentsData, error: payError } = await supabaseClient
+            .from('payments')
+            .select('*, restaurants(name)')
+            .order('created_at', { ascending: false });
+        
+        if (!payError) payments = paymentsData || [];
+        
+        // Load all users
+        const { data: usersData, error: usersError } = await supabaseClient
+            .from('staff_users')
+            .select('*, restaurants(name)')
+            .order('created_at', { ascending: false });
+        
+        if (!usersError) users = usersData || [];
+        
+        // Update dashboard stats
+        updateDashboardStats();
+        
+        // Setup charts
+        setupCharts();
+        
+        // Load notifications and activities
+        loadNotifications();
+        loadActivities();
+        
+        console.log('✓ Admin data loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading admin data:', error);
+    }
 }
 
 // Load restaurant data for staff dashboard
@@ -1155,8 +1112,16 @@ async function loadRestaurantData(restaurantId) {
             console.log(`✓ Loaded ${users.length} active staff members`);
         }
         
-        // Update UI based on loaded data
-        updateStaffUIAfterDataLoad();
+        // Update UI with restaurant name
+        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
+        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
+        
+        // Setup charts with restaurant data
+        setupStaffCharts();
+        
+        // Load notifications and activities
+        loadNotifications();
+        loadActivities();
         
         console.log('✓ Restaurant data loaded successfully');
         
@@ -1164,25 +1129,326 @@ async function loadRestaurantData(restaurantId) {
         console.error('❌ Error loading restaurant data:', error);
         dishes = [];
         users = [];
-        updateStaffUIAfterDataLoad();
     }
 }
 
-// Update UI after loading data
-function updateStaffUIAfterDataLoad() {
+// Update dashboard stats
+function updateDashboardStats() {
+    // Total restaurants
+    document.getElementById('totalRestaurants').textContent = restaurants.length;
+    
+    // Active subscriptions
+    const activeSubs = subscriptions.filter(s => s.status === 'active').length;
+    document.getElementById('activeSubscriptions').textContent = activeSubs;
+    
+    // Monthly revenue (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const monthlyRevenue = payments
+        .filter(p => p.status === 'completed' && new Date(p.created_at) >= thirtyDaysAgo)
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('monthlyRevenue').textContent = `₹${monthlyRevenue}`;
+    
+    // Pending payments
+    const pending = payments.filter(p => p.status === 'pending').length;
+    document.getElementById('pendingPayments').textContent = pending;
+    
+    // Update title based on user
+    if (userRole !== 'admin' && currentRestaurant) {
+        document.getElementById('stat1Title').textContent = 'Menu Items';
+        document.getElementById('totalRestaurants').textContent = dishes.length;
+        
+        document.getElementById('stat2Title').textContent = 'Today\'s Orders';
+        document.getElementById('activeSubscriptions').textContent = '0'; // You can calculate this
+        
+        document.getElementById('stat3Title').textContent = 'Active Staff';
+        document.getElementById('monthlyRevenue').textContent = users.length;
+        
+        document.getElementById('stat4Title').textContent = 'Table Occupancy';
+        document.getElementById('pendingPayments').textContent = '75%'; // Example
+    }
+}
+
+function setupCharts() {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const last6Months = getLast6Months();
+    
+    if (revenueChart) revenueChart.destroy();
+    
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: last6Months,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: generateRevenueData(last6Months),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    
+    // Plan Distribution Chart
+    const planCtx = document.getElementById('planChart').getContext('2d');
+    
+    if (planChart) planChart.destroy();
+    
+    const planCounts = {
+        basic: subscriptions.filter(s => s.plan === 'basic').length,
+        pro: subscriptions.filter(s => s.plan === 'pro').length,
+        enterprise: subscriptions.filter(s => s.plan === 'enterprise').length
+    };
+    
+    planChart = new Chart(planCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Basic', 'Pro', 'Enterprise'],
+            datasets: [{
+                data: [planCounts.basic, planCounts.pro, planCounts.enterprise],
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(59, 130, 246)',
+                    'rgb(139, 92, 246)'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function setupStaffCharts() {
+    // For staff, show different charts
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    if (revenueChart) revenueChart.destroy();
+    
+    // Show today's orders chart for staff
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
+            datasets: [{
+                label: "Today's Orders",
+                data: [5, 12, 8, 15, 10, 20, 18],
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+    
+    // Plan Distribution/Categories Chart for staff
+    const planCtx = document.getElementById('planChart').getContext('2d');
+    if (planChart) planChart.destroy();
+    
+    // Show menu categories distribution for staff
+    const categoryCount = {};
+    dishes.forEach(dish => {
+        categoryCount[dish.category] = (categoryCount[dish.category] || 0) + 1;
+    });
+    
+    planChart = new Chart(planCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(categoryCount),
+            datasets: [{
+                data: Object.values(categoryCount),
+                backgroundColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)',
+                    'rgb(239, 68, 68)',
+                    'rgb(139, 92, 246)',
+                    'rgb(236, 72, 153)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+}
+
+function getLast6Months() {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+    }
+    
+    return months;
+}
+
+function generateRevenueData(months) {
+    // Generate sample data - in real app, fetch from database
+    return months.map(() => Math.floor(Math.random() * 50000) + 10000);
+}
+
+async function loadNotifications() {
     try {
-        // Update restaurant name in sidebar
-        document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
-        document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
+        let html = '';
         
-        // Update user info in sidebar
-        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
-        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
+        if (userRole === 'admin') {
+            // Admin notifications
+            const pendingPayments = payments.filter(p => p.status === 'pending').length;
+            const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
+            
+            if (pendingPayments > 0) {
+                html += `
+                    <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                        <div>
+                            <p class="font-medium">${pendingPayments} pending payment${pendingPayments > 1 ? 's' : ''}</p>
+                            <p class="text-sm text-gray-600">Require verification</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (pendingRestaurants > 0) {
+                html += `
+                    <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-clock text-blue-600 mt-1 mr-3"></i>
+                        <div>
+                            <p class="font-medium">${pendingRestaurants} restaurant${pendingRestaurants > 1 ? 's' : ''} pending</p>
+                            <p class="text-sm text-gray-600">Awaiting activation</p>
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            // Staff notifications
+            html = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-bell-slash text-3xl mb-3"></i>
+                    <p>No new notifications</p>
+                </div>
+            `;
+        }
         
-        console.log('✓ Staff UI updated with loaded data');
+        if (!html) {
+            html = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+        }
+        
+        document.getElementById('notificationsList').innerHTML = html;
         
     } catch (error) {
-        console.error('Error updating staff UI:', error);
+        console.error('Error loading notifications:', error);
+    }
+}
+
+async function loadActivities() {
+    try {
+        let html = '';
+        
+        if (userRole === 'admin') {
+            // Recent payments
+            const recentPayments = payments.slice(0, 5);
+            recentPayments.forEach(payment => {
+                const date = new Date(payment.created_at).toLocaleDateString();
+                const time = new Date(payment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                html += `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center mr-3">
+                            <i class="fas fa-rupee-sign text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">${payment.restaurants?.name || 'Unknown Restaurant'}</p>
+                            <p class="text-sm text-gray-600">Payment of ₹${payment.amount} ${payment.status}</p>
+                            <p class="text-xs text-gray-500">${date} at ${time}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Recent registrations
+            const recentRestaurants = restaurants.slice(0, 3);
+            recentRestaurants.forEach(restaurant => {
+                const date = new Date(restaurant.created_at).toLocaleDateString();
+                
+                html += `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                            <i class="fas fa-utensils text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">${restaurant.name}</p>
+                            <p class="text-sm text-gray-600">New restaurant registered</p>
+                            <p class="text-xs text-gray-500">${date}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            // Staff activities
+            html = `
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>
+                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
+                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
     }
 }
 
@@ -1205,19 +1471,16 @@ function showView(viewName) {
     }
     
     // Show selected view
-    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1).replace(/_/g, '')}`);
+    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
     if (viewElement) {
         viewElement.classList.remove('hidden');
     }
     
-    // Update title and subtitle based on user role
+    // Update title and subtitle
     updateViewTitle(viewName);
     
     // Load view-specific data
     switch(viewName) {
-        case 'dashboard':
-            updateDashboardStats();
-            break;
         case 'restaurants':
             loadRestaurantsTable();
             break;
@@ -1227,74 +1490,551 @@ function showView(viewName) {
     }
 }
 
-// Update title and subtitle based on view and user role
 function updateViewTitle(viewName) {
-    try {
-        const viewTitle = document.getElementById('viewTitle');
-        const viewSubtitle = document.getElementById('viewSubtitle');
-        
-        if (!viewTitle || !viewSubtitle) return;
-        
-        switch(viewName) {
-            case 'dashboard':
-                if (userRole === 'admin') {
-                    viewTitle.textContent = 'Admin Dashboard';
-                    viewSubtitle.textContent = 'System Overview & Analytics';
-                } else {
-                    viewTitle.textContent = `${currentRestaurant?.name || 'Restaurant'} Dashboard`;
-                    viewSubtitle.textContent = 'Real-time Overview & Analytics';
-                }
-                break;
-                
-            case 'restaurants':
-                if (userRole === 'admin') {
-                    viewTitle.textContent = 'Restaurant Management';
-                    viewSubtitle.textContent = 'Manage all registered restaurants';
-                } else {
-                    viewTitle.textContent = 'Menu Management';
-                    viewSubtitle.textContent = 'Manage your restaurant menu items';
-                }
-                break;
-                
-            case 'users':
-                if (userRole === 'admin') {
-                    viewTitle.textContent = 'User Management';
-                    viewSubtitle.textContent = 'Manage all system users';
-                } else {
-                    viewTitle.textContent = 'Staff Management';
-                    viewSubtitle.textContent = 'Manage restaurant staff members';
-                }
-                break;
-                
-            default:
-                viewTitle.textContent = 'Dashboard';
-                viewSubtitle.textContent = 'Overview & Analytics';
+    const titles = {
+        'dashboard': { 
+            title: userRole === 'admin' ? 'Admin Dashboard' : `${currentRestaurant?.name || 'Restaurant'} Dashboard`, 
+            subtitle: userRole === 'admin' ? 'System Overview & Analytics' : 'Real-time Overview & Analytics' 
+        },
+        'restaurants': { 
+            title: userRole === 'admin' ? 'Restaurant Management' : 'Menu Management', 
+            subtitle: userRole === 'admin' ? 'Manage all registered restaurants' : 'Manage your restaurant menu items' 
+        },
+        'users': { 
+            title: userRole === 'admin' ? 'User Management' : 'Staff Management', 
+            subtitle: userRole === 'admin' ? 'Manage all system users across restaurants' : 'Manage restaurant staff members' 
         }
-        
-        // Also update the page title
-        document.title = `${viewTitle.textContent} - DigitalMenuPro Admin`;
-        
-    } catch (error) {
-        console.error('Error updating view title:', error);
-        document.title = 'DigitalMenuPro Admin';
-    }
+    };
+    
+    const viewInfo = titles[viewName] || titles.dashboard;
+    document.getElementById('viewTitle').textContent = viewInfo.title;
+    document.getElementById('viewSubtitle').textContent = viewInfo.subtitle;
 }
 
-// Toggle sidebar
+// Sidebar Toggle
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"]');
+    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"] i');
+    
+    sidebar.classList.toggle('collapsed');
     
     if (sidebar.classList.contains('collapsed')) {
-        sidebar.classList.remove('collapsed');
-        mainContent.classList.remove('lg:ml-64');
-        toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i><span class="ml-3 sidebar-text">Collapse Sidebar</span>';
+        mainContent.style.marginLeft = '80px';
+        toggleBtn.classList.remove('fa-chevron-left');
+        toggleBtn.classList.add('fa-chevron-right');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Expand Sidebar';
     } else {
-        sidebar.classList.add('collapsed');
-        mainContent.classList.add('lg:ml-64');
-        toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i><span class="ml-3 sidebar-text">Expand Sidebar</span>';
+        mainContent.style.marginLeft = '256px';
+        toggleBtn.classList.remove('fa-chevron-right');
+        toggleBtn.classList.add('fa-chevron-left');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Collapse Sidebar';
     }
+}
+
+// Notifications Toggle
+function toggleNotifications() {
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('hidden');
+}
+
+// Restaurant Management
+async function loadRestaurantsTable() {
+    try {
+        if (userRole === 'admin') {
+            await loadAdminRestaurantsTable();
+        } else {
+            await loadStaffMenuTable();
+        }
+    } catch (error) {
+        console.error('Error loading table:', error);
+    }
+}
+
+// Load admin restaurants table
+async function loadAdminRestaurantsTable() {
+    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedRestaurants = restaurants.slice(startIndex, endIndex);
+    
+    // Update table headers for admin
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    `;
+    
+    let tableHTML = '';
+    paginatedRestaurants.forEach(restaurant => {
+        // Find subscription for this restaurant
+        const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
+        
+        tableHTML += `
+            <tr class="restaurant-row hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-utensils text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${restaurant.name}</div>
+                            <div class="text-sm text-gray-500">${restaurant.url_slug}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${restaurant.owner_name || restaurant.owner_email}</div>
+                    <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-3 py-1 text-xs font-medium rounded-full ${subscription?.plan === 'pro' ? 'bg-blue-100 text-blue-800' : subscription?.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                        ${subscription?.plan ? subscription.plan.toUpperCase() : 'No Plan'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                        ${restaurant.status.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${subscription ? (subscription.auto_pay ? 'Auto-Pay Enabled' : 'Manual Payment') : 'No Subscription'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${new Date(restaurant.created_at).toLocaleDateString()}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="editRestaurant('${restaurant.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                No restaurants found
+            </td>
+        </tr>
+    `;
+    
+    // Update pagination info
+    document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
+    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
+    document.getElementById('restaurantTotal').textContent = restaurants.length;
+    document.getElementById('restaurantLabel').textContent = 'restaurants';
+}
+
+// Load staff menu table
+async function loadStaffMenuTable() {
+    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedDishes = dishes.slice(startIndex, endIndex);
+    
+    // Update table headers for staff (menu items)
+    document.getElementById('restaurantsTableHeader').innerHTML = `
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    `;
+    
+    let tableHTML = '';
+    paginatedDishes.forEach(dish => {
+        const statusClass = dish.is_available ? 'status-active' : 'status-inactive';
+        const statusText = dish.is_available ? 'Available' : 'Unavailable';
+        
+        tableHTML += `
+            <tr class="dish-row">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-utensil-spoon text-gray-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">${dish.category || 'Uncategorized'}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ₹${dish.price || '0'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="editDish('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
+                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                No dishes found
+            </td>
+        </tr>
+    `;
+    
+    // Update pagination info
+    document.getElementById('restaurantStart').textContent = dishes.length > 0 ? startIndex + 1 : 0;
+    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, dishes.length);
+    document.getElementById('restaurantTotal').textContent = dishes.length;
+    document.getElementById('restaurantLabel').textContent = 'menu items';
+}
+
+// Filter restaurants/menu items
+function filterRestaurants() {
+    if (userRole === 'admin') {
+        // Filter restaurants for admin
+        const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const planFilter = document.getElementById('planFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        
+        // Apply filters (simplified - in real app you would filter the data)
+        console.log('Filtering restaurants by:', searchTerm, statusFilter, planFilter, dateFrom, dateTo);
+    } else {
+        // Filter dishes for staff
+        const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
+        console.log('Filtering dishes by:', searchTerm);
+    }
+}
+
+// Pagination functions
+function prevRestaurantPage() {
+    if (currentRestaurantPage > 1) {
+        currentRestaurantPage--;
+        loadRestaurantsTable();
+    }
+}
+
+function nextRestaurantPage() {
+    const totalItems = userRole === 'admin' ? restaurants.length : dishes.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (currentRestaurantPage < totalPages) {
+        currentRestaurantPage++;
+        loadRestaurantsTable();
+    }
+}
+
+// User Management
+async function loadUsersTable() {
+    try {
+        if (userRole === 'admin') {
+            await loadAllUsersTable();
+        } else {
+            await loadRestaurantStaffTable();
+        }
+    } catch (error) {
+        console.error('Error loading users table:', error);
+    }
+}
+
+// Load all users for admin
+async function loadAllUsersTable() {
+    let tableHTML = '';
+    
+    users.forEach(user => {
+        // Determine role badge class
+        let roleClass = 'bg-red-100 text-red-800';
+        let roleText = user.role;
+        
+        switch(user.role) {
+            case 'owner':
+                roleClass = 'bg-yellow-100 text-yellow-800';
+                break;
+            case 'manager':
+                roleClass = 'bg-blue-100 text-blue-800';
+                break;
+            case 'chef':
+                roleClass = 'bg-orange-100 text-orange-800';
+                break;
+            case 'waiter':
+                roleClass = 'bg-green-100 text-green-800';
+                break;
+        }
+        
+        // Status badge
+        const statusClass = user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        const statusText = user.is_active ? 'ACTIVE' : 'INACTIVE';
+        
+        // Last active time
+        let lastActive = 'Never';
+        if (user.last_login) {
+            const lastLogin = new Date(user.last_login);
+            const now = new Date();
+            const diffMs = now - lastLogin;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else if (diffMins > 0) {
+                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            } else {
+                lastActive = 'Just now';
+            }
+        }
+        
+        tableHTML += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${user.name}</div>
+                            <div class="text-sm text-gray-500">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${user.restaurants?.name || 'No Restaurant'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded ${roleClass}">
+                        ${roleText.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded ${statusClass}">
+                        ${statusText}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${lastActive}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    ${user.role !== 'admin' ? `
+                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('usersTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                No users found
+            </td>
+        </tr>
+    `;
+}
+
+// Load restaurant staff for staff users
+async function loadRestaurantStaffTable() {
+    let tableHTML = '';
+    
+    // Filter users for current restaurant only
+    const restaurantStaff = users.filter(user => 
+        user.restaurant_id === currentRestaurant?.id || 
+        user.restaurants?.id === currentRestaurant?.id
+    );
+    
+    restaurantStaff.forEach(user => {
+        // Determine role badge class
+        let roleClass = 'bg-red-100 text-red-800';
+        let roleText = user.role;
+        
+        switch(user.role) {
+            case 'owner':
+                roleClass = 'bg-yellow-100 text-yellow-800';
+                roleText = 'Owner';
+                break;
+            case 'manager':
+                roleClass = 'bg-blue-100 text-blue-800';
+                roleText = 'Manager';
+                break;
+            case 'chef':
+                roleClass = 'bg-orange-100 text-orange-800';
+                roleText = 'Chef';
+                break;
+            case 'waiter':
+                roleClass = 'bg-green-100 text-green-800';
+                roleText = 'Waiter';
+                break;
+        }
+        
+        // Status badge
+        const statusClass = user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        const statusText = user.is_active ? 'ACTIVE' : 'INACTIVE';
+        
+        // Last active time
+        let lastActive = 'Never';
+        if (user.last_login) {
+            const lastLogin = new Date(user.last_login);
+            const now = new Date();
+            const diffMs = now - lastLogin;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) {
+                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            } else if (diffHours > 0) {
+                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            } else if (diffMins > 0) {
+                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            } else {
+                lastActive = 'Just now';
+            }
+        }
+        
+        // Don't show edit button for current user (they can't edit themselves)
+        const canEdit = user.id !== currentUser?.id;
+        
+        tableHTML += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${user.name}</div>
+                            <div class="text-sm text-gray-500">${user.email}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${currentRestaurant?.name || 'Current Restaurant'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded ${roleClass}">
+                        ${roleText.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs rounded ${statusClass}">
+                        ${statusText}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${lastActive}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    ${canEdit ? `
+                        <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : `
+                        <span class="text-gray-400">Current User</span>
+                    `}
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('usersTable').innerHTML = tableHTML || `
+        <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                No staff members found
+            </td>
+        </tr>
+    `;
+}
+
+// Filter users
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    
+    const rows = document.querySelectorAll('#usersTable tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
+
+// Placeholder functions for actions (can be implemented later)
+function viewRestaurantDetails(restaurantId) {
+    alert(`View restaurant details for ID: ${restaurantId}`);
+}
+
+function editRestaurant(restaurantId) {
+    alert(`Edit restaurant with ID: ${restaurantId}`);
+}
+
+function toggleRestaurantStatus(restaurantId) {
+    alert(`Toggle restaurant status for ID: ${restaurantId}`);
+}
+
+function deleteRestaurant(restaurantId) {
+    alert(`Delete restaurant with ID: ${restaurantId}`);
+}
+
+function exportRestaurants() {
+    alert('Export functionality would be implemented here');
+}
+
+function editDish(dishId) {
+    alert(`Edit dish with ID: ${dishId}`);
+}
+
+function toggleDishStatus(dishId, isAvailable) {
+    alert(`Toggle dish status for ID: ${dishId} to ${!isAvailable ? 'available' : 'unavailable'}`);
+}
+
+function editUser(userId) {
+    alert(`Edit user with ID: ${userId}`);
+}
+
+function toggleUserStatus(userId) {
+    alert(`Toggle user status for ID: ${userId}`);
+}
+
+function deleteUser(userId) {
+    alert(`Delete user with ID: ${userId}`);
+}
+
+function exportUsers() {
+    alert('Export users functionality would be implemented here');
 }
 
 // Initialize the dashboard
