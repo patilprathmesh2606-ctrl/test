@@ -538,40 +538,50 @@
                                    placeholder="e.g., spicy, vegan, gluten-free">
                         </div>
                         
-                        <!-- Image Upload Section -->
+                        <!-- Image Selection Section -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image</label>
-                            <div class="space-y-4">
-                                <!-- Option 1: Upload from computer -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Image</label>
-                                    <input type="file" id="dishImageFile" accept="image/*" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                           onchange="previewImage(this, 'addDishImagePreview')">
-                                    <div class="mt-2">
-                                        <img id="addDishImagePreview" class="image-preview hidden" src="" alt="Image preview">
-                                    </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Dish Image</label>
+                            
+                            <!-- Search Bar -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <input type="text" id="addImageSearch" placeholder="Search images..." 
+                                       oninput="searchAddImages()" 
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" onclick="refreshAddImageGallery()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="text-sm text-gray-500 mb-3">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Select an image from your gallery
+                            </div>
+                            
+                            <!-- Current Image Preview -->
+                            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
+                                <div class="flex items-center justify-center">
+                                    <img id="addSelectedImagePreview" src="https://via.placeholder.com/300x200?text=No+Image" 
+                                         class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
                                 </div>
-                                
-                                <!-- Option 2: Use URL -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or enter Image URL</label>
-                                    <input type="url" id="dishImageUrl" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                           placeholder="https://example.com/dish-image.jpg">
+                                <input type="hidden" id="addSelectedImageUrl">
+                                <div class="mt-2 text-center">
+                                    <button type="button" onclick="clearAddSelectedImage()" class="text-sm text-red-600 hover:text-red-800">
+                                        <i class="fas fa-times mr-1"></i>Remove Image
+                                    </button>
                                 </div>
-                                
-                                <!-- Option 3: Image Grid from Supabase -->
-                                <div id="addDishImageGridContainer">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
-                                    <div id="addDishImageGrid" class="bg-gray-50 p-4 rounded-lg max-h-80 overflow-y-auto">
-                                        <div class="text-center py-8">
-                                            <div class="loading inline-block"></div>
-                                            <p class="text-gray-600 mt-2">Loading images...</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <img id="addDishGridPreview" class="image-preview hidden" src="" alt="Selected image">
+                            </div>
+                            
+                            <!-- Image Gallery -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-sm font-medium text-gray-700">Available Images:</label>
+                                    <span id="addImageCount" class="text-sm text-gray-500">0 images</span>
+                                </div>
+                                <div id="addImageGallery" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-300">
+                                    <div class="col-span-3 text-center py-8">
+                                        <div class="loading inline-block"></div>
+                                        <p class="text-gray-600 mt-2">Loading images...</p>
                                     </div>
                                 </div>
                             </div>
@@ -665,45 +675,50 @@
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         
-                        <!-- Current Image -->
-                        <div id="currentImageContainer" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Image</label>
-                            <img id="currentDishImage" class="image-preview" src="" alt="Current dish image">
-                        </div>
-                        
-                        <!-- New Image Upload Section -->
+                        <!-- Image Selection Section -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">New Dish Image</label>
-                            <div class="space-y-4">
-                                <!-- Option 1: Upload from computer -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload New Image</label>
-                                    <input type="file" id="editDishImageFile" accept="image/*" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                           onchange="previewImage(this, 'editDishImagePreview')">
-                                    <div class="mt-2">
-                                        <img id="editDishImagePreview" class="image-preview hidden" src="" alt="Image preview">
-                                    </div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Dish Image</label>
+                            
+                            <!-- Search Bar -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <input type="text" id="editImageSearch" placeholder="Search images..." 
+                                       oninput="searchEditImages()" 
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" onclick="refreshEditImageGallery()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="text-sm text-gray-500 mb-3">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Select an image from your gallery
+                            </div>
+                            
+                            <!-- Current Image Preview -->
+                            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
+                                <div class="flex items-center justify-center">
+                                    <img id="editSelectedImagePreview" src="https://via.placeholder.com/300x200?text=No+Image" 
+                                         class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
                                 </div>
-                                
-                                <!-- Option 2: Use URL -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or enter New Image URL</label>
-                                    <input type="url" id="editDishImageUrl" 
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <input type="hidden" id="editSelectedImageUrl">
+                                <div class="mt-2 text-center">
+                                    <button type="button" onclick="clearEditSelectedImage()" class="text-sm text-red-600 hover:text-red-800">
+                                        <i class="fas fa-times mr-1"></i>Remove Image
+                                    </button>
                                 </div>
-                                
-                                <!-- Option 3: Image Grid from Supabase -->
-                                <div id="editDishImageGridContainer">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Or select from your images</label>
-                                    <div id="editDishImageGrid" class="bg-gray-50 p-4 rounded-lg max-h-80 overflow-y-auto">
-                                        <div class="text-center py-8">
-                                            <div class="loading inline-block"></div>
-                                            <p class="text-gray-600 mt-2">Loading images...</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <img id="editDishGridPreview" class="image-preview hidden" src="" alt="Selected image">
+                            </div>
+                            
+                            <!-- Image Gallery -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-sm font-medium text-gray-700">Available Images:</label>
+                                    <span id="editImageCount" class="text-sm text-gray-500">0 images</span>
+                                </div>
+                                <div id="editImageGallery" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-300">
+                                    <div class="col-span-3 text-center py-8">
+                                        <div class="loading inline-block"></div>
+                                        <p class="text-gray-600 mt-2">Loading images...</p>
                                     </div>
                                 </div>
                             </div>
@@ -775,7 +790,6 @@ let userRole = 'admin';
 let isStaffMode = false;
 let restaurants = [];
 let dishes = [];
-let uploadedImageUrl = null;
 let availableImages = [];
 
 // Initialize dashboard
@@ -804,26 +818,6 @@ async function initDashboard() {
     } catch (error) {
         console.error('Dashboard initialization error:', error);
         document.getElementById('adminLoginModal').classList.remove('hidden');
-    }
-}
-
-// Image preview function
-function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    const file = input.files[0];
-    
-    if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-        }
-        
-        reader.readAsDataURL(file);
-    } else {
-        preview.src = '';
-        preview.classList.add('hidden');
     }
 }
 
@@ -868,10 +862,18 @@ async function loadDishImagesFromStorage() {
 // Render image grid
 function renderImageGrid(images, containerId, selectedImageUrl = null) {
     const container = document.getElementById(containerId);
+    const countId = containerId.replace('Gallery', 'Count');
+    const countElement = document.getElementById(countId);
+    
+    if (!container) return;
+    
+    if (countElement) {
+        countElement.textContent = `${images.length} images`;
+    }
     
     if (!images || images.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
+            <div class="col-span-3 text-center py-8 text-gray-500">
                 <i class="fas fa-image text-3xl mb-2"></i>
                 <p>No images found in storage</p>
             </div>
@@ -879,49 +881,102 @@ function renderImageGrid(images, containerId, selectedImageUrl = null) {
         return;
     }
     
-    let html = `
-        <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-    `;
+    let html = '';
     
     images.forEach((image, index) => {
         const isSelected = selectedImageUrl === image.url;
         const fileName = image.name.length > 15 ? image.name.substring(0, 12) + '...' : image.name;
         
         html += `
-            <div class="image-grid-item cursor-pointer ${isSelected ? 'selected' : ''}" 
-                 onclick="selectImageFromGrid('${image.url}', '${containerId.includes('add') ? 'add' : 'edit'}')">
-                <div class="aspect-square overflow-hidden rounded-lg border-2 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'} hover:border-blue-400 transition-all">
-                    <img src="${image.url}" 
-                         alt="${image.name}"
-                         class="image-thumbnail w-full h-full object-cover hover:scale-110 transition-transform duration-200"
-                         loading="lazy">
-                </div>
-                <div class="mt-1 text-xs text-gray-600 truncate text-center" title="${image.name}">
-                    ${fileName}
-                </div>
+            <div class="relative group cursor-pointer" onclick="selectImageFromGallery('${image.url}', '${containerId}')">
+                <img src="${image.url}" 
+                     alt="${image.name}"
+                     class="w-full h-20 object-cover rounded-lg border-2 ${isSelected ? 'border-blue-500' : 'border-gray-200'} hover:border-blue-400 transition-all"
+                     loading="lazy">
+                ${isSelected ? '<div class="absolute top-1 right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"><i class="fas fa-check"></i></div>' : ''}
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg"></div>
             </div>
         `;
     });
     
-    html += `</div>`;
     container.innerHTML = html;
 }
 
-// Select image from grid
-function selectImageFromGrid(imageUrl, modalType) {
-    uploadedImageUrl = imageUrl;
+// Select image from gallery
+function selectImageFromGallery(imageUrl, containerId) {
+    const modalType = containerId.includes('add') ? 'add' : 'edit';
     
     if (modalType === 'add') {
-        document.getElementById('dishImageUrl').value = imageUrl;
-        const preview = document.getElementById('addDishGridPreview');
-        preview.src = imageUrl;
-        preview.classList.remove('hidden');
+        document.getElementById('addSelectedImageUrl').value = imageUrl;
+        document.getElementById('addSelectedImagePreview').src = imageUrl;
     } else {
-        document.getElementById('editDishImageUrl').value = imageUrl;
-        const preview = document.getElementById('editDishGridPreview');
-        preview.src = imageUrl;
-        preview.classList.remove('hidden');
+        document.getElementById('editSelectedImageUrl').value = imageUrl;
+        document.getElementById('editSelectedImagePreview').src = imageUrl;
     }
+    
+    // Re-render gallery to show selection
+    const images = availableImages;
+    renderImageGrid(images, containerId, imageUrl);
+}
+
+// Clear selected image for Add modal
+function clearAddSelectedImage() {
+    document.getElementById('addSelectedImageUrl').value = '';
+    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    renderImageGrid(availableImages, 'addImageGallery', null);
+}
+
+// Clear selected image for Edit modal
+function clearEditSelectedImage() {
+    document.getElementById('editSelectedImageUrl').value = '';
+    document.getElementById('editSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    renderImageGrid(availableImages, 'editImageGallery', null);
+}
+
+// Search images in Add modal
+function searchAddImages() {
+    const searchTerm = document.getElementById('addImageSearch').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderImageGrid(availableImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
+        return;
+    }
+    
+    const filteredImages = availableImages.filter(img => 
+        img.name.toLowerCase().includes(searchTerm)
+    );
+    
+    renderImageGrid(filteredImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
+}
+
+// Search images in Edit modal
+function searchEditImages() {
+    const searchTerm = document.getElementById('editImageSearch').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderImageGrid(availableImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
+        return;
+    }
+    
+    const filteredImages = availableImages.filter(img => 
+        img.name.toLowerCase().includes(searchTerm)
+    );
+    
+    renderImageGrid(filteredImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
+}
+
+// Refresh image gallery in Add modal
+async function refreshAddImageGallery() {
+    availableImages = await loadDishImagesFromStorage();
+    renderImageGrid(availableImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
+    alert('Image gallery refreshed!');
+}
+
+// Refresh image gallery in Edit modal
+async function refreshEditImageGallery() {
+    availableImages = await loadDishImagesFromStorage();
+    renderImageGrid(availableImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
+    alert('Image gallery refreshed!');
 }
 
 // Upload image to Supabase Storage
@@ -1153,16 +1208,14 @@ async function showAddDishModal() {
     // Reset form
     document.getElementById('addDishForm').reset();
     
-    // Clear image previews
-    document.getElementById('addDishImagePreview').classList.add('hidden');
-    document.getElementById('addDishGridPreview').classList.add('hidden');
-    
-    // Reset uploaded image URL
-    uploadedImageUrl = null;
+    // Clear image selection
+    document.getElementById('addSelectedImageUrl').value = '';
+    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('addImageSearch').value = '';
     
     // Load and display images from Supabase
-    const images = await loadDishImagesFromStorage();
-    renderImageGrid(images, 'addDishImageGrid');
+    availableImages = await loadDishImagesFromStorage();
+    renderImageGrid(availableImages, 'addImageGallery', null);
     
     // Show modal
     document.getElementById('addDishModal').classList.remove('hidden');
@@ -1170,7 +1223,8 @@ async function showAddDishModal() {
 
 function closeAddDishModal() {
     document.getElementById('addDishModal').classList.add('hidden');
-    uploadedImageUrl = null;
+    document.getElementById('addSelectedImageUrl').value = '';
+    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
 }
 
 async function saveNewDish() {
@@ -1196,23 +1250,8 @@ async function saveNewDish() {
     loading.classList.remove('hidden');
     
     try {
-        let finalImageUrl = null;
-        
-        // Check for uploaded file
-        const fileInput = document.getElementById('dishImageFile');
-        const urlInput = document.getElementById('dishImageUrl').value;
-        
-        if (fileInput.files && fileInput.files[0]) {
-            // Upload file to storage
-            const file = fileInput.files[0];
-            finalImageUrl = await uploadImageToStorage(file);
-        } else if (urlInput) {
-            // Use URL if provided
-            finalImageUrl = urlInput;
-        } else if (uploadedImageUrl) {
-            // Use image selected from grid
-            finalImageUrl = uploadedImageUrl;
-        }
+        // Get selected image URL
+        const finalImageUrl = document.getElementById('addSelectedImageUrl').value || null;
         
         // Prepare dish data
         const dishData = {
@@ -1287,26 +1326,15 @@ async function showEditDishModal() {
     document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
     document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
     
-    // Handle current image
-    const currentImageContainer = document.getElementById('currentImageContainer');
-    if (dish.image_url) {
-        document.getElementById('currentDishImage').src = dish.image_url;
-        currentImageContainer.classList.remove('hidden');
-        document.getElementById('editDishImageUrl').value = dish.image_url;
-        uploadedImageUrl = dish.image_url;
-    } else {
-        currentImageContainer.classList.add('hidden');
-        document.getElementById('editDishImageUrl').value = '';
-        uploadedImageUrl = null;
-    }
-    
-    // Clear other image previews
-    document.getElementById('editDishImagePreview').classList.add('hidden');
-    document.getElementById('editDishGridPreview').classList.add('hidden');
+    // Set selected image
+    const currentImageUrl = dish.image_url || '';
+    document.getElementById('editSelectedImageUrl').value = currentImageUrl;
+    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editImageSearch').value = '';
     
     // Load and display images from Supabase
-    const images = await loadDishImagesFromStorage();
-    renderImageGrid(images, 'editDishImageGrid', dish.image_url);
+    availableImages = await loadDishImagesFromStorage();
+    renderImageGrid(availableImages, 'editImageGallery', currentImageUrl);
     
     // Show modal
     document.getElementById('editDishModal').classList.remove('hidden');
@@ -1314,7 +1342,8 @@ async function showEditDishModal() {
 
 function closeEditDishModal() {
     document.getElementById('editDishModal').classList.add('hidden');
-    uploadedImageUrl = null;
+    document.getElementById('editSelectedImageUrl').value = '';
+    document.getElementById('editSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
 }
 
 async function updateDish() {
@@ -1340,23 +1369,8 @@ async function updateDish() {
     loading.classList.remove('hidden');
     
     try {
-        let finalImageUrl = document.getElementById('editDishImageUrl').value;
-        
-        // Check for uploaded file
-        const fileInput = document.getElementById('editDishImageFile');
-        
-        if (fileInput.files && fileInput.files[0]) {
-            // Upload file to storage
-            const file = fileInput.files[0];
-            const newImageUrl = await uploadImageToStorage(file);
-            
-            if (newImageUrl) {
-                finalImageUrl = newImageUrl;
-            }
-        } else if (uploadedImageUrl && uploadedImageUrl !== document.getElementById('editDishImageUrl').value) {
-            // Use image selected from grid
-            finalImageUrl = uploadedImageUrl;
-        }
+        // Get selected image URL
+        const finalImageUrl = document.getElementById('editSelectedImageUrl').value || null;
         
         // Prepare dish data
         const dishData = {
@@ -1367,7 +1381,7 @@ async function updateDish() {
             preparation_time: parseInt(document.getElementById('editDishPrepTime').value) || null,
             is_available: document.getElementById('editDishAvailability').value === 'true',
             tags: document.getElementById('editDishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-            image_url: finalImageUrl || null,
+            image_url: finalImageUrl,
             updated_at: new Date().toISOString()
         };
         
@@ -1940,26 +1954,15 @@ async function editDishRow(dishId) {
     document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
     document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
     
-    // Handle current image
-    const currentImageContainer = document.getElementById('currentImageContainer');
-    if (dish.image_url) {
-        document.getElementById('currentDishImage').src = dish.image_url;
-        currentImageContainer.classList.remove('hidden');
-        document.getElementById('editDishImageUrl').value = dish.image_url;
-        uploadedImageUrl = dish.image_url;
-    } else {
-        currentImageContainer.classList.add('hidden');
-        document.getElementById('editDishImageUrl').value = '';
-        uploadedImageUrl = null;
-    }
-    
-    // Clear other image previews
-    document.getElementById('editDishImagePreview').classList.add('hidden');
-    document.getElementById('editDishGridPreview').classList.add('hidden');
+    // Set selected image
+    const currentImageUrl = dish.image_url || '';
+    document.getElementById('editSelectedImageUrl').value = currentImageUrl;
+    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editImageSearch').value = '';
     
     // Load and display images from Supabase
-    const images = await loadDishImagesFromStorage();
-    renderImageGrid(images, 'editDishImageGrid', dish.image_url);
+    availableImages = await loadDishImagesFromStorage();
+    renderImageGrid(availableImages, 'editImageGallery', currentImageUrl);
     
     // Show modal
     document.getElementById('editDishModal').classList.remove('hidden');
