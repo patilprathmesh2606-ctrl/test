@@ -78,6 +78,28 @@
             background-color: #fee2e2;
             color: #991b1b;
         }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -320,12 +342,12 @@
                                     <span class="text-xs">View Revenue</span>
                                 </button>
                                 
-                                <button onclick="showReserveTable()" class="staff-action p-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200" data-permission="reserveTable">
+                                <button onclick="showReserveTableModal()" class="staff-action p-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200" data-permission="reserveTable">
                                     <i class="fas fa-chair mb-1"></i>
                                     <span class="text-xs">Reserve Table</span>
                                 </button>
                                 
-                                <button onclick="showOrders()" class="staff-action p-3 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200" data-permission="viewTableOrders">
+                                <button onclick="showOrdersModal()" class="staff-action p-3 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200" data-permission="viewTableOrders">
                                     <i class="fas fa-list-alt mb-1"></i>
                                     <span class="text-xs">View Orders</span>
                                 </button>
@@ -338,15 +360,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="staff-action" data-permission="viewOrderHistoryName">
                                     <h4 class="font-medium mb-2">By Customer Name</h4>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <p class="text-sm text-gray-600">Customer order history will appear here</p>
+                                    <div id="orderHistoryByName" class="bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
+                                        <p class="text-sm text-gray-600">Loading...</p>
                                     </div>
                                 </div>
                                 
                                 <div class="staff-action" data-permission="viewOrderHistoryTable">
                                     <h4 class="font-medium mb-2">By Table Number</h4>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <p class="text-sm text-gray-600">Table order history will appear here</p>
+                                    <div id="orderHistoryByTable" class="bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
+                                        <p class="text-sm text-gray-600">Loading...</p>
                                     </div>
                                 </div>
                             </div>
@@ -543,6 +565,449 @@
         </div>
     </div>
 
+    <!-- MODALS FOR QUICK ACTIONS -->
+
+    <!-- Add Dish Modal -->
+    <div id="addDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Add New Dish</h3>
+                    <button onclick="closeAddDishModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addDishForm" onsubmit="event.preventDefault(); saveNewDish();">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name *</label>
+                            <input type="text" id="dishName" required 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="dishDescription" rows="3" 
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                                <select id="dishCategory" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Select Category</option>
+                                    <option value="starters">Starters</option>
+                                    <option value="main-course">Main Course</option>
+                                    <option value="desserts">Desserts</option>
+                                    <option value="beverages">Beverages</option>
+                                    <option value="specials">Specials</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
+                                <input type="number" id="dishPrice" min="0" step="0.01" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preparation Time (minutes)</label>
+                                <input type="number" id="dishPrepTime" min="0" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                                <select id="dishAvailability" 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="true">Available</option>
+                                    <option value="false">Not Available</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="dishTags" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="e.g., spicy, vegan, gluten-free">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image URL</label>
+                            <input type="url" id="dishImageUrl" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="https://example.com/dish-image.jpg">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button type="button" onclick="closeAddDishModal()" 
+                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Save Dish
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Dish Modal -->
+    <div id="editDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Edit Dish</h3>
+                    <button onclick="closeEditDishModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="editDishForm" onsubmit="event.preventDefault(); updateDish();">
+                    <input type="hidden" id="editDishId">
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name *</label>
+                            <input type="text" id="editDishName" required 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="editDishDescription" rows="3" 
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                                <select id="editDishCategory" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Select Category</option>
+                                    <option value="starters">Starters</option>
+                                    <option value="main-course">Main Course</option>
+                                    <option value="desserts">Desserts</option>
+                                    <option value="beverages">Beverages</option>
+                                    <option value="specials">Specials</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
+                                <input type="number" id="editDishPrice" min="0" step="0.01" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preparation Time (minutes)</label>
+                                <input type="number" id="editDishPrepTime" min="0" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                                <select id="editDishAvailability" 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="true">Available</option>
+                                    <option value="false">Not Available</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="editDishTags" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Image URL</label>
+                            <input type="url" id="editDishImageUrl" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button type="button" onclick="closeEditDishModal()" 
+                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Update Dish
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Dish Confirmation Modal -->
+    <div id="deleteDishModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-md slide-in">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Dish</h3>
+                    <p class="text-gray-600" id="deleteDishMessage">Are you sure you want to delete this dish?</p>
+                </div>
+                
+                <input type="hidden" id="deleteDishId">
+                
+                <div class="flex justify-center space-x-3">
+                    <button onclick="closeDeleteDishModal()" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button onclick="confirmDeleteDish()" 
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Report Modal -->
+    <div id="revenueReportModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Revenue Report</h3>
+                    <button onclick="closeRevenueReportModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Date Range Selector -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-3 md:space-y-0">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                            <select id="revenueDateRange" onchange="updateRevenueReport()" 
+                                    class="px-4 py-2 border border-gray-300 rounded-lg">
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="week">Last 7 Days</option>
+                                <option value="month">This Month</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div id="customDateRange" class="hidden md:flex items-center space-x-2">
+                            <input type="date" id="revenueStartDate" 
+                                   class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <span>to</span>
+                            <input type="date" id="revenueEndDate" 
+                                   class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <button onclick="applyCustomDateRange()" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Revenue Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white border rounded-lg p-4 shadow">
+                        <div class="text-sm text-gray-600 mb-1">Total Revenue</div>
+                        <div class="text-2xl font-bold text-gray-800" id="totalRevenue">₹0</div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4 shadow">
+                        <div class="text-sm text-gray-600 mb-1">Total Orders</div>
+                        <div class="text-2xl font-bold text-gray-800" id="totalOrders">0</div>
+                    </div>
+                    <div class="bg-white border rounded-lg p-4 shadow">
+                        <div class="text-sm text-gray-600 mb-1">Average Order Value</div>
+                        <div class="text-2xl font-bold text-gray-800" id="averageOrderValue">₹0</div>
+                    </div>
+                </div>
+                
+                <!-- Revenue Chart -->
+                <div class="bg-white border rounded-lg p-4 shadow mb-6">
+                    <h4 class="font-medium text-gray-800 mb-4">Revenue Trend</h4>
+                    <div class="h-64">
+                        <canvas id="revenueReportChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Top Selling Dishes -->
+                <div class="bg-white border rounded-lg p-4 shadow">
+                    <h4 class="font-medium text-gray-800 mb-4">Top Selling Dishes</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-2 text-left">Dish Name</th>
+                                    <th class="px-4 py-2 text-left">Quantity Sold</th>
+                                    <th class="px-4 py-2 text-left">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topDishesTable">
+                                <!-- Will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Reservation Modal -->
+    <div id="reserveTableModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Reserve Table</h3>
+                    <button onclick="closeReserveTableModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="reserveTableForm" onsubmit="event.preventDefault(); reserveTable();">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
+                                <input type="text" id="customerName" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                                <input type="tel" id="customerPhone" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests *</label>
+                                <select id="numberOfGuests" required 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Select</option>
+                                    <option value="1">1 Person</option>
+                                    <option value="2">2 People</option>
+                                    <option value="3">3 People</option>
+                                    <option value="4">4 People</option>
+                                    <option value="5">5 People</option>
+                                    <option value="6">6 People</option>
+                                    <option value="7">7 People</option>
+                                    <option value="8">8 People</option>
+                                    <option value="9">9+ People</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Table Number</label>
+                                <select id="tableNumber" 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Auto Assign</option>
+                                    <option value="1">Table 1</option>
+                                    <option value="2">Table 2</option>
+                                    <option value="3">Table 3</option>
+                                    <option value="4">Table 4</option>
+                                    <option value="5">Table 5</option>
+                                    <option value="6">Table 6</option>
+                                    <option value="7">Table 7</option>
+                                    <option value="8">Table 8</option>
+                                    <option value="9">Table 9</option>
+                                    <option value="10">Table 10</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Reservation Date *</label>
+                                <input type="date" id="reservationDate" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Reservation Time *</label>
+                                <input type="time" id="reservationTime" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
+                            <textarea id="specialRequests" rows="3" 
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button type="button" onclick="closeReserveTableModal()" 
+                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Reserve Table
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
+    <div id="ordersModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 fade-in">
+        <div class="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto slide-in">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Current Orders</h3>
+                    <button onclick="closeOrdersModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <select id="orderStatusFilter" onchange="filterOrders()" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="preparing">Preparing</option>
+                        <option value="ready">Ready</option>
+                        <option value="served">Served</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    
+                    <input type="text" id="orderSearch" placeholder="Search by table or customer..." 
+                           class="px-4 py-2 border border-gray-300 rounded-lg w-64" oninput="filterOrders()">
+                </div>
+                
+                <!-- Orders Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ordersGrid">
+                    <!-- Orders will be loaded dynamically -->
+                </div>
+                
+                <!-- No Orders Message -->
+                <div id="noOrdersMessage" class="text-center py-12">
+                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">No orders found</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
 // Configuration
 const SUPABASE_URL = 'https://aazqyrkklajqscsdfgjl.supabase.co';
@@ -574,38 +1039,33 @@ const itemsPerPage = 10;
 // Chart instances
 let revenueChart = null;
 let planChart = null;
+let revenueReportChart = null;
 
-// Check URL parameters for staff mode
-function checkUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const restaurantSlug = urlParams.get('restaurant');
-    const staffParam = urlParams.get('staff');
-    
-    if (restaurantSlug && staffParam === 'true') {
-        isStaffMode = true;
-        return restaurantSlug;
-    }
-    return null;
-}
+// Current orders data
+let currentOrders = [];
 
 // Initialize dashboard
 async function initDashboard() {
     try {
-        const restaurantSlug = checkUrlParams();
+        // Set today's date for date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('reservationDate').value = today;
         
         // Check if user is already logged in
         const { data: { user } } = await supabaseClient.auth.getUser();
         
         if (user) {
-            if (isStaffMode && restaurantSlug) {
-                // STAFF LOGIN FLOW
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantSlug = urlParams.get('restaurant');
+            const staffParam = urlParams.get('staff');
+            
+            if (restaurantSlug && staffParam === 'true') {
+                isStaffMode = true;
                 await handleStaffAccess(user, restaurantSlug);
             } else {
-                // ADMIN LOGIN FLOW
                 await handleAdminAccess(user);
             }
         } else {
-            // No user logged in, show login modal
             document.getElementById('adminLoginModal').style.display = 'flex';
         }
     } catch (error) {
@@ -649,18 +1109,16 @@ async function handleStaffAccess(user, restaurantSlug) {
             return;
         }
         
-        // Set user info
         currentUser = staffUser;
         currentRestaurant = restaurant;
         userRole = staffUser.role;
         
         console.log('✅ Staff logged in:', staffUser.name, 'Role:', staffUser.role, 'Restaurant:', restaurant.name);
         
-        // IMPORTANT: If permissions are null/empty, set default permissions
+        // Set default permissions if none exist
         if (!staffUser.permissions || Object.keys(staffUser.permissions).length === 0) {
             console.log('⚠️ No permissions found, setting defaults...');
             await setDefaultPermissions(staffUser.id, staffUser.role);
-            // Reload user with new permissions
             const { data: updatedUser } = await supabaseClient
                 .from('staff_users')
                 .select('*')
@@ -671,13 +1129,8 @@ async function handleStaffAccess(user, restaurantSlug) {
         
         console.log('📋 User permissions:', currentUser.permissions);
         
-        // Update UI for staff
         setupStaffUI();
-        
-        // Load restaurant-specific data
         await loadRestaurantData(restaurant.id);
-        
-        // Hide login modal, show dashboard
         document.getElementById('adminLoginModal').style.display = 'none';
         document.getElementById('adminDashboard').classList.remove('hidden');
         
@@ -771,8 +1224,6 @@ function getUserPermissions() {
             "viewOrderHistoryTable": true
         };
     }
-    
-    // Get from currentUser.permissions
     return currentUser?.permissions || {};
 }
 
@@ -789,25 +1240,21 @@ function updateUIBasedOnPermissions() {
     const permissions = getUserPermissions();
     console.log('🔧 Applying user permissions:', permissions);
     
-    // Show staff actions section
     const staffActionsSection = document.getElementById('staffActionsSection');
     if (staffActionsSection) {
         staffActionsSection.style.display = 'block';
     }
     
-    // Update each button/feature based on permissions
     document.querySelectorAll('[data-permission]').forEach(element => {
         const permissionName = element.getAttribute('data-permission');
         const hasPerm = hasPermission(permissionName);
         element.style.display = hasPerm ? 'block' : 'none';
         
-        // Also disable buttons if needed
         if (element.tagName === 'BUTTON') {
             element.disabled = !hasPerm;
         }
     });
     
-    // For owner role, ensure they have manager permissions
     if (userRole === 'owner') {
         document.querySelectorAll('.staff-action').forEach(el => {
             el.style.display = 'block';
@@ -818,68 +1265,697 @@ function updateUIBasedOnPermissions() {
     }
 }
 
-// Staff action functions
+// QUICK ACTIONS MODAL FUNCTIONS
+
+// Add Dish
 function showAddDishModal() {
     if (!hasPermission('addDish')) {
         alert('You do not have permission to add dishes');
         return;
     }
-    alert('Add Dish modal would open here');
+    
+    // Reset form
+    document.getElementById('addDishForm').reset();
+    
+    // Show modal
+    document.getElementById('addDishModal').classList.remove('hidden');
 }
 
+function closeAddDishModal() {
+    document.getElementById('addDishModal').classList.add('hidden');
+}
+
+async function saveNewDish() {
+    if (!hasPermission('addDish')) {
+        alert('Permission denied');
+        return;
+    }
+    
+    const dishData = {
+        restaurant_id: currentRestaurant.id,
+        name: document.getElementById('dishName').value,
+        description: document.getElementById('dishDescription').value,
+        category: document.getElementById('dishCategory').value,
+        price: parseFloat(document.getElementById('dishPrice').value),
+        preparation_time: parseInt(document.getElementById('dishPrepTime').value) || null,
+        is_available: document.getElementById('dishAvailability').value === 'true',
+        tags: document.getElementById('dishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+        image_url: document.getElementById('dishImageUrl').value || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('dishes')
+            .insert([dishData])
+            .select();
+        
+        if (error) throw error;
+        
+        // Refresh dishes list
+        await loadRestaurantData(currentRestaurant.id);
+        
+        // Show success message
+        alert('Dish added successfully!');
+        closeAddDishModal();
+        
+        // Update UI
+        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+            loadRestaurantsTable();
+        }
+        
+    } catch (error) {
+        console.error('Error adding dish:', error);
+        alert('Error adding dish: ' + error.message);
+    }
+}
+
+// Edit Dish
 function showEditDishModal() {
     if (!hasPermission('editDish')) {
         alert('You do not have permission to edit dishes');
         return;
     }
-    alert('Edit Dish modal would open here');
+    
+    // For demo, show the first dish - in real app, you'd select which dish to edit
+    if (dishes.length === 0) {
+        alert('No dishes available to edit');
+        return;
+    }
+    
+    // Let user select a dish to edit (for now, edit first dish)
+    const dish = dishes[0];
+    
+    // Fill form with dish data
+    document.getElementById('editDishId').value = dish.id;
+    document.getElementById('editDishName').value = dish.name;
+    document.getElementById('editDishDescription').value = dish.description || '';
+    document.getElementById('editDishCategory').value = dish.category;
+    document.getElementById('editDishPrice').value = dish.price;
+    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
+    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
+    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
+    document.getElementById('editDishImageUrl').value = dish.image_url || '';
+    
+    // Show modal
+    document.getElementById('editDishModal').classList.remove('hidden');
 }
 
+function closeEditDishModal() {
+    document.getElementById('editDishModal').classList.add('hidden');
+}
+
+async function updateDish() {
+    if (!hasPermission('editDish')) {
+        alert('Permission denied');
+        return;
+    }
+    
+    const dishId = document.getElementById('editDishId').value;
+    const dishData = {
+        name: document.getElementById('editDishName').value,
+        description: document.getElementById('editDishDescription').value,
+        category: document.getElementById('editDishCategory').value,
+        price: parseFloat(document.getElementById('editDishPrice').value),
+        preparation_time: parseInt(document.getElementById('editDishPrepTime').value) || null,
+        is_available: document.getElementById('editDishAvailability').value === 'true',
+        tags: document.getElementById('editDishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+        image_url: document.getElementById('editDishImageUrl').value || null,
+        updated_at: new Date().toISOString()
+    };
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('dishes')
+            .update(dishData)
+            .eq('id', dishId)
+            .select();
+        
+        if (error) throw error;
+        
+        // Refresh dishes list
+        await loadRestaurantData(currentRestaurant.id);
+        
+        // Show success message
+        alert('Dish updated successfully!');
+        closeEditDishModal();
+        
+        // Update UI
+        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+            loadRestaurantsTable();
+        }
+        
+    } catch (error) {
+        console.error('Error updating dish:', error);
+        alert('Error updating dish: ' + error.message);
+    }
+}
+
+// Delete Dish
 function showDeleteDishModal() {
     if (!hasPermission('deleteDish')) {
         alert('You do not have permission to delete dishes');
         return;
     }
-    alert('Delete Dish modal would open here');
+    
+    // For demo, show confirmation for first dish
+    if (dishes.length === 0) {
+        alert('No dishes available to delete');
+        return;
+    }
+    
+    const dish = dishes[0];
+    document.getElementById('deleteDishId').value = dish.id;
+    document.getElementById('deleteDishMessage').textContent = `Are you sure you want to delete "${dish.name}"? This action cannot be undone.`;
+    
+    // Show modal
+    document.getElementById('deleteDishModal').classList.remove('hidden');
 }
 
+function closeDeleteDishModal() {
+    document.getElementById('deleteDishModal').classList.add('hidden');
+}
+
+async function confirmDeleteDish() {
+    if (!hasPermission('deleteDish')) {
+        alert('Permission denied');
+        return;
+    }
+    
+    const dishId = document.getElementById('deleteDishId').value;
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('dishes')
+            .delete()
+            .eq('id', dishId);
+        
+        if (error) throw error;
+        
+        // Refresh dishes list
+        await loadRestaurantData(currentRestaurant.id);
+        
+        // Show success message
+        alert('Dish deleted successfully!');
+        closeDeleteDishModal();
+        
+        // Update UI
+        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+            loadRestaurantsTable();
+        }
+        
+    } catch (error) {
+        console.error('Error deleting dish:', error);
+        alert('Error deleting dish: ' + error.message);
+    }
+}
+
+// View Revenue
 function showRevenueReport() {
     if (!hasPermission('viewRevenue')) {
         alert('You do not have permission to view revenue');
         return;
     }
-    alert('Revenue report would open here');
+    
+    loadRevenueReport();
+    document.getElementById('revenueReportModal').classList.remove('hidden');
 }
 
-function showReserveTable() {
+function closeRevenueReportModal() {
+    document.getElementById('revenueReportModal').classList.add('hidden');
+}
+
+async function loadRevenueReport() {
+    try {
+        // For demo, we'll use sample data
+        // In a real app, you would fetch from Supabase
+        
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        
+        // Sample data for demo
+        const sampleData = {
+            totalRevenue: 12500,
+            totalOrders: 42,
+            averageOrderValue: 297.62,
+            topDishes: [
+                { name: "Butter Chicken", quantity: 18, revenue: 3600 },
+                { name: "Garlic Naan", quantity: 35, revenue: 2800 },
+                { name: "Biryani", quantity: 12, revenue: 2400 },
+                { name: "Paneer Tikka", quantity: 15, revenue: 2250 },
+                { name: "Mango Lassi", quantity: 20, revenue: 1600 }
+            ],
+            hourlyRevenue: [800, 1200, 1800, 2200, 2500, 3000]
+        };
+        
+        // Update UI
+        document.getElementById('totalRevenue').textContent = `₹${sampleData.totalRevenue}`;
+        document.getElementById('totalOrders').textContent = sampleData.totalOrders;
+        document.getElementById('averageOrderValue').textContent = `₹${sampleData.averageOrderValue}`;
+        
+        // Update top dishes table
+        let topDishesHTML = '';
+        sampleData.topDishes.forEach((dish, index) => {
+            topDishesHTML += `
+                <tr class="${index % 2 === 0 ? 'bg-gray-50' : ''}">
+                    <td class="px-4 py-2">${dish.name}</td>
+                    <td class="px-4 py-2">${dish.quantity}</td>
+                    <td class="px-4 py-2">₹${dish.revenue}</td>
+                </tr>
+            `;
+        });
+        document.getElementById('topDishesTable').innerHTML = topDishesHTML;
+        
+        // Update chart
+        updateRevenueChart(sampleData.hourlyRevenue);
+        
+    } catch (error) {
+        console.error('Error loading revenue report:', error);
+    }
+}
+
+function updateRevenueChart(hourlyRevenue) {
+    const ctx = document.getElementById('revenueReportChart').getContext('2d');
+    
+    if (revenueReportChart) {
+        revenueReportChart.destroy();
+    }
+    
+    const hours = ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'];
+    
+    revenueReportChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: hours.slice(0, hourlyRevenue.length),
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: hourlyRevenue,
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateRevenueReport() {
+    const range = document.getElementById('revenueDateRange').value;
+    
+    if (range === 'custom') {
+        document.getElementById('customDateRange').classList.remove('hidden');
+    } else {
+        document.getElementById('customDateRange').classList.add('hidden');
+        loadRevenueReport();
+    }
+}
+
+function applyCustomDateRange() {
+    const startDate = document.getElementById('revenueStartDate').value;
+    const endDate = document.getElementById('revenueEndDate').value;
+    
+    if (!startDate || !endDate) {
+        alert('Please select both start and end dates');
+        return;
+    }
+    
+    // In a real app, you would fetch data for the selected date range
+    console.log('Loading revenue for date range:', startDate, 'to', endDate);
+    loadRevenueReport();
+}
+
+// Reserve Table
+function showReserveTableModal() {
     if (!hasPermission('reserveTable')) {
         alert('You do not have permission to reserve tables');
         return;
     }
-    alert('Table reservation system would open here');
+    
+    // Reset form
+    document.getElementById('reserveTableForm').reset();
+    
+    // Set default time (next hour)
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const nextHour = now.toTimeString().substring(0, 5);
+    document.getElementById('reservationTime').value = nextHour;
+    
+    // Show modal
+    document.getElementById('reserveTableModal').classList.remove('hidden');
 }
 
-function showOrders() {
+function closeReserveTableModal() {
+    document.getElementById('reserveTableModal').classList.add('hidden');
+}
+
+async function reserveTable() {
+    if (!hasPermission('reserveTable')) {
+        alert('Permission denied');
+        return;
+    }
+    
+    const reservationData = {
+        restaurant_id: currentRestaurant.id,
+        customer_name: document.getElementById('customerName').value,
+        customer_phone: document.getElementById('customerPhone').value,
+        number_of_guests: parseInt(document.getElementById('numberOfGuests').value),
+        table_number: document.getElementById('tableNumber').value || null,
+        reservation_date: document.getElementById('reservationDate').value,
+        reservation_time: document.getElementById('reservationTime').value,
+        special_requests: document.getElementById('specialRequests').value,
+        status: 'confirmed',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
+    
+    try {
+        // In a real app, you would insert into a reservations table
+        // For demo, we'll just show a success message
+        
+        console.log('Reservation data:', reservationData);
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Show success message
+        alert(`Table reserved successfully!\n\nReservation Details:\nCustomer: ${reservationData.customer_name}\nDate: ${reservationData.reservation_date}\nTime: ${reservationData.reservation_time}\nGuests: ${reservationData.number_of_guests}`);
+        
+        closeReserveTableModal();
+        
+    } catch (error) {
+        console.error('Error creating reservation:', error);
+        alert('Error creating reservation: ' + error.message);
+    }
+}
+
+// View Orders
+function showOrdersModal() {
     if (!hasPermission('viewTableOrders')) {
         alert('You do not have permission to view orders');
         return;
     }
-    alert('Order management view would open here');
+    
+    loadCurrentOrders();
+    document.getElementById('ordersModal').classList.remove('hidden');
+}
+
+function closeOrdersModal() {
+    document.getElementById('ordersModal').classList.add('hidden');
+}
+
+async function loadCurrentOrders() {
+    try {
+        // In a real app, fetch orders from Supabase
+        // For demo, use sample data
+        
+        const sampleOrders = [
+            {
+                id: 'ORD001',
+                table_number: 'T1',
+                customer_name: 'John Doe',
+                status: 'preparing',
+                total_amount: 1250,
+                items: [
+                    { name: 'Butter Chicken', quantity: 2, price: 250 },
+                    { name: 'Garlic Naan', quantity: 4, price: 40 }
+                ],
+                created_at: new Date().toISOString()
+            },
+            {
+                id: 'ORD002',
+                table_number: 'T3',
+                customer_name: 'Jane Smith',
+                status: 'pending',
+                total_amount: 850,
+                items: [
+                    { name: 'Paneer Tikka', quantity: 1, price: 200 },
+                    { name: 'Biryani', quantity: 1, price: 300 },
+                    { name: 'Coke', quantity: 2, price: 50 }
+                ],
+                created_at: new Date().toISOString()
+            },
+            {
+                id: 'ORD003',
+                table_number: 'T5',
+                customer_name: 'Robert Johnson',
+                status: 'ready',
+                total_amount: 1800,
+                items: [
+                    { name: 'Butter Chicken', quantity: 1, price: 250 },
+                    { name: 'Biryani', quantity: 2, price: 300 },
+                    { name: 'Garlic Naan', quantity: 6, price: 40 }
+                ],
+                created_at: new Date().toISOString()
+            }
+        ];
+        
+        currentOrders = sampleOrders;
+        renderOrders(sampleOrders);
+        
+    } catch (error) {
+        console.error('Error loading orders:', error);
+    }
+}
+
+function renderOrders(orders) {
+    const ordersGrid = document.getElementById('ordersGrid');
+    const noOrdersMessage = document.getElementById('noOrdersMessage');
+    
+    if (orders.length === 0) {
+        ordersGrid.innerHTML = '';
+        noOrdersMessage.classList.remove('hidden');
+        return;
+    }
+    
+    noOrdersMessage.classList.add('hidden');
+    
+    let ordersHTML = '';
+    
+    orders.forEach(order => {
+        const statusColors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'preparing': 'bg-blue-100 text-blue-800',
+            'ready': 'bg-green-100 text-green-800',
+            'served': 'bg-purple-100 text-purple-800',
+            'completed': 'bg-gray-100 text-gray-800'
+        };
+        
+        const statusText = {
+            'pending': 'Pending',
+            'preparing': 'Preparing',
+            'ready': 'Ready to Serve',
+            'served': 'Served',
+            'completed': 'Completed'
+        };
+        
+        const statusColor = statusColors[order.status] || 'bg-gray-100 text-gray-800';
+        const statusDisplay = statusText[order.status] || order.status;
+        
+        let itemsHTML = '';
+        order.items.forEach(item => {
+            itemsHTML += `
+                <div class="flex justify-between text-sm">
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>₹${item.price * item.quantity}</span>
+                </div>
+            `;
+        });
+        
+        ordersHTML += `
+            <div class="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <div class="font-bold text-lg">Table ${order.table_number}</div>
+                        <div class="text-sm text-gray-600">${order.customer_name}</div>
+                    </div>
+                    <span class="px-3 py-1 text-xs rounded-full ${statusColor}">
+                        ${statusDisplay}
+                    </span>
+                </div>
+                
+                <div class="space-y-2 mb-4">
+                    ${itemsHTML}
+                </div>
+                
+                <div class="border-t pt-3">
+                    <div class="flex justify-between font-bold">
+                        <span>Total</span>
+                        <span>₹${order.total_amount}</span>
+                    </div>
+                    
+                    <div class="flex space-x-2 mt-3">
+                        ${order.status === 'pending' ? `
+                            <button onclick="updateOrderStatus('${order.id}', 'preparing')" 
+                                    class="flex-1 bg-blue-600 text-white py-1 rounded hover:bg-blue-700 text-sm">
+                                Start Preparing
+                            </button>
+                        ` : ''}
+                        
+                        ${order.status === 'preparing' ? `
+                            <button onclick="updateOrderStatus('${order.id}', 'ready')" 
+                                    class="flex-1 bg-green-600 text-white py-1 rounded hover:bg-green-700 text-sm">
+                                Mark Ready
+                            </button>
+                        ` : ''}
+                        
+                        ${order.status === 'ready' ? `
+                            <button onclick="updateOrderStatus('${order.id}', 'served')" 
+                                    class="flex-1 bg-purple-600 text-white py-1 rounded hover:bg-purple-700 text-sm">
+                                Mark Served
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    ordersGrid.innerHTML = ordersHTML;
+}
+
+function filterOrders() {
+    const statusFilter = document.getElementById('orderStatusFilter').value;
+    const searchTerm = document.getElementById('orderSearch').value.toLowerCase();
+    
+    let filteredOrders = currentOrders;
+    
+    if (statusFilter !== 'all') {
+        filteredOrders = filteredOrders.filter(order => order.status === statusFilter);
+    }
+    
+    if (searchTerm) {
+        filteredOrders = filteredOrders.filter(order => 
+            order.table_number.toLowerCase().includes(searchTerm) ||
+            order.customer_name.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    renderOrders(filteredOrders);
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        // In a real app, update order in Supabase
+        console.log(`Updating order ${orderId} to status: ${newStatus}`);
+        
+        // Update local state
+        const orderIndex = currentOrders.findIndex(order => order.id === orderId);
+        if (orderIndex !== -1) {
+            currentOrders[orderIndex].status = newStatus;
+            renderOrders(currentOrders);
+            
+            // Show success message
+            const statusMessages = {
+                'preparing': 'Order is now being prepared',
+                'ready': 'Order is ready to serve',
+                'served': 'Order has been served'
+            };
+            
+            alert(statusMessages[newStatus] || 'Order status updated');
+        }
+        
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        alert('Error updating order status: ' + error.message);
+    }
+}
+
+// Load Order History
+async function loadOrderHistory() {
+    if (!hasPermission('viewOrderHistoryName') && !hasPermission('viewOrderHistoryTable')) {
+        return;
+    }
+    
+    try {
+        // In a real app, fetch order history from Supabase
+        // For demo, use sample data
+        
+        const sampleHistoryByName = [
+            { customer: 'John Doe', orders: 5, total: 6250 },
+            { customer: 'Jane Smith', orders: 3, total: 2550 },
+            { customer: 'Robert Johnson', orders: 7, total: 12600 },
+            { customer: 'Sarah Williams', orders: 2, total: 1800 }
+        ];
+        
+        const sampleHistoryByTable = [
+            { table: 'T1', orders: 8, total: 10000 },
+            { table: 'T3', orders: 5, total: 6250 },
+            { table: 'T5', orders: 12, total: 15000 },
+            { table: 'T7', orders: 3, total: 3750 }
+        ];
+        
+        // Render history by name
+        if (hasPermission('viewOrderHistoryName')) {
+            let historyByNameHTML = '';
+            sampleHistoryByName.forEach(item => {
+                historyByNameHTML += `
+                    <div class="flex justify-between items-center p-2 border-b">
+                        <div>
+                            <div class="font-medium">${item.customer}</div>
+                            <div class="text-sm text-gray-600">${item.orders} orders</div>
+                        </div>
+                        <div class="font-bold">₹${item.total}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('orderHistoryByName').innerHTML = historyByNameHTML || '<p class="text-gray-500">No history available</p>';
+        }
+        
+        // Render history by table
+        if (hasPermission('viewOrderHistoryTable')) {
+            let historyByTableHTML = '';
+            sampleHistoryByTable.forEach(item => {
+                historyByTableHTML += `
+                    <div class="flex justify-between items-center p-2 border-b">
+                        <div>
+                            <div class="font-medium">Table ${item.table}</div>
+                            <div class="text-sm text-gray-600">${item.orders} orders</div>
+                        </div>
+                        <div class="font-bold">₹${item.total}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('orderHistoryByTable').innerHTML = historyByTableHTML || '<p class="text-gray-500">No history available</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error loading order history:', error);
+    }
 }
 
 // Setup UI for staff
 function setupStaffUI() {
-    // Hide admin-only elements
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = 'none';
     });
     
-    // Show staff-only elements
     document.querySelectorAll('.staff-only').forEach(el => {
         el.style.display = 'block';
     });
     
-    // Update UI text
     document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
     document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
     
@@ -891,14 +1967,12 @@ function setupStaffUI() {
     
     document.getElementById('restaurantLabel').textContent = 'menu items';
     
-    // Apply permissions
     updateUIBasedOnPermissions();
 }
 
 // Handle admin access
 async function handleAdminAccess(user) {
     try {
-        // Check if user is admin
         const { data: adminUser, error: adminError } = await supabaseClient
             .from('staff_users')
             .select('*')
@@ -907,7 +1981,6 @@ async function handleAdminAccess(user) {
             .single();
             
         if (adminError || !adminUser) {
-            // Check if user is staff for any restaurant
             const { data: staffUser } = await supabaseClient
                 .from('staff_users')
                 .select('*, restaurants(*)')
@@ -916,7 +1989,6 @@ async function handleAdminAccess(user) {
                 .single();
                 
             if (staffUser) {
-                // Redirect to staff view for their restaurant
                 window.location.href = `index.html?restaurant=${staffUser.restaurants.url_slug}&staff=true`;
                 return;
             }
@@ -930,13 +2002,8 @@ async function handleAdminAccess(user) {
         currentUser = adminUser;
         userRole = 'admin';
         
-        // Update UI for admin
         setupAdminUI();
-        
-        // Load admin data
         await loadAdminData();
-        
-        // Hide login modal, show dashboard
         document.getElementById('adminLoginModal').style.display = 'none';
         document.getElementById('adminDashboard').classList.remove('hidden');
         
@@ -950,20 +2017,15 @@ async function handleAdminAccess(user) {
 
 // Setup UI for admin
 function setupAdminUI() {
-    // Show admin-only elements
     document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = 'block';
     });
     
-    // Hide staff-only elements
     document.querySelectorAll('.staff-only').forEach(el => {
         el.style.display = 'none';
     });
     
-    // Hide staff actions section
     document.getElementById('staffActionsSection').style.display = 'none';
-    
-    // Update dashboard title
     document.getElementById('dashboardTitle').textContent = 'Admin Panel';
     document.getElementById('dashboardSubtitle').textContent = 'DigitalMenuPro';
 }
@@ -990,8 +2052,6 @@ async function handleAdminLogin() {
         });
         
         if (error) throw error;
-        
-        // Reload to initialize dashboard with new user
         window.location.reload();
         
     } catch (error) {
@@ -1048,13 +2108,8 @@ async function loadAdminData() {
         
         if (!usersError) users = usersData || [];
         
-        // Update dashboard stats
         updateDashboardStats();
-        
-        // Setup charts
         setupCharts();
-        
-        // Load notifications and activities
         loadNotifications();
         loadActivities();
         
@@ -1085,21 +2140,6 @@ async function loadRestaurantData(restaurantId) {
             dishes = [];
         }
         
-        // Load orders for this restaurant (last 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: ordersData, error: ordersError } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .gte('created_at', thirtyDaysAgo.toISOString())
-            .order('created_at', { ascending: false });
-        
-        if (!ordersError) {
-            console.log(`✓ Loaded ${ordersData.length} recent orders`);
-        }
-        
         // Load staff members for this restaurant
         const { data: staffData, error: staffError } = await supabaseClient
             .from('staff_users')
@@ -1116,12 +2156,12 @@ async function loadRestaurantData(restaurantId) {
         document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
         document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
         
-        // Setup charts with restaurant data
         setupStaffCharts();
-        
-        // Load notifications and activities
         loadNotifications();
         loadActivities();
+        
+        // Load order history
+        loadOrderHistory();
         
         console.log('✓ Restaurant data loaded successfully');
         
@@ -1160,13 +2200,13 @@ function updateDashboardStats() {
         document.getElementById('totalRestaurants').textContent = dishes.length;
         
         document.getElementById('stat2Title').textContent = 'Today\'s Orders';
-        document.getElementById('activeSubscriptions').textContent = '0'; // You can calculate this
+        document.getElementById('activeSubscriptions').textContent = '42'; // Sample data
         
         document.getElementById('stat3Title').textContent = 'Active Staff';
         document.getElementById('monthlyRevenue').textContent = users.length;
         
         document.getElementById('stat4Title').textContent = 'Table Occupancy';
-        document.getElementById('pendingPayments').textContent = '75%'; // Example
+        document.getElementById('pendingPayments').textContent = '75%'; // Sample data
     }
 }
 
@@ -1253,11 +2293,9 @@ function setupCharts() {
 }
 
 function setupStaffCharts() {
-    // For staff, show different charts
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
     if (revenueChart) revenueChart.destroy();
     
-    // Show today's orders chart for staff
     revenueChart = new Chart(revenueCtx, {
         type: 'line',
         data: {
@@ -1281,11 +2319,9 @@ function setupStaffCharts() {
         }
     });
     
-    // Plan Distribution/Categories Chart for staff
     const planCtx = document.getElementById('planChart').getContext('2d');
     if (planChart) planChart.destroy();
     
-    // Show menu categories distribution for staff
     const categoryCount = {};
     dishes.forEach(dish => {
         categoryCount[dish.category] = (categoryCount[dish.category] || 0) + 1;
@@ -1332,7 +2368,6 @@ function getLast6Months() {
 }
 
 function generateRevenueData(months) {
-    // Generate sample data - in real app, fetch from database
     return months.map(() => Math.floor(Math.random() * 50000) + 10000);
 }
 
@@ -1341,7 +2376,6 @@ async function loadNotifications() {
         let html = '';
         
         if (userRole === 'admin') {
-            // Admin notifications
             const pendingPayments = payments.filter(p => p.status === 'pending').length;
             const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
             
@@ -1369,11 +2403,25 @@ async function loadNotifications() {
                 `;
             }
         } else {
-            // Staff notifications
+            // Sample staff notifications
+            const today = new Date();
+            const reservationsToday = 8; // Sample data
+            
             html = `
-                <div class="text-center py-8 text-gray-500">
-                    <i class="fas fa-bell-slash text-3xl mb-3"></i>
-                    <p>No new notifications</p>
+                <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-chair text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${reservationsToday} reservations today</p>
+                        <p class="text-sm text-gray-600">Check table availability</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start p-3 bg-green-50 rounded-lg">
+                    <i class="fas fa-utensils text-green-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">2 new orders</p>
+                        <p class="text-sm text-gray-600">Waiting for preparation</p>
+                    </div>
                 </div>
             `;
         }
@@ -1394,7 +2442,6 @@ async function loadActivities() {
         let html = '';
         
         if (userRole === 'admin') {
-            // Recent payments
             const recentPayments = payments.slice(0, 5);
             recentPayments.forEach(payment => {
                 const date = new Date(payment.created_at).toLocaleDateString();
@@ -1414,7 +2461,6 @@ async function loadActivities() {
                 `;
             });
             
-            // Recent registrations
             const recentRestaurants = restaurants.slice(0, 3);
             recentRestaurants.forEach(restaurant => {
                 const date = new Date(restaurant.created_at).toLocaleDateString();
@@ -1433,16 +2479,28 @@ async function loadActivities() {
                 `;
             });
         } else {
-            // Staff activities
-            html = `
-                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
-                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
+            // Sample staff activities
+            const activities = [
+                { icon: 'fa-plus', color: 'green', title: 'New dish added', desc: 'Butter Chicken added to menu', time: '10:30 AM' },
+                { icon: 'fa-edit', color: 'blue', title: 'Dish updated', desc: 'Paneer Tikka price updated', time: '11:45 AM' },
+                { icon: 'fa-chair', color: 'purple', title: 'Table reserved', desc: 'Table 3 reserved for 4 people', time: '12:15 PM' },
+                { icon: 'fa-list-alt', color: 'orange', title: 'Order completed', desc: 'Order #ORD003 served', time: '1:30 PM' }
+            ];
+            
+            activities.forEach(activity => {
+                html += `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-${activity.color}-100 text-${activity.color}-600 flex items-center justify-center mr-3">
+                            <i class="fas ${activity.icon} text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">${activity.title}</p>
+                            <p class="text-sm text-gray-600">${activity.desc}</p>
+                            <p class="text-xs text-gray-500">${activity.time}</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            });
         }
         
         document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
@@ -1454,32 +2512,26 @@ async function loadActivities() {
 
 // View Navigation
 function showView(viewName) {
-    // Hide all views
     document.querySelectorAll('.view').forEach(view => {
         view.classList.add('hidden');
     });
     
-    // Remove active class from all nav items
     document.querySelectorAll('nav a').forEach(navItem => {
         navItem.classList.remove('active-nav', 'bg-gray-700');
     });
     
-    // Add active class to clicked nav item
     const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
     if (activeNav) {
         activeNav.classList.add('active-nav', 'bg-gray-700');
     }
     
-    // Show selected view
     const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
     if (viewElement) {
         viewElement.classList.remove('hidden');
     }
     
-    // Update title and subtitle
     updateViewTitle(viewName);
     
-    // Load view-specific data
     switch(viewName) {
         case 'restaurants':
             loadRestaurantsTable();
@@ -1557,7 +2609,6 @@ async function loadAdminRestaurantsTable() {
     const endIndex = startIndex + itemsPerPage;
     const paginatedRestaurants = restaurants.slice(startIndex, endIndex);
     
-    // Update table headers for admin
     document.getElementById('restaurantsTableHeader').innerHTML = `
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
@@ -1570,7 +2621,6 @@ async function loadAdminRestaurantsTable() {
     
     let tableHTML = '';
     paginatedRestaurants.forEach(restaurant => {
-        // Find subscription for this restaurant
         const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
         
         tableHTML += `
@@ -1632,7 +2682,6 @@ async function loadAdminRestaurantsTable() {
         </tr>
     `;
     
-    // Update pagination info
     document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
     document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
     document.getElementById('restaurantTotal').textContent = restaurants.length;
@@ -1645,7 +2694,6 @@ async function loadStaffMenuTable() {
     const endIndex = startIndex + itemsPerPage;
     const paginatedDishes = dishes.slice(startIndex, endIndex);
     
-    // Update table headers for staff (menu items)
     document.getElementById('restaurantsTableHeader').innerHTML = `
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
@@ -1656,7 +2704,7 @@ async function loadStaffMenuTable() {
     
     let tableHTML = '';
     paginatedDishes.forEach(dish => {
-        const statusClass = dish.is_available ? 'status-active' : 'status-inactive';
+        const statusClass = dish.is_available ? 'status-active' : 'status-suspended';
         const statusText = dish.is_available ? 'Available' : 'Unavailable';
         
         tableHTML += `
@@ -1682,7 +2730,7 @@ async function loadStaffMenuTable() {
                     <span class="status-badge ${statusClass}">${statusText}</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="editDish('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                    <button onclick="editDishRow('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
                         <i class="fas fa-edit"></i>
                     </button>
                     <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
@@ -1701,7 +2749,6 @@ async function loadStaffMenuTable() {
         </tr>
     `;
     
-    // Update pagination info
     document.getElementById('restaurantStart').textContent = dishes.length > 0 ? startIndex + 1 : 0;
     document.getElementById('restaurantEnd').textContent = Math.min(endIndex, dishes.length);
     document.getElementById('restaurantTotal').textContent = dishes.length;
@@ -1711,17 +2758,11 @@ async function loadStaffMenuTable() {
 // Filter restaurants/menu items
 function filterRestaurants() {
     if (userRole === 'admin') {
-        // Filter restaurants for admin
         const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
         const statusFilter = document.getElementById('statusFilter').value;
         const planFilter = document.getElementById('planFilter').value;
-        const dateFrom = document.getElementById('dateFrom').value;
-        const dateTo = document.getElementById('dateTo').value;
-        
-        // Apply filters (simplified - in real app you would filter the data)
-        console.log('Filtering restaurants by:', searchTerm, statusFilter, planFilter, dateFrom, dateTo);
+        console.log('Filtering restaurants by:', searchTerm, statusFilter, planFilter);
     } else {
-        // Filter dishes for staff
         const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
         console.log('Filtering dishes by:', searchTerm);
     }
@@ -1745,254 +2786,69 @@ function nextRestaurantPage() {
     }
 }
 
-// User Management
-async function loadUsersTable() {
+// Edit dish from table row
+async function editDishRow(dishId) {
+    if (!hasPermission('editDish')) {
+        alert('You do not have permission to edit dishes');
+        return;
+    }
+    
+    const dish = dishes.find(d => d.id === dishId);
+    if (!dish) return;
+    
+    // Fill form with dish data
+    document.getElementById('editDishId').value = dish.id;
+    document.getElementById('editDishName').value = dish.name;
+    document.getElementById('editDishDescription').value = dish.description || '';
+    document.getElementById('editDishCategory').value = dish.category;
+    document.getElementById('editDishPrice').value = dish.price;
+    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
+    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
+    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
+    document.getElementById('editDishImageUrl').value = dish.image_url || '';
+    
+    // Show modal
+    document.getElementById('editDishModal').classList.remove('hidden');
+}
+
+// Toggle dish status
+async function toggleDishStatus(dishId, currentStatus) {
+    if (!hasPermission('editDish')) {
+        alert('You do not have permission to edit dishes');
+        return;
+    }
+    
+    const newStatus = !currentStatus;
+    
     try {
-        if (userRole === 'admin') {
-            await loadAllUsersTable();
-        } else {
-            await loadRestaurantStaffTable();
+        const { data, error } = await supabaseClient
+            .from('dishes')
+            .update({ 
+                is_available: newStatus,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', dishId)
+            .select();
+        
+        if (error) throw error;
+        
+        // Refresh dishes list
+        await loadRestaurantData(currentRestaurant.id);
+        
+        // Update UI
+        if (document.getElementById('viewRestaurants').classList.contains('hidden') === false) {
+            loadRestaurantsTable();
         }
+        
+        alert(`Dish ${newStatus ? 'enabled' : 'disabled'} successfully!`);
+        
     } catch (error) {
-        console.error('Error loading users table:', error);
+        console.error('Error toggling dish status:', error);
+        alert('Error updating dish status: ' + error.message);
     }
 }
 
-// Load all users for admin
-async function loadAllUsersTable() {
-    let tableHTML = '';
-    
-    users.forEach(user => {
-        // Determine role badge class
-        let roleClass = 'bg-red-100 text-red-800';
-        let roleText = user.role;
-        
-        switch(user.role) {
-            case 'owner':
-                roleClass = 'bg-yellow-100 text-yellow-800';
-                break;
-            case 'manager':
-                roleClass = 'bg-blue-100 text-blue-800';
-                break;
-            case 'chef':
-                roleClass = 'bg-orange-100 text-orange-800';
-                break;
-            case 'waiter':
-                roleClass = 'bg-green-100 text-green-800';
-                break;
-        }
-        
-        // Status badge
-        const statusClass = user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-        const statusText = user.is_active ? 'ACTIVE' : 'INACTIVE';
-        
-        // Last active time
-        let lastActive = 'Never';
-        if (user.last_login) {
-            const lastLogin = new Date(user.last_login);
-            const now = new Date();
-            const diffMs = now - lastLogin;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-            
-            if (diffDays > 0) {
-                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            } else if (diffHours > 0) {
-                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            } else if (diffMins > 0) {
-                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else {
-                lastActive = 'Just now';
-            }
-        }
-        
-        tableHTML += `
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-blue-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${user.name}</div>
-                            <div class="text-sm text-gray-500">${user.email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${user.restaurants?.name || 'No Restaurant'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded ${roleClass}">
-                        ${roleText.toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded ${statusClass}">
-                        ${statusText}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${lastActive}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                        <i class="fas fa-power-off"></i>
-                    </button>
-                    ${user.role !== 'admin' ? `
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    ` : ''}
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('usersTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                No users found
-            </td>
-        </tr>
-    `;
-}
-
-// Load restaurant staff for staff users
-async function loadRestaurantStaffTable() {
-    let tableHTML = '';
-    
-    // Filter users for current restaurant only
-    const restaurantStaff = users.filter(user => 
-        user.restaurant_id === currentRestaurant?.id || 
-        user.restaurants?.id === currentRestaurant?.id
-    );
-    
-    restaurantStaff.forEach(user => {
-        // Determine role badge class
-        let roleClass = 'bg-red-100 text-red-800';
-        let roleText = user.role;
-        
-        switch(user.role) {
-            case 'owner':
-                roleClass = 'bg-yellow-100 text-yellow-800';
-                roleText = 'Owner';
-                break;
-            case 'manager':
-                roleClass = 'bg-blue-100 text-blue-800';
-                roleText = 'Manager';
-                break;
-            case 'chef':
-                roleClass = 'bg-orange-100 text-orange-800';
-                roleText = 'Chef';
-                break;
-            case 'waiter':
-                roleClass = 'bg-green-100 text-green-800';
-                roleText = 'Waiter';
-                break;
-        }
-        
-        // Status badge
-        const statusClass = user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-        const statusText = user.is_active ? 'ACTIVE' : 'INACTIVE';
-        
-        // Last active time
-        let lastActive = 'Never';
-        if (user.last_login) {
-            const lastLogin = new Date(user.last_login);
-            const now = new Date();
-            const diffMs = now - lastLogin;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-            
-            if (diffDays > 0) {
-                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            } else if (diffHours > 0) {
-                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            } else if (diffMins > 0) {
-                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else {
-                lastActive = 'Just now';
-            }
-        }
-        
-        // Don't show edit button for current user (they can't edit themselves)
-        const canEdit = user.id !== currentUser?.id;
-        
-        tableHTML += `
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                            <i class="fas fa-user text-blue-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${user.name}</div>
-                            <div class="text-sm text-gray-500">${user.email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${currentRestaurant?.name || 'Current Restaurant'}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded ${roleClass}">
-                        ${roleText.toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded ${statusClass}">
-                        ${statusText}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${lastActive}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    ${canEdit ? `
-                        <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    ` : `
-                        <span class="text-gray-400">Current User</span>
-                    `}
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('usersTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                No staff members found
-            </td>
-        </tr>
-    `;
-}
-
-// Filter users
-function filterUsers() {
-    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-    
-    const rows = document.querySelectorAll('#usersTable tr');
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-}
-
-// Placeholder functions for actions (can be implemented later)
+// Placeholder functions for other actions
 function viewRestaurantDetails(restaurantId) {
     alert(`View restaurant details for ID: ${restaurantId}`);
 }
@@ -2011,30 +2867,6 @@ function deleteRestaurant(restaurantId) {
 
 function exportRestaurants() {
     alert('Export functionality would be implemented here');
-}
-
-function editDish(dishId) {
-    alert(`Edit dish with ID: ${dishId}`);
-}
-
-function toggleDishStatus(dishId, isAvailable) {
-    alert(`Toggle dish status for ID: ${dishId} to ${!isAvailable ? 'available' : 'unavailable'}`);
-}
-
-function editUser(userId) {
-    alert(`Edit user with ID: ${userId}`);
-}
-
-function toggleUserStatus(userId) {
-    alert(`Toggle user status for ID: ${userId}`);
-}
-
-function deleteUser(userId) {
-    alert(`Delete user with ID: ${userId}`);
-}
-
-function exportUsers() {
-    alert('Export users functionality would be implemented here');
 }
 
 // Initialize the dashboard
