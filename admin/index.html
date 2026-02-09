@@ -561,7 +561,7 @@
                             <div class="mb-4 p-3 bg-gray-50 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
                                 <div class="flex items-center justify-center">
-                                    <img id="addSelectedImagePreview" src="https://via.placeholder.com/300x200?text=No+Image" 
+                                    <img id="addSelectedImagePreview" src="https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image" 
                                          class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
                                 </div>
                                 <input type="hidden" id="addSelectedImageUrl">
@@ -698,7 +698,7 @@
                             <div class="mb-4 p-3 bg-gray-50 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
                                 <div class="flex items-center justify-center">
-                                    <img id="editSelectedImagePreview" src="https://via.placeholder.com/300x200?text=No+Image" 
+                                    <img id="editSelectedImagePreview" src="https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image" 
                                          class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
                                 </div>
                                 <input type="hidden" id="editSelectedImageUrl">
@@ -922,14 +922,14 @@ function selectImageFromGallery(imageUrl, containerId) {
 // Clear selected image for Add modal
 function clearAddSelectedImage() {
     document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
     renderImageGrid(availableImages, 'addImageGallery', null);
 }
 
 // Clear selected image for Edit modal
 function clearEditSelectedImage() {
     document.getElementById('editSelectedImageUrl').value = '';
-    document.getElementById('editSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
     renderImageGrid(availableImages, 'editImageGallery', null);
 }
 
@@ -1210,7 +1210,7 @@ async function showAddDishModal() {
     
     // Clear image selection
     document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
     document.getElementById('addImageSearch').value = '';
     
     // Load and display images from Supabase
@@ -1224,7 +1224,7 @@ async function showAddDishModal() {
 function closeAddDishModal() {
     document.getElementById('addDishModal').classList.add('hidden');
     document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
 }
 
 async function saveNewDish() {
@@ -1329,7 +1329,7 @@ async function showEditDishModal() {
     // Set selected image
     const currentImageUrl = dish.image_url || '';
     document.getElementById('editSelectedImageUrl').value = currentImageUrl;
-    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
     document.getElementById('editImageSearch').value = '';
     
     // Load and display images from Supabase
@@ -1343,7 +1343,7 @@ async function showEditDishModal() {
 function closeEditDishModal() {
     document.getElementById('editDishModal').classList.add('hidden');
     document.getElementById('editSelectedImageUrl').value = '';
-    document.getElementById('editSelectedImagePreview').src = 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
 }
 
 async function updateDish() {
@@ -1957,7 +1957,7 @@ async function editDishRow(dishId) {
     // Set selected image
     const currentImageUrl = dish.image_url || '';
     document.getElementById('editSelectedImageUrl').value = currentImageUrl;
-    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://via.placeholder.com/300x200?text=No+Image';
+    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
     document.getElementById('editImageSearch').value = '';
     
     // Load and display images from Supabase
