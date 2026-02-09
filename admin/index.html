@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <th data-column="category">Category</th>
     <style>
         .sidebar {
             transition: all 0.3s ease;
@@ -336,66 +335,63 @@
                             </div>
                         </div>
 
-<!-- Add to the dashboard view after the stats cards -->
-<div class="bg-white rounded-xl shadow-lg p-6">
-    <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <button onclick="showAddDishModal()" class="staff-action p-3 bg-green-100 text-green-800 rounded-lg hover:bg-green-200" data-permission="add_dishes">
-            <i class="fas fa-plus mb-1"></i>
-            <span class="text-xs">Add Dish</span>
-        </button>
-        
-        <button onclick="showEditDishModal()" class="staff-action p-3 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200" data-permission="edit_dishes">
-            <i class="fas fa-edit mb-1"></i>
-            <span class="text-xs">Edit Dish</span>
-        </button>
-        
-        <button onclick="showDeleteDishModal()" class="staff-action p-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200" data-permission="delete_dishes">
-            <i class="fas fa-trash mb-1"></i>
-            <span class="text-xs">Delete Dish</span>
-        </button>
-        
-        <button onclick="showRevenueReport()" class="staff-action p-3 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200" data-permission="view_revenue">
-            <i class="fas fa-rupee-sign mb-1"></i>
-            <span class="text-xs">View Revenue</span>
-        </button>
-        
-        <button onclick="showReserveTable()" class="staff-action p-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200" data-permission="manage_reservations">
-            <i class="fas fa-chair mb-1"></i>
-            <span class="text-xs">Reserve Table</span>
-        </button>
-        
-        <button onclick="showOrders()" class="staff-action p-3 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200" data-permission="view_orders">
-            <i class="fas fa-list-alt mb-1"></i>
-            <span class="text-xs">View Orders</span>
-        </button>
-    </div>
-</div>
+                        <!-- Quick Actions -->
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                                <button onclick="showAddDishModal()" class="staff-action p-3 bg-green-100 text-green-800 rounded-lg hover:bg-green-200" data-permission="addDish">
+                                    <i class="fas fa-plus mb-1"></i>
+                                    <span class="text-xs">Add Dish</span>
+                                </button>
+                                
+                                <button onclick="showEditDishModal()" class="staff-action p-3 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200" data-permission="editDish">
+                                    <i class="fas fa-edit mb-1"></i>
+                                    <span class="text-xs">Edit Dish</span>
+                                </button>
+                                
+                                <button onclick="showDeleteDishModal()" class="staff-action p-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200" data-permission="deleteDish">
+                                    <i class="fas fa-trash mb-1"></i>
+                                    <span class="text-xs">Delete Dish</span>
+                                </button>
+                                
+                                <button onclick="showRevenueReport()" class="staff-action p-3 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200" data-permission="viewRevenue">
+                                    <i class="fas fa-rupee-sign mb-1"></i>
+                                    <span class="text-xs">View Revenue</span>
+                                </button>
+                                
+                                <button onclick="showReserveTable()" class="staff-action p-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200" data-permission="reserveTable">
+                                    <i class="fas fa-chair mb-1"></i>
+                                    <span class="text-xs">Reserve Table</span>
+                                </button>
+                                
+                                <button onclick="showOrders()" class="staff-action p-3 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200" data-permission="viewTableOrders">
+                                    <i class="fas fa-list-alt mb-1"></i>
+                                    <span class="text-xs">View Orders</span>
+                                </button>
+                            </div>
+                        </div>
 
-<!-- Add History section -->
-<div class="bg-white rounded-xl shadow-lg p-6">
-    <h3 class="text-lg font-bold mb-4">Order History</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="staff-action" data-permission="view_order_history">
-            <h4 class="font-medium mb-2">By Customer Name</h4>
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">Customer order history will appear here</p>
-            </div>
-        </div>
-        
-        <div class="staff-action" data-permission="view_order_history">
-            <h4 class="font-medium mb-2">By Table Number</h4>
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">Table order history will appear here</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
+                        <!-- Add History section -->
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Order History</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="staff-action" data-permission="viewOrderHistoryName">
+                                    <h4 class="font-medium mb-2">By Customer Name</h4>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <p class="text-sm text-gray-600">Customer order history will appear here</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="staff-action" data-permission="viewOrderHistoryTable">
+                                    <h4 class="font-medium mb-2">By Table Number</h4>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <p class="text-sm text-gray-600">Table order history will appear here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
-                       <!-- <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-gray-600 text-sm" id="stat2Title">Active Subscriptions</p>
@@ -410,39 +406,7 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm" id="stat3Title">Monthly Revenue</p>
-                                    <p class="text-3xl font-bold" id="monthlyRevenue">₹0</p>
-                                </div>
-                                <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> <span id="stat3Change">15%</span></span>
-                                    <span class="text-gray-500 ml-2" id="stat3Subtitle">from last month</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm" id="stat4Title">Pending Payments</p>
-                                    <p class="text-3xl font-bold" id="pendingPayments">0</p>
-                                </div>
-                                <i class="fas fa-clock text-4xl text-yellow-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-red-600"><i class="fas fa-arrow-down mr-1"></i> <span id="stat4Change">3%</span></span>
-                                    <span class="text-gray-500 ml-2" id="stat4Subtitle">from last month</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
+                    </div>
                     
                     <!-- Charts -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -699,228 +663,52 @@ let rolePermissions = {
     waiter: {}
 };
 
-// Default permissions for each role
+// Default permissions for each role (using camelCase to match your database)
 const DEFAULT_PERMISSIONS = {
     owner: {
-        // Dashboard & Analytics
-        view_dashboard: true,
-        view_analytics: true,
-        export_reports: true,
-        
-        // Menu Management
-        manage_menu: true,
-        add_dishes: true,
-        edit_dishes: true,
-        delete_dishes: true,
-        manage_categories: true,
-        manage_specials: true,
-        
-        // Order Management
-        view_orders: true,
-        manage_orders: true,
-        update_order_status: true,
-        process_refunds: true,
-        view_order_history: true,
-        
-        // Staff Management
-        manage_staff: true,
-        add_staff: true,
-        edit_staff: true,
-        deactivate_staff: true,
-        assign_roles: true,
-        
-        // Customer Management
-        view_customers: true,
-        manage_reservations: true,
-        send_notifications: true,
-        
-        // Financial
-        view_reports: true,
-        view_revenue: true,
-        manage_discounts: true,
-        
-        // Settings
-        manage_settings: true,
-        update_restaurant_info: true,
-        manage_payment_settings: true,
-        manage_notification_settings: true
+        "addDish": true,
+        "editDish": true,
+        "deleteDish": true,
+        "manageStaff": true,
+        "viewRevenue": true,
+        "reserveTable": true,
+        "viewTableOrders": true,
+        "viewOrderHistoryName": true,
+        "viewOrderHistoryTable": true
     },
     manager: {
-        // Dashboard & Analytics
-        view_dashboard: true,
-        view_analytics: true,
-        export_reports: true,
-        
-        // Menu Management
-        manage_menu: true,
-        add_dishes: true,
-        edit_dishes: true,
-        delete_dishes: true,
-        manage_categories: true,
-        manage_specials: true,
-        
-        // Order Management
-        view_orders: true,
-        manage_orders: true,
-        update_order_status: true,
-        process_refunds: true,
-        view_order_history: true,
-        
-        // Staff Management
-        manage_staff: true,
-        add_staff: true,
-        edit_staff: true,
-        deactivate_staff: true,
-        assign_roles: false,
-        
-        // Customer Management
-        view_customers: true,
-        manage_reservations: true,
-        send_notifications: true,
-        
-        // Financial
-        view_reports: true,
-        view_revenue: true,
-        manage_discounts: true,
-        
-        // Settings
-        manage_settings: false,
-        update_restaurant_info: true,
-        manage_payment_settings: false,
-        manage_notification_settings: true
+        "addDish": true,
+        "editDish": true,
+        "deleteDish": true,
+        "manageStaff": false,
+        "viewRevenue": true,
+        "reserveTable": true,
+        "viewTableOrders": true,
+        "viewOrderHistoryName": true,
+        "viewOrderHistoryTable": true
     },
     chef: {
-        // Dashboard & Analytics
-        view_dashboard: true,
-        view_analytics: false,
-        export_reports: false,
-        
-        // Menu Management
-        manage_menu: true,
-        add_dishes: true,
-        edit_dishes: true,
-        delete_dishes: true,
-        manage_categories: true,
-        manage_specials: true,
-        
-        // Order Management
-        view_orders: true,
-        manage_orders: true,
-        update_order_status: true,
-        process_refunds: false,
-        view_order_history: true,
-        
-        // Staff Management
-        manage_staff: false,
-        add_staff: false,
-        edit_staff: false,
-        deactivate_staff: false,
-        assign_roles: false,
-        
-        // Customer Management
-        view_customers: false,
-        manage_reservations: false,
-        send_notifications: false,
-        
-        // Financial
-        view_reports: false,
-        view_revenue: false,
-        manage_discounts: false,
-        
-        // Settings
-        manage_settings: false,
-        update_restaurant_info: false,
-        manage_payment_settings: false,
-        manage_notification_settings: false
+        "addDish": true,
+        "editDish": true,
+        "deleteDish": true,
+        "manageStaff": false,
+        "viewRevenue": false,
+        "reserveTable": false,
+        "viewTableOrders": true,
+        "viewOrderHistoryName": true,
+        "viewOrderHistoryTable": true
     },
     waiter: {
-        // Dashboard & Analytics
-        view_dashboard: true,
-        view_analytics: false,
-        export_reports: false,
-        
-        // Menu Management
-        manage_menu: false,
-        add_dishes: false,
-        edit_dishes: false,
-        delete_dishes: false,
-        manage_categories: false,
-        manage_specials: false,
-        
-        // Order Management
-        view_orders: true,
-        manage_orders: true,
-        update_order_status: true,
-        process_refunds: false,
-        view_order_history: true,
-        
-        // Staff Management
-        manage_staff: false,
-        add_staff: false,
-        edit_staff: false,
-        deactivate_staff: false,
-        assign_roles: false,
-        
-        // Customer Management
-        view_customers: true,
-        manage_reservations: true,
-        send_notifications: true,
-        
-        // Financial
-        view_reports: false,
-        view_revenue: false,
-        manage_discounts: false,
-        
-        // Settings
-        manage_settings: false,
-        update_restaurant_info: false,
-        manage_payment_settings: false,
-        manage_notification_settings: false
+        "addDish": false,
+        "editDish": false,
+        "deleteDish": false,
+        "manageStaff": false,
+        "viewRevenue": false,
+        "reserveTable": true,
+        "viewTableOrders": true,
+        "viewOrderHistoryName": true,
+        "viewOrderHistoryTable": true
     }
-};
-
-// Permission categories for better organization
-const PERMISSION_CATEGORIES = {
-    'Dashboard & Analytics': ['view_dashboard', 'view_analytics', 'export_reports'],
-    'Menu Management': ['manage_menu', 'add_dishes', 'edit_dishes', 'delete_dishes', 'manage_categories', 'manage_specials'],
-    'Order Management': ['view_orders', 'manage_orders', 'update_order_status', 'process_refunds', 'view_order_history'],
-    'Staff Management': ['manage_staff', 'add_staff', 'edit_staff', 'deactivate_staff', 'assign_roles'],
-    'Customer Management': ['view_customers', 'manage_reservations', 'send_notifications'],
-    'Financial': ['view_reports', 'view_revenue', 'manage_discounts'],
-    'Settings': ['manage_settings', 'update_restaurant_info', 'manage_payment_settings', 'manage_notification_settings']
-};
-
-// Permission descriptions
-const PERMISSION_DESCRIPTIONS = {
-    view_dashboard: 'Access to the main dashboard',
-    view_analytics: 'View restaurant analytics and reports',
-    export_reports: 'Export reports and data',
-    manage_menu: 'Full menu management access',
-    add_dishes: 'Add new dishes to the menu',
-    edit_dishes: 'Edit existing dishes',
-    delete_dishes: 'Delete dishes from the menu',
-    manage_categories: 'Manage menu categories',
-    manage_specials: 'Manage daily/weekly specials',
-    view_orders: 'View incoming orders',
-    manage_orders: 'Manage and process orders',
-    update_order_status: 'Update order status (preparing, ready, etc.)',
-    process_refunds: 'Process order refunds',
-    view_order_history: 'View order history',
-    manage_staff: 'Manage restaurant staff',
-    add_staff: 'Add new staff members',
-    edit_staff: 'Edit staff information',
-    deactivate_staff: 'Deactivate staff accounts',
-    assign_roles: 'Assign roles to staff members',
-    view_customers: 'View customer information',
-    manage_reservations: 'Manage table reservations',
-    send_notifications: 'Send notifications to customers',
-    view_reports: 'View financial reports',
-    view_revenue: 'View revenue reports',
-    manage_discounts: 'Create and manage discounts',
-    manage_settings: 'Manage restaurant settings',
-    update_restaurant_info: 'Update restaurant information',
-    manage_payment_settings: 'Manage payment settings',
-    manage_notification_settings: 'Manage notification settings'
 };
 
 // Check URL parameters for staff mode
@@ -1104,470 +892,298 @@ async function setDefaultPermissions(userId, role) {
     console.log('✓ Default permissions set for', role);
 }
 
-// Load role permissions from database
-async function loadRolePermissionsFromDB() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('role_permissions')
-            .select('*');
-        
-        if (error) {
-            console.error('Error loading role permissions:', error);
-            // Use default permissions if database doesn't have them
-            rolePermissions = DEFAULT_PERMISSIONS;
-            return;
-        }
-        
-        // Convert database data to our format
-        if (data && data.length > 0) {
-            data.forEach(item => {
-                if (!rolePermissions[item.role]) {
-                    rolePermissions[item.role] = {};
-                }
-                rolePermissions[item.role] = item.permissions || {};
-            });
-        } else {
-            // Use default permissions if no data in database
-            rolePermissions = DEFAULT_PERMISSIONS;
-            
-            // Save default permissions to database
-            await saveDefaultPermissionsToDB();
-        }
-        
-        console.log('✓ Role permissions loaded');
-        
-    } catch (error) {
-        console.error('Error loading permissions:', error);
-        rolePermissions = DEFAULT_PERMISSIONS;
+// Get current user's permissions
+function getUserPermissions() {
+    if (userRole === 'admin') {
+        return {
+            "addDish": true,
+            "editDish": true,
+            "deleteDish": true,
+            "manageStaff": true,
+            "viewRevenue": true,
+            "reserveTable": true,
+            "viewTableOrders": true,
+            "viewOrderHistoryName": true,
+            "viewOrderHistoryTable": true
+        };
     }
+    
+    // Get from currentUser.permissions
+    return currentUser?.permissions || {};
 }
 
-// Save default permissions to database
-async function saveDefaultPermissionsToDB() {
-    try {
-        const permissionsToSave = Object.keys(DEFAULT_PERMISSIONS).map(role => ({
-            role: role,
-            permissions: DEFAULT_PERMISSIONS[role],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        }));
-        
-        const { error } = await supabaseClient
-            .from('role_permissions')
-            .upsert(permissionsToSave);
-        
-        if (error) throw error;
-        
-        console.log('✓ Default permissions saved to database');
-        
-    } catch (error) {
-        console.error('Error saving default permissions:', error);
-    }
+// Check if user has specific permission
+function hasPermission(permissionName) {
+    const permissions = getUserPermissions();
+    return permissions[permissionName] === true;
 }
 
-// Load permissions for a specific role
-function loadRolePermissions(role) {
-    currentEditingRole = role;
+// Update UI based on permissions
+function updateUIBasedOnPermissions() {
+    if (userRole === 'admin') return;
     
-    // Update UI
-    document.getElementById('currentRoleInfo').textContent = `Configuring permissions for ${role.toUpperCase()} role`;
+    const permissions = getUserPermissions();
+    console.log('🔧 Applying user permissions:', permissions);
     
-    // Get permissions for this role
-    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-    
-    // Build permissions HTML
-    let html = '<div class="space-y-6">';
-    
-    // Loop through permission categories
-    Object.keys(PERMISSION_CATEGORIES).forEach(category => {
-        const categoryPermissions = PERMISSION_CATEGORIES[category];
+    // Update each button/feature based on permissions
+    document.querySelectorAll('[data-permission]').forEach(element => {
+        const permissionName = element.getAttribute('data-permission');
+        const hasPerm = hasPermission(permissionName);
+        element.style.display = hasPerm ? 'block' : 'none';
         
-        html += `
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-lg font-bold mb-4">${category}</h3>
-                <div class="permission-grid">
-        `;
-        
-        categoryPermissions.forEach(permission => {
-            const isEnabled = permissions[permission] === true;
-            const description = PERMISSION_DESCRIPTIONS[permission] || permission;
-            
-            html += `
-                <div class="permission-item">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="font-medium">${permission.replace(/_/g, ' ').toUpperCase()}</p>
-                            <p class="text-sm text-gray-600 mt-1">${description}</p>
-                        </div>
-                        <span class="text-sm ${isEnabled ? 'permission-enabled' : 'permission-disabled'}">
-                            ${isEnabled ? 'ENABLED' : 'DISABLED'}
-                        </span>
-                    </div>
-                    
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="permission_${permission}" 
-                                   value="true" ${isEnabled ? 'checked' : ''}
-                                   onchange="updatePermission('${permission}', true)">
-                            <span>Enable</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="permission_${permission}" 
-                                   value="false" ${!isEnabled ? 'checked' : ''}
-                                   onchange="updatePermission('${permission}', false)">
-                            <span>Disable</span>
-                        </label>
-                    </div>
-                </div>
-            `;
+        // Also disable buttons if needed
+        if (element.tagName === 'BUTTON') {
+            element.disabled = !hasPerm;
+        }
+    });
+    
+    // For owner role, ensure they have manager permissions
+    if (userRole === 'owner') {
+        document.querySelectorAll('.staff-action').forEach(el => {
+            el.style.display = 'block';
+            if (el.tagName === 'BUTTON') {
+                el.disabled = false;
+            }
         });
-        
-        html += `
-                </div>
-            </div>
-        `;
-    });
-    
-    html += '</div>';
-    
-    // Update container
-    document.getElementById('permissionsContainer').innerHTML = html;
-    
-    // Update statistics
-    updatePermissionStatistics(role);
-}
-
-// Update a permission for current role
-function updatePermission(permission, value) {
-    if (!currentEditingRole) return;
-    
-    // Update local permissions
-    if (!rolePermissions[currentEditingRole]) {
-        rolePermissions[currentEditingRole] = {};
-    }
-    rolePermissions[currentEditingRole][permission] = value;
-    
-    // Update statistics
-    updatePermissionStatistics(currentEditingRole);
-    
-    // Show save indicator
-    showSaveIndicator();
-}
-
-// Update permission statistics
-function updatePermissionStatistics(role) {
-    const permissions = rolePermissions[role] || {};
-    const permissionKeys = Object.keys(permissions);
-    const total = permissionKeys.length;
-    const enabled = permissionKeys.filter(key => permissions[key] === true).length;
-    const disabled = total - enabled;
-    
-    // Count staff with this role
-    const staffWithRole = users.filter(user => user.role === role).length;
-    
-    // Update UI
-    document.getElementById('totalPermissions').textContent = total;
-    document.getElementById('enabledPermissions').textContent = enabled;
-    document.getElementById('disabledPermissions').textContent = disabled;
-    document.getElementById('staffCount').textContent = staffWithRole;
-}
-
-// Show save indicator
-function showSaveIndicator() {
-    const saveBtn = document.querySelector('button[onclick="saveAllPermissions()"]');
-    if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Save All Permissions (Unsaved Changes)';
-        saveBtn.className = 'px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700';
     }
 }
 
-// Save all permissions to database
-async function saveAllPermissions() {
-    if (!currentEditingRole) {
-        alert('Please select a role first');
+// Staff action functions
+function showAddDishModal() {
+    if (!hasPermission('addDish')) {
+        alert('You do not have permission to add dishes');
         return;
     }
-    
-    try {
-        // Prepare data for database
-        const permissionsData = Object.keys(rolePermissions).map(role => ({
-            role: role,
-            permissions: rolePermissions[role],
-            updated_at: new Date().toISOString()
-        }));
-        
-        // Upsert to database
-        const { error } = await supabaseClient
-            .from('role_permissions')
-            .upsert(permissionsData);
-        
-        if (error) throw error;
-        
-        // Update staff users with new permissions
-        await updateStaffPermissions();
-        
-        // Update save button
-        const saveBtn = document.querySelector('button[onclick="saveAllPermissions()"]');
-        if (saveBtn) {
-            saveBtn.innerHTML = '<i class="fas fa-check mr-2"></i>All Permissions Saved';
-            saveBtn.className = 'px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700';
-            
-            // Reset after 3 seconds
-            setTimeout(() => {
-                saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save All Permissions';
-                saveBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700';
-            }, 3000);
-        }
-        
-        alert(`Permissions for ${currentEditingRole.toUpperCase()} role saved successfully!`);
-        
-    } catch (error) {
-        console.error('Error saving permissions:', error);
-        alert('Error saving permissions: ' + error.message);
-    }
+    alert('Add Dish modal would open here');
 }
 
-// Update staff users with new permissions
-async function updateStaffPermissions() {
-    try {
-        // Get all staff users
-        const { data: allStaff, error } = await supabaseClient
-            .from('staff_users')
-            .select('*');
-        
-        if (error) throw error;
-        
-        // Update each staff user
-        for (const staff of allStaff) {
-            const role = staff.role;
-            const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-            
-            await supabaseClient
-                .from('staff_users')
-                .update({
-                    permissions: permissions,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', staff.id);
-        }
-        
-        console.log('✓ Staff permissions updated');
-        
-    } catch (error) {
-        console.error('Error updating staff permissions:', error);
-    }
-}
-
-// Load default permissions
-function loadDefaultPermissions() {
-    if (!currentEditingRole) {
-        alert('Please select a role first');
+function showEditDishModal() {
+    if (!hasPermission('editDish')) {
+        alert('You do not have permission to edit dishes');
         return;
     }
-    
-    if (confirm(`Load default permissions for ${currentEditingRole.toUpperCase()} role? This will overwrite current changes.`)) {
-        rolePermissions[currentEditingRole] = DEFAULT_PERMISSIONS[currentEditingRole];
-        loadRolePermissions(currentEditingRole);
+    alert('Edit Dish modal would open here');
+}
+
+function showDeleteDishModal() {
+    if (!hasPermission('deleteDish')) {
+        alert('You do not have permission to delete dishes');
+        return;
     }
+    alert('Delete Dish modal would open here');
 }
 
-// View individual user permissions
-function viewUserPermissions(userId) {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-    
-    const role = user.role;
-    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-    
-    let html = `
-        <div class="space-y-6">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="text-2xl font-bold">${user.name}'s Permissions</h3>
-                    <p class="text-gray-600">${user.email} • ${user.restaurants?.name || 'No Restaurant'}</p>
-                </div>
-                <span class="role-badge role-${role}">${role.toUpperCase()}</span>
-            </div>
-            
-            <div class="bg-gray-50 rounded-lg p-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p><span class="text-gray-600">Role:</span> <span class="font-medium">${role.toUpperCase()}</span></p>
-                        <p><span class="text-gray-600">Status:</span> <span class="font-medium ${user.is_active ? 'text-green-600' : 'text-red-600'}">${user.is_active ? 'ACTIVE' : 'INACTIVE'}</span></p>
-                    </div>
-                    <div>
-                        <p><span class="text-gray-600">Last Login:</span> ${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</p>
-                        <p><span class="text-gray-600">Member Since:</span> ${new Date(user.created_at).toLocaleDateString()}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    `;
-    
-    // Count enabled permissions
-    const enabledPermissions = Object.keys(permissions).filter(key => permissions[key] === true);
-    const disabledPermissions = Object.keys(permissions).filter(key => permissions[key] === false);
-    
-    html += `
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h4 class="font-bold mb-4 text-green-600">Enabled Permissions (${enabledPermissions.length})</h4>
-                    <div class="space-y-2">
-    `;
-    
-    enabledPermissions.forEach(permission => {
-        const description = PERMISSION_DESCRIPTIONS[permission] || permission;
-        html += `
-            <div class="flex items-center p-2 bg-green-50 rounded">
-                <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                <div>
-                    <p class="font-medium">${permission.replace(/_/g, ' ').toUpperCase()}</p>
-                    <p class="text-sm text-gray-600">${description}</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    html += `
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h4 class="font-bold mb-4 text-red-600">Disabled Permissions (${disabledPermissions.length})</h4>
-                    <div class="space-y-2">
-    `;
-    
-    disabledPermissions.forEach(permission => {
-        const description = PERMISSION_DESCRIPTIONS[permission] || permission;
-        html += `
-            <div class="flex items-center p-2 bg-red-50 rounded">
-                <i class="fas fa-times-circle text-red-500 mr-3"></i>
-                <div>
-                    <p class="font-medium">${permission.replace(/_/g, ' ').toUpperCase()}</p>
-                    <p class="text-sm text-gray-600">${description}</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    html += `
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex justify-end space-x-3 pt-6 border-t">
-                <button onclick="editUser('${user.id}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fas fa-edit mr-2"></i>Edit User
-                </button>
-                <button onclick="closePermissionsModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    Close
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('userPermissionsModal').innerHTML = html;
-    document.getElementById('userPermissionsModal').classList.remove('hidden');
+function showRevenueReport() {
+    if (!hasPermission('viewRevenue')) {
+        alert('You do not have permission to view revenue');
+        return;
+    }
+    alert('Revenue report would open here');
 }
 
-function closePermissionsModal() {
-    document.getElementById('userPermissionsModal').classList.add('hidden');
+function showReserveTable() {
+    if (!hasPermission('reserveTable')) {
+        alert('You do not have permission to reserve tables');
+        return;
+    }
+    alert('Table reservation system would open here');
 }
 
-// Export users
-function exportUsers() {
-    let csv = 'Name,Email,Restaurant,Role,Status,Last Login,Member Since\n';
-    
-    users.forEach(user => {
-        csv += `"${user.name}","${user.email}","${user.restaurants?.name || 'No Restaurant'}","${user.role}","${user.is_active ? 'Active' : 'Inactive'}","${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}","${new Date(user.created_at).toLocaleDateString()}"\n`;
-    });
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+function showOrders() {
+    if (!hasPermission('viewTableOrders')) {
+        alert('You do not have permission to view orders');
+        return;
+    }
+    alert('Order management view would open here');
 }
 
 // Setup UI for staff
 function setupStaffUI() {
-    // ... (existing setupStaffUI code remains the same)
+    // Show/hide admin-only elements
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Update UI with permissions
+    updateUIBasedOnPermissions();
+}
+
+// Handle admin access
+async function handleAdminAccess(user) {
+    try {
+        // Check if user is admin
+        const { data: adminUser, error: adminError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .eq('email', user.email)
+            .eq('role', 'admin')
+            .single();
+            
+        if (adminError || !adminUser) {
+            // Check if user is staff for any restaurant
+            const { data: staffUser } = await supabaseClient
+                .from('staff_users')
+                .select('*, restaurants(*)')
+                .eq('user_id', user.id)
+                .eq('is_active', true)
+                .single();
+                
+            if (staffUser) {
+                // Redirect to staff view for their restaurant
+                window.location.href = `index.html?restaurant=${staffUser.restaurants.url_slug}&staff=true`;
+                return;
+            }
+            
+            alert('Access denied. Admin privileges required.');
+            await supabaseClient.auth.signOut();
+            showLoginModal();
+            return;
+        }
+        
+        currentUser = adminUser;
+        userRole = 'admin';
+        
+        // Update UI for admin
+        setupAdminUI();
+        
+        // Load admin data
+        await loadAdminData();
+        
+        // Hide login modal, show dashboard
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        
+        console.log('✓ Admin dashboard initialized');
+        
+    } catch (error) {
+        console.error('❌ Admin access error:', error);
+        showLoginModal();
+    }
 }
 
 // Setup UI for admin
 function setupAdminUI() {
-    // ... (existing setupAdminUI code remains the same)
+    // Show admin-only elements
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = 'block';
+    });
+    
+    // Hide staff-only elements
+    document.querySelectorAll('.staff-only').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Update dashboard title
+    document.getElementById('dashboardTitle').textContent = 'Admin Panel';
+    document.getElementById('dashboardSubtitle').textContent = 'DigitalMenuPro';
 }
 
 // Show login modal
 function showLoginModal() {
-    // ... (existing showLoginModal code remains the same)
+    document.getElementById('loginModal').style.display = 'flex';
 }
 
 // Handle login
 async function handleLogin() {
-    // ... (existing handleLogin code remains the same)
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+    
+    if (error) {
+        alert('Login failed: ' + error.message);
+        return;
+    }
+    
+    // Reload to initialize dashboard with new user
+    window.location.reload();
 }
 
 // Logout
 async function adminLogout() {
-    // ... (existing adminLogout code remains the same)
+    await supabaseClient.auth.signOut();
+    window.location.reload();
 }
 
-// Load admin data
-async function loadAdminData() {
+// Load restaurant data for staff dashboard
+async function loadRestaurantData(restaurantId) {
     try {
-        console.log('📊 Loading admin data...');
+        console.log(`📋 Loading data for restaurant: ${restaurantId}`);
         
-        // Load restaurants
-        const { data: restaurantsData, error: resError } = await supabaseClient
-            .from('restaurants')
+        // Load dishes for this restaurant
+        const { data: dishesData, error: dishesError } = await supabaseClient
+            .from('dishes')
             .select('*')
+            .eq('restaurant_id', restaurantId)
+            .order('category', { ascending: true });
+        
+        if (!dishesError) {
+            dishes = dishesData || [];
+            console.log(`✓ Loaded ${dishes.length} dishes`);
+        } else {
+            console.error('Error loading dishes:', dishesError);
+            dishes = [];
+        }
+        
+        // Load orders for this restaurant (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const { data: ordersData, error: ordersError } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('restaurant_id', restaurantId)
+            .gte('created_at', thirtyDaysAgo.toISOString())
             .order('created_at', { ascending: false });
         
-        if (!resError) restaurants = restaurantsData || [];
+        if (!ordersError) {
+            console.log(`✓ Loaded ${ordersData.length} recent orders`);
+        }
         
-        // Load subscriptions
-        const { data: subsData, error: subsError } = await supabaseClient
-            .from('subscriptions')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
-        
-        if (!subsError) subscriptions = subsData || [];
-        
-        // Load payments
-        const { data: paymentsData, error: payError } = await supabaseClient
-            .from('payments')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
-        
-        if (!payError) payments = paymentsData || [];
-        
-        // Load all users
-        const { data: usersData, error: usersError } = await supabaseClient
+        // Load staff members for this restaurant
+        const { data: staffData, error: staffError } = await supabaseClient
             .from('staff_users')
-            .select('*, restaurants(name)')
-            .order('created_at', { ascending: false });
+            .select('*')
+            .eq('restaurant_id', restaurantId)
+            .eq('is_active', true);
         
-        if (!usersError) users = usersData || [];
+        if (!staffError) {
+            users = staffData || [];
+            console.log(`✓ Loaded ${users.length} active staff members`);
+        }
         
-        // Update dashboard stats
-        updateDashboardStats();
+        // Update UI based on loaded data
+        updateStaffUIAfterDataLoad();
         
-        console.log('✓ Admin data loaded');
+        console.log('✓ Restaurant data loaded successfully');
         
     } catch (error) {
-        console.error('❌ Error loading admin data:', error);
+        console.error('❌ Error loading restaurant data:', error);
+        dishes = [];
+        users = [];
+        updateStaffUIAfterDataLoad();
     }
 }
 
-// Update dashboard stats
-function updateDashboardStats() {
-    // ... (existing updateDashboardStats code remains the same)
+// Update UI after loading data
+function updateStaffUIAfterDataLoad() {
+    try {
+        // Update restaurant name in sidebar
+        document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
+        document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
+        
+        // Update user info in sidebar
+        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
+        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
+        
+        console.log('✓ Staff UI updated with loaded data');
+        
+    } catch (error) {
+        console.error('Error updating staff UI:', error);
+    }
 }
 
 // View Navigation
@@ -1605,446 +1221,13 @@ function showView(viewName) {
         case 'restaurants':
             loadRestaurantsTable();
             break;
-        case 'staff_permissions':
-            if (userRole === 'admin') {
-                // Load first role by default
-                loadRolePermissions('owner');
-            }
-            break;
         case 'users':
             loadUsersTable();
             break;
-        // ... other cases remain the same
     }
 }
 
-    // Load restaurant data for staff dashboard
-async function loadRestaurantData(restaurantId) {
-    try {
-        console.log(`📋 Loading data for restaurant: ${restaurantId}`);
-        
-        // Load dishes for this restaurant
-        const { data: dishesData, error: dishesError } = await supabaseClient
-            .from('dishes')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .order('category', { ascending: true });
-        
-        if (!dishesError) {
-            dishes = dishesData || [];
-            console.log(`✓ Loaded ${dishes.length} dishes`);
-        } else {
-            console.error('Error loading dishes:', dishesError);
-            dishes = [];
-        }
-        
-        // Load orders for this restaurant (last 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: ordersData, error: ordersError } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .gte('created_at', thirtyDaysAgo.toISOString())
-            .order('created_at', { ascending: false });
-        
-        if (!ordersError) {
-            // You might want to store this in a global variable
-            console.log(`✓ Loaded ${ordersData.length} recent orders`);
-            
-            // Calculate some stats for staff dashboard
-            const todayOrders = ordersData.filter(order => {
-                const orderDate = new Date(order.created_at);
-                const today = new Date();
-                return orderDate.toDateString() === today.toDateString();
-            });
-            
-            // Update staff dashboard stats
-            updateStaffDashboardStats(dishes.length, todayOrders.length);
-        }
-        
-        // Load staff members for this restaurant
-        const { data: staffData, error: staffError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .eq('is_active', true);
-        
-        if (!staffError) {
-            users = staffData || [];
-            console.log(`✓ Loaded ${users.length} active staff members`);
-        }
-        
-        // Update UI based on loaded data
-        updateStaffUIAfterDataLoad();
-        
-        console.log('✓ Restaurant data loaded successfully');
-        
-    } catch (error) {
-        console.error('❌ Error loading restaurant data:', error);
-        // Initialize with empty data to prevent further errors
-        dishes = [];
-        users = [];
-        updateStaffUIAfterDataLoad();
-    }
-}
-
-// Update staff dashboard stats
-function updateStaffDashboardStats(totalDishes, todayOrders) {
-    try {
-        // Update the dashboard stats for staff view
-        document.getElementById('totalRestaurants').textContent = '1';
-        document.getElementById('activeSubscriptions').textContent = '1';
-        document.getElementById('monthlyRevenue').textContent = 'Loading...';
-        document.getElementById('pendingPayments').textContent = todayOrders || '0';
-        
-        // Update chart titles for staff context
-        document.getElementById('chart1Title').textContent = 'Today\'s Orders';
-        document.getElementById('chart2Title').textContent = 'Menu Categories';
-        document.getElementById('stat1Title').textContent = 'Total Menu Items';
-        document.getElementById('stat2Title').textContent = 'Today\'s Orders';
-        document.getElementById('stat3Title').textContent = 'Active Staff';
-        document.getElementById('stat4Title').textContent = 'Table Occupancy';
-        
-        // Update stat values
-        document.getElementById('totalRestaurants').textContent = dishes.length || '0';
-        document.getElementById('activeSubscriptions').textContent = todayOrders || '0';
-        document.getElementById('monthlyRevenue').textContent = users.length || '0';
-        
-        // Update subtitles
-        document.getElementById('stat1Subtitle').textContent = 'in menu';
-        document.getElementById('stat2Subtitle').textContent = 'today';
-        document.getElementById('stat3Subtitle').textContent = 'active members';
-        document.getElementById('stat4Subtitle').textContent = 'estimated';
-        
-    } catch (error) {
-        console.error('Error updating staff dashboard:', error);
-    }
-}
-
-// Update UI after loading data
-function updateStaffUIAfterDataLoad() {
-    try {
-        // Update restaurant name in sidebar
-        document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
-        document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
-        
-        // Update user info in sidebar
-        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
-        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
-        
-        // Update the view titles
-        document.getElementById('restaurantsViewTitle').textContent = 'Menu Management';
-        document.getElementById('restaurantsViewSubtitle').textContent = 'Manage your restaurant menu';
-        document.getElementById('usersViewTitle').textContent = 'Staff Management';
-        document.getElementById('usersViewSubtitle').textContent = 'Manage restaurant staff';
-        
-        // Update labels
-        document.getElementById('restaurantLabel').textContent = 'menu items';
-        
-        // Show/hide appropriate buttons based on permissions
-        updateButtonVisibility();
-        
-        // Initialize charts with restaurant data
-        if (typeof initializeStaffCharts === 'function') {
-            initializeStaffCharts();
-        }
-        
-        console.log('✓ Staff UI updated with loaded data');
-        
-    } catch (error) {
-        console.error('Error updating staff UI:', error);
-    }
-}
-
-// Update button visibility based on staff permissions
-function updateButtonVisibility() {
-    // Get current user's role and permissions
-    const role = currentUser?.role || 'waiter';
-    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-    
-    // Show/hide admin-only elements
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = 'none';
-    });
-    
-    // Show/hide staff-only elements
-    const staffElements = document.querySelectorAll('.staff-only');
-    staffElements.forEach(el => {
-        el.style.display = 'block';
-    });
-    
-    // Check specific permissions
-    const addDishBtn = document.querySelector('button[onclick="showAddDishModal()"]');
-    if (addDishBtn) {
-        addDishBtn.style.display = permissions.add_dishes ? 'block' : 'none';
-    }
-    
-    // Update export buttons
-    document.querySelectorAll('button[onclick*="export"]').forEach(btn => {
-        btn.style.display = permissions.export_reports ? 'block' : 'none';
-    });
-    
-    // Update search placeholder based on view
-    const restaurantSearch = document.getElementById('restaurantSearch');
-    if (restaurantSearch) {
-        restaurantSearch.placeholder = 'Search menu items...';
-    }
-}
-
-// Initialize staff charts
-function initializeStaffCharts() {
-    try {
-        // Revenue/Today's Orders Chart
-        const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
-        if (revenueCtx) {
-            // Simple chart for today's orders (you can customize this)
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
-                    datasets: [{
-                        label: 'Today\'s Orders',
-                        data: [5, 12, 8, 15, 10, 20, 18],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Plan Distribution/Categories Chart
-        const planCtx = document.getElementById('planChart')?.getContext('2d');
-        if (planCtx) {
-            // Show menu categories distribution
-            const categoryCount = {};
-            dishes.forEach(dish => {
-                categoryCount[dish.category] = (categoryCount[dish.category] || 0) + 1;
-            });
-            
-            new Chart(planCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(categoryCount),
-                    datasets: [{
-                        data: Object.values(categoryCount),
-                        backgroundColor: [
-                            'rgb(59, 130, 246)',
-                            'rgb(16, 185, 129)',
-                            'rgb(245, 158, 11)',
-                            'rgb(239, 68, 68)',
-                            'rgb(139, 92, 246)',
-                            'rgb(236, 72, 153)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        }
-                    }
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Error initializing staff charts:', error);
-    }
-}
-
-// Load restaurants table (for admin) or menu items (for staff)
-async function loadRestaurantsTable() {
-    try {
-        if (userRole === 'admin') {
-            // Admin sees all restaurants
-            await loadAdminRestaurantsTable();
-        } else {
-            // Staff sees their restaurant's menu
-            await loadStaffMenuTable();
-        }
-    } catch (error) {
-        console.error('Error loading table:', error);
-    }
-}
-
-// Load admin restaurants table
-async function loadAdminRestaurantsTable() {
-    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedRestaurants = restaurants.slice(startIndex, endIndex);
-    
-    // Update table headers for admin
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-    `;
-    
-    let tableHTML = '';
-    paginatedRestaurants.forEach(restaurant => {
-        const statusClass = restaurant.is_active ? 'status-active' : 'status-inactive';
-        const statusText = restaurant.is_active ? 'Active' : 'Inactive';
-        
-        tableHTML += `
-            <tr class="restaurant-row">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-utensils text-blue-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${restaurant.name}</div>
-                            <div class="text-sm text-gray-500">${restaurant.url_slug || 'No slug'}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${restaurant.owner_name || 'Not set'}</div>
-                    <div class="text-sm text-gray-500">${restaurant.owner_email || ''}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${restaurant.plan || 'Free'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${new Date(restaurant.created_at).toLocaleDateString()}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="editRestaurant('${restaurant.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleRestaurantStatus('${restaurant.id}', ${restaurant.is_active})" class="${restaurant.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                        <i class="fas ${restaurant.is_active ? 'fa-ban' : 'fa-check'}"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML;
-    
-    // Update pagination info
-    document.getElementById('restaurantStart').textContent = startIndex + 1;
-    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
-    document.getElementById('restaurantTotal').textContent = restaurants.length;
-}
-
-// Load staff menu table
-async function loadStaffMenuTable() {
-    const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedDishes = dishes.slice(startIndex, endIndex);
-    
-    // Update table headers for staff (menu items)
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-    `;
-    
-    let tableHTML = '';
-    paginatedDishes.forEach(dish => {
-        const statusClass = dish.is_available ? 'status-active' : 'status-inactive';
-        const statusText = dish.is_available ? 'Available' : 'Unavailable';
-        
-        tableHTML += `
-            <tr class="dish-row">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-utensil-spoon text-gray-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
-                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="category-badge">${dish.category || 'Uncategorized'}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ₹${dish.price || '0'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="editDish('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML;
-    
-    // Update pagination info
-    document.getElementById('restaurantStart').textContent = startIndex + 1;
-    document.getElementById('restaurantEnd').textContent = Math.min(endIndex, dishes.length);
-    document.getElementById('restaurantTotal').textContent = dishes.length;
-}
-
-// Filter restaurants/menu items
-function filterRestaurants() {
-    const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
-    
-    if (userRole === 'admin') {
-        // Filter restaurants for admin
-        // You might want to implement actual filtering logic here
-        console.log('Filtering restaurants by:', searchTerm);
-    } else {
-        // Filter dishes for staff
-        // You might want to implement actual filtering logic here
-        console.log('Filtering dishes by:', searchTerm);
-    }
-}
-
-// Pagination functions
-function prevRestaurantPage() {
-    if (currentRestaurantPage > 1) {
-        currentRestaurantPage--;
-        loadRestaurantsTable();
-    }
-}
-
-function nextRestaurantPage() {
-    const totalItems = userRole === 'admin' ? restaurants.length : dishes.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
-    if (currentRestaurantPage < totalPages) {
-        currentRestaurantPage++;
-        loadRestaurantsTable();
-    }
-}
-    // Update title and subtitle based on view and user role
+// Update title and subtitle based on view and user role
 function updateViewTitle(viewName) {
     try {
         const viewTitle = document.getElementById('viewTitle');
@@ -2073,16 +1256,6 @@ function updateViewTitle(viewName) {
                 }
                 break;
                 
-            case 'subscriptions':
-                viewTitle.textContent = 'Subscription Management';
-                viewSubtitle.textContent = 'Manage restaurant subscriptions and plans';
-                break;
-                
-            case 'payments':
-                viewTitle.textContent = 'Payment Management';
-                viewSubtitle.textContent = 'View and manage payment transactions';
-                break;
-                
             case 'users':
                 if (userRole === 'admin') {
                     viewTitle.textContent = 'User Management';
@@ -2091,31 +1264,6 @@ function updateViewTitle(viewName) {
                     viewTitle.textContent = 'Staff Management';
                     viewSubtitle.textContent = 'Manage restaurant staff members';
                 }
-                break;
-                
-            case 'staff_permissions':
-                viewTitle.textContent = 'Staff Permissions';
-                viewSubtitle.textContent = 'Configure permissions for different roles';
-                break;
-                
-            case 'plans':
-                viewTitle.textContent = 'Plan Management';
-                viewSubtitle.textContent = 'Manage subscription plans and pricing';
-                break;
-                
-            case 'settings':
-                if (userRole === 'admin') {
-                    viewTitle.textContent = 'System Settings';
-                    viewSubtitle.textContent = 'Configure system-wide settings';
-                } else {
-                    viewTitle.textContent = 'Restaurant Settings';
-                    viewSubtitle.textContent = 'Configure your restaurant settings';
-                }
-                break;
-                
-            case 'terms':
-                viewTitle.textContent = 'Terms & Policies';
-                viewSubtitle.textContent = 'Manage terms, conditions, and policies';
                 break;
                 
             default:
@@ -2132,235 +1280,7 @@ function updateViewTitle(viewName) {
     }
 }
 
-    // Load users table (all users for admin, staff for restaurant staff)
-async function loadUsersTable() {
-    try {
-        if (userRole === 'admin') {
-            await loadAllUsersTable();
-        } else {
-            await loadRestaurantStaffTable();
-        }
-    } catch (error) {
-        console.error('Error loading users table:', error);
-    }
-}
-
-// Load all users for admin
-async function loadAllUsersTable() {
-    let tableHTML = '';
-    
-    users.forEach(user => {
-        // Determine role badge class
-        let roleClass = 'role-admin';
-        let roleText = user.role;
-        
-        switch(user.role) {
-            case 'owner':
-                roleClass = 'role-owner';
-                break;
-            case 'manager':
-                roleClass = 'role-manager';
-                break;
-            case 'chef':
-                roleClass = 'role-chef';
-                break;
-            case 'waiter':
-                roleClass = 'role-waiter';
-                break;
-            case 'admin':
-                roleClass = 'role-admin';
-                break;
-        }
-        
-        // Status badge
-        const statusClass = user.is_active ? 'status-active' : 'status-inactive';
-        const statusText = user.is_active ? 'Active' : 'Inactive';
-        
-        // Last active time
-        let lastActive = 'Never';
-        if (user.last_login) {
-            const lastLogin = new Date(user.last_login);
-            const now = new Date();
-            const diffMs = now - lastLogin;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-            
-            if (diffDays > 0) {
-                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            } else if (diffHours > 0) {
-                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            } else if (diffMins > 0) {
-                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else {
-                lastActive = 'Just now';
-            }
-        }
-        
-        tableHTML += `
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-user text-blue-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${user.name}</div>
-                            <div class="text-sm text-gray-500">${user.email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${user.restaurants?.name || 'No Restaurant'}</div>
-                    <div class="text-sm text-gray-500">${user.restaurants?.url_slug || ''}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="role-badge ${roleClass}">${roleText.toUpperCase()}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${lastActive}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="viewUserPermissions('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                        <i class="fas fa-user-shield"></i>
-                    </button>
-                    <button onclick="editUser('${user.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleUserStatus('${user.id}', ${user.is_active})" class="${user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                        <i class="fas ${user.is_active ? 'fa-ban' : 'fa-check'}"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('usersTable').innerHTML = tableHTML;
-}
-
-// Load restaurant staff for staff users
-async function loadRestaurantStaffTable() {
-    let tableHTML = '';
-    
-    // Filter users for current restaurant only
-    const restaurantStaff = users.filter(user => 
-        user.restaurant_id === currentRestaurant?.id || 
-        user.restaurants?.id === currentRestaurant?.id
-    );
-    
-    restaurantStaff.forEach(user => {
-        // Determine role badge class
-        let roleClass = 'role-admin';
-        let roleText = user.role;
-        
-        switch(user.role) {
-            case 'owner':
-                roleClass = 'role-owner';
-                break;
-            case 'manager':
-                roleClass = 'role-manager';
-                roleText = 'Manager';
-                break;
-            case 'chef':
-                roleClass = 'role-chef';
-                roleText = 'Chef';
-                break;
-            case 'waiter':
-                roleClass = 'role-waiter';
-                roleText = 'Waiter';
-                break;
-        }
-        
-        // Status badge
-        const statusClass = user.is_active ? 'status-active' : 'status-inactive';
-        const statusText = user.is_active ? 'Active' : 'Inactive';
-        
-        // Last active time
-        let lastActive = 'Never';
-        if (user.last_login) {
-            const lastLogin = new Date(user.last_login);
-            const now = new Date();
-            const diffMs = now - lastLogin;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-            
-            if (diffDays > 0) {
-                lastActive = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-            } else if (diffHours > 0) {
-                lastActive = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-            } else if (diffMins > 0) {
-                lastActive = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-            } else {
-                lastActive = 'Just now';
-            }
-        }
-        
-        // Don't show edit button for current user (they can't edit themselves)
-        const canEdit = user.id !== currentUser?.id;
-        
-        tableHTML += `
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-user text-blue-600"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${user.name}</div>
-                            <div class="text-sm text-gray-500">${user.email}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${currentRestaurant?.name || 'Current Restaurant'}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="role-badge ${roleClass}">${roleText.toUpperCase()}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${lastActive}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    ${canEdit ? `
-                        <button onclick="viewUserPermissions('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                            <i class="fas fa-user-shield"></i>
-                        </button>
-                        <button onclick="editUser('${user.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="toggleUserStatus('${user.id}', ${user.is_active})" class="${user.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                            <i class="fas ${user.is_active ? 'fa-ban' : 'fa-check'}"></i>
-                        </button>
-                    ` : `
-                        <span class="text-gray-400">Current User</span>
-                    `}
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('usersTable').innerHTML = tableHTML;
-}
-
-// Filter users
-function filterUsers() {
-    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-    
-    const rows = document.querySelectorAll('#usersTable tr');
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-}
-
-    // Toggle sidebar
+// Toggle sidebar
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -2377,644 +1297,6 @@ function toggleSidebar() {
     }
 }
 
-// Toggle notifications panel
-function toggleNotifications() {
-    const panel = document.getElementById('notificationsPanel');
-    panel.classList.toggle('hidden');
-}
-
-// Close notifications panel when clicking outside
-document.addEventListener('click', function(event) {
-    const notificationsPanel = document.getElementById('notificationsPanel');
-    const notificationsBtn = document.querySelector('[onclick="toggleNotifications()"]');
-    
-    if (notificationsPanel && !notificationsPanel.contains(event.target) && 
-        notificationsBtn && !notificationsBtn.contains(event.target)) {
-        notificationsPanel.classList.add('hidden');
-    }
-});
-
-// Load notifications
-async function loadNotifications() {
-    try {
-        const notificationsList = document.getElementById('notificationsList');
-        if (!notificationsList) return;
-        
-        // For now, show a simple message
-        notificationsList.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-bell-slash text-3xl mb-3"></i>
-                <p>No new notifications</p>
-            </div>
-        `;
-        
-        // Update badge
-        const badge = document.getElementById('notificationBadge');
-        if (badge) {
-            badge.style.display = 'none';
-        }
-    } catch (error) {
-        console.error('Error loading notifications:', error);
-    }
-}
-
-// Load activities
-async function loadActivities() {
-    try {
-        const activitiesList = document.getElementById('activitiesList');
-        if (!activitiesList) return;
-        
-        let activitiesHTML = '';
-        
-        // For staff, show restaurant-specific activities
-        if (userRole !== 'admin' && currentRestaurant) {
-            activitiesHTML = `
-                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
-                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
-                    </div>
-                </div>
-            `;
-        } else {
-            // For admin, show system activities
-            activitiesHTML = `
-                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-medium">System activities will appear here</p>
-                        <p class="text-xs text-gray-600">Recent restaurant registrations, payments, and updates</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        activitiesList.innerHTML = activitiesHTML;
-        
-    } catch (error) {
-        console.error('Error loading activities:', error);
-    }
-}
-
-// Show add dish modal (for staff)
-function showAddDishModal() {
-    alert('Add Dish functionality would open here. This is a placeholder.');
-}
-
-// Export restaurants (for admin)
-function exportRestaurants() {
-    alert('Export functionality would be implemented here. This is a placeholder.');
-}
-
-// Placeholder functions for actions
-function viewRestaurantDetails(restaurantId) {
-    alert(`View restaurant details for ID: ${restaurantId}`);
-}
-
-function editRestaurant(restaurantId) {
-    alert(`Edit restaurant with ID: ${restaurantId}`);
-}
-
-function toggleRestaurantStatus(restaurantId, isActive) {
-    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this restaurant?`)) {
-        alert(`Restaurant ${restaurantId} status would be toggled to ${!isActive}`);
-        // Here you would make an API call to update the restaurant status
-    }
-}
-
-function editDish(dishId) {
-    alert(`Edit dish with ID: ${dishId}`);
-}
-
-function toggleDishStatus(dishId, isAvailable) {
-    if (confirm(`Are you sure you want to mark this dish as ${isAvailable ? 'unavailable' : 'available'}?`)) {
-        alert(`Dish ${dishId} availability would be toggled to ${!isAvailable}`);
-        // Here you would make an API call to update the dish status
-    }
-}
-
-function viewUserPermissions(userId) {
-    // This should call your existing viewUserPermissions function
-    alert(`View permissions for user ID: ${userId}`);
-}
-
-function editUser(userId) {
-    alert(`Edit user with ID: ${userId}`);
-}
-
-function toggleUserStatus(userId, isActive) {
-    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this user?`)) {
-        alert(`User ${userId} status would be toggled to ${!isActive}`);
-        // Here you would make an API call to update the user status
-    }
-}
-
-    // Toggle sidebar
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"]');
-    
-    if (sidebar.classList.contains('collapsed')) {
-        sidebar.classList.remove('collapsed');
-        mainContent.classList.remove('lg:ml-64');
-        toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i><span class="ml-3 sidebar-text">Collapse Sidebar</span>';
-    } else {
-        sidebar.classList.add('collapsed');
-        mainContent.classList.add('lg:ml-64');
-        toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i><span class="ml-3 sidebar-text">Expand Sidebar</span>';
-    }
-}
-
-// Toggle notifications panel
-function toggleNotifications() {
-    const panel = document.getElementById('notificationsPanel');
-    panel.classList.toggle('hidden');
-}
-
-// Close notifications panel when clicking outside
-document.addEventListener('click', function(event) {
-    const notificationsPanel = document.getElementById('notificationsPanel');
-    const notificationsBtn = document.querySelector('[onclick="toggleNotifications()"]');
-    
-    if (notificationsPanel && !notificationsPanel.contains(event.target) && 
-        notificationsBtn && !notificationsBtn.contains(event.target)) {
-        notificationsPanel.classList.add('hidden');
-    }
-});
-
-// Load notifications
-async function loadNotifications() {
-    try {
-        const notificationsList = document.getElementById('notificationsList');
-        if (!notificationsList) return;
-        
-        // For now, show a simple message
-        notificationsList.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-bell-slash text-3xl mb-3"></i>
-                <p>No new notifications</p>
-            </div>
-        `;
-        
-        // Update badge
-        const badge = document.getElementById('notificationBadge');
-        if (badge) {
-            badge.style.display = 'none';
-        }
-    } catch (error) {
-        console.error('Error loading notifications:', error);
-    }
-}
-
-// Load activities
-async function loadActivities() {
-    try {
-        const activitiesList = document.getElementById('activitiesList');
-        if (!activitiesList) return;
-        
-        let activitiesHTML = '';
-        
-        // For staff, show restaurant-specific activities
-        if (userRole !== 'admin' && currentRestaurant) {
-            activitiesHTML = `
-                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-medium">Restaurant activities will appear here</p>
-                        <p class="text-xs text-gray-600">Recent orders, menu updates, and staff activities</p>
-                    </div>
-                </div>
-            `;
-        } else {
-            // For admin, show system activities
-            activitiesHTML = `
-                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <p class="text-sm font-medium">System activities will appear here</p>
-                        <p class="text-xs text-gray-600">Recent restaurant registrations, payments, and updates</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        activitiesList.innerHTML = activitiesHTML;
-        
-    } catch (error) {
-        console.error('Error loading activities:', error);
-    }
-}
-
-// Show add dish modal (for staff)
-function showAddDishModal() {
-    alert('Add Dish functionality would open here. This is a placeholder.');
-}
-
-// Export restaurants (for admin)
-function exportRestaurants() {
-    alert('Export functionality would be implemented here. This is a placeholder.');
-}
-
-// Placeholder functions for actions
-function viewRestaurantDetails(restaurantId) {
-    alert(`View restaurant details for ID: ${restaurantId}`);
-}
-
-function editRestaurant(restaurantId) {
-    alert(`Edit restaurant with ID: ${restaurantId}`);
-}
-
-function toggleRestaurantStatus(restaurantId, isActive) {
-    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this restaurant?`)) {
-        alert(`Restaurant ${restaurantId} status would be toggled to ${!isActive}`);
-        // Here you would make an API call to update the restaurant status
-    }
-}
-
-function editDish(dishId) {
-    alert(`Edit dish with ID: ${dishId}`);
-}
-
-function toggleDishStatus(dishId, isAvailable) {
-    if (confirm(`Are you sure you want to mark this dish as ${isAvailable ? 'unavailable' : 'available'}?`)) {
-        alert(`Dish ${dishId} availability would be toggled to ${!isAvailable}`);
-        // Here you would make an API call to update the dish status
-    }
-}
-
-function viewUserPermissions(userId) {
-    // This should call your existing viewUserPermissions function
-    alert(`View permissions for user ID: ${userId}`);
-}
-
-function editUser(userId) {
-    alert(`Edit user with ID: ${userId}`);
-}
-
-function toggleUserStatus(userId, isActive) {
-    if (confirm(`Are you sure you want to ${isActive ? 'deactivate' : 'activate'} this user?`)) {
-        alert(`User ${userId} status would be toggled to ${!isActive}`);
-        // Here you would make an API call to update the user status
-    }
-}
-
-    // Update all UI elements based on staff permissions
-function updateUIBasedOnPermissions() {
-    if (userRole === 'admin') return; // Only apply to staff
-    
-    try {
-        // Get current staff user's role and permissions
-        const role = currentUser?.role || 'waiter';
-        const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-        
-        console.log('🔧 Applying permissions for role:', role, permissions);
-        
-        // 1. Update Dashboard Stats visibility
-        updateDashboardPermissions(permissions);
-        
-        // 2. Update Sidebar Navigation
-        updateSidebarPermissions(permissions);
-        
-        // 3. Update Restaurant/Menu View buttons
-        updateMenuManagementPermissions(permissions);
-        
-        // 4. Update Users/Staff View
-        updateStaffManagementPermissions(permissions);
-        
-        // 5. Update specific feature buttons
-        updateFeatureButtons(permissions);
-        
-        console.log('✓ UI permissions applied');
-        
-    } catch (error) {
-        console.error('Error updating UI permissions:', error);
-    }
-}
-
-// Update dashboard elements based on permissions
-function updateDashboardPermissions(permissions) {
-    // Show/hide dashboard elements
-    const dashboardElements = {
-        'view_analytics': ['#chart1Title', '#chart2Title', '#revenueChart', '#planChart'],
-        'export_reports': ['button[onclick*="export"]', 'button[onclick*="download"]']
-    };
-    
-    Object.keys(dashboardElements).forEach(permission => {
-        const show = permissions[permission] === true;
-        dashboardElements[permission].forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(el => {
-                el.style.display = show ? 'block' : 'none';
-            });
-        });
-    });
-}
-
-// Update sidebar navigation based on permissions
-function updateSidebarPermissions(permissions) {
-    const sidebarItems = {
-        // Map permission to sidebar items
-        'view_analytics': ['a[onclick="showView(\'dashboard\')"]'],
-        'manage_menu': ['a[onclick="showView(\'restaurants\')"]'],
-        'manage_staff': ['a[onclick="showView(\'users\')"]'],
-        'manage_settings': ['a[onclick="showView(\'settings\')"]']
-    };
-    
-    Object.keys(sidebarItems).forEach(permission => {
-        const show = permissions[permission] === true;
-        sidebarItems[permission].forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(el => {
-                if (!show) {
-                    el.style.display = 'none';
-                    // Also remove from parent li
-                    const parentLi = el.closest('li');
-                    if (parentLi) parentLi.style.display = 'none';
-                }
-            });
-        });
-    });
-}
-
-// Update menu management permissions
-function updateMenuManagementPermissions(permissions) {
-    // Add Dish button
-    const addDishBtn = document.querySelector('button[onclick="showAddDishModal()"]');
-    if (addDishBtn) {
-        addDishBtn.style.display = permissions.add_dishes ? 'block' : 'none';
-    }
-    
-    // Edit/Delete dish buttons in table
-    const editButtons = document.querySelectorAll('button[onclick*="editDish"]');
-    const deleteButtons = document.querySelectorAll('button[onclick*="toggleDishStatus"]');
-    
-    editButtons.forEach(btn => {
-        btn.style.display = permissions.edit_dishes ? 'inline-block' : 'none';
-    });
-    
-    deleteButtons.forEach(btn => {
-        btn.style.display = permissions.delete_dishes ? 'inline-block' : 'none';
-    });
-    
-    // Manage categories/specials
-    if (!permissions.manage_categories) {
-        // Hide category management features
-        const categoryHeaders = document.querySelectorAll('th:contains("Category")');
-        categoryHeaders.forEach(th => {
-            if (th.textContent.includes('Category')) {
-                th.style.display = 'none';
-            }
-        });
-        
-        const categoryCells = document.querySelectorAll('.category-badge');
-        categoryCells.forEach(cell => cell.style.display = 'none');
-    }
-}
-
-// Update staff management permissions
-function updateStaffManagementPermissions(permissions) {
-    if (!permissions.manage_staff) {
-        // Hide staff management section
-        const staffNav = document.querySelector('a[onclick="showView(\'users\')"]');
-        if (staffNav) {
-            const parentLi = staffNav.closest('li');
-            if (parentLi) parentLi.style.display = 'none';
-        }
-    }
-    
-    // Hide add/edit staff buttons if not allowed
-    if (!permissions.add_staff) {
-        const addStaffButtons = document.querySelectorAll('button[onclick*="addStaff"]');
-        addStaffButtons.forEach(btn => btn.style.display = 'none');
-    }
-    
-    if (!permissions.edit_staff) {
-        const editStaffButtons = document.querySelectorAll('button[onclick*="editUser"]');
-        editStaffButtons.forEach(btn => btn.style.display = 'none');
-    }
-}
-
-// Update specific feature buttons
-function updateFeatureButtons(permissions) {
-    // View Revenue button/feature
-    const revenueElements = document.querySelectorAll('*[class*="revenue"], *[id*="revenue"]');
-    revenueElements.forEach(el => {
-        el.style.display = permissions.view_revenue ? 'block' : 'none';
-    });
-    
-    // Reserve Table feature
-    if (!permissions.manage_reservations) {
-        const reservationElements = document.querySelectorAll('*[class*="reservation"], *[id*="reservation"]');
-        reservationElements.forEach(el => el.style.display = 'none');
-    }
-    
-    // View Orders
-    if (!permissions.view_orders) {
-        const orderElements = document.querySelectorAll('*[class*="order"], *[id*="order"]');
-        orderElements.forEach(el => el.style.display = 'none');
-    }
-    
-    // Order History (Name)
-    const historyNameElements = document.querySelectorAll('*[class*="history-name"], *[id*="history-name"]');
-    historyNameElements.forEach(el => {
-        el.style.display = permissions.view_order_history ? 'block' : 'none';
-    });
-    
-    // Order History (Table)
-    const historyTableElements = document.querySelectorAll('*[class*="history-table"], *[id*="history-table"]');
-    historyTableElements.forEach(el => {
-        el.style.display = permissions.view_order_history ? 'block' : 'none';
-    });
-}
-
-    // View Navigation with permission checks
-function showView(viewName) {
-    // Check if user has permission to view this section
-    if (!hasPermissionForView(viewName)) {
-        alert('You do not have permission to access this section.');
-        return;
-    }
-    
-    // Hide all views
-    document.querySelectorAll('.view').forEach(view => {
-        view.classList.add('hidden');
-    });
-    
-    // Remove active class from all nav items
-    document.querySelectorAll('nav a').forEach(navItem => {
-        navItem.classList.remove('active-nav', 'bg-gray-700');
-    });
-    
-    // Add active class to clicked nav item
-    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
-    if (activeNav) {
-        activeNav.classList.add('active-nav', 'bg-gray-700');
-    }
-    
-    // Show selected view
-    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1).replace(/_/g, '')}`);
-    if (viewElement) {
-        viewElement.classList.remove('hidden');
-    }
-    
-    // Update title and subtitle based on user role
-    updateViewTitle(viewName);
-    
-    // Apply permissions to the view
-    if (userRole !== 'admin') {
-        updateUIBasedOnPermissions();
-    }
-    
-    // Load view-specific data
-    switch(viewName) {
-        case 'dashboard':
-            updateDashboardStats();
-            break;
-        case 'restaurants':
-            loadRestaurantsTable();
-            break;
-        case 'staff_permissions':
-            if (userRole === 'admin') {
-                loadRolePermissions('owner');
-            }
-            break;
-        case 'users':
-            loadUsersTable();
-            break;
-    }
-}
-
-// Check if user has permission to view a specific section
-function hasPermissionForView(viewName) {
-    if (userRole === 'admin') return true;
-    
-    const role = currentUser?.role || 'waiter';
-    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-    
-    switch(viewName) {
-        case 'dashboard':
-            return permissions.view_dashboard === true;
-        case 'restaurants':
-            return permissions.manage_menu === true;
-        case 'users':
-            return permissions.manage_staff === true;
-        case 'settings':
-            return permissions.manage_settings === true;
-        default:
-            return true;
-    }
-}
-
-    // Staff action functions
-function showAddDishModal() {
-    if (!checkPermission('add_dishes')) return;
-    
-    // Your add dish modal logic here
-    alert('Add Dish modal would open here');
-    // You would typically show a modal with a form to add a new dish
-}
-
-function showEditDishModal() {
-    if (!checkPermission('edit_dishes')) return;
-    
-    alert('Edit Dish modal would open here. Select a dish to edit.');
-}
-
-function showDeleteDishModal() {
-    if (!checkPermission('delete_dishes')) return;
-    
-    alert('Delete Dish modal would open here. Select a dish to delete.');
-}
-
-function showRevenueReport() {
-    if (!checkPermission('view_revenue')) return;
-    
-    // Open revenue report
-    alert('Revenue report would open here');
-    // You could open a new view or modal with revenue charts and data
-}
-
-function showReserveTable() {
-    if (!checkPermission('manage_reservations')) return;
-    
-    alert('Table reservation system would open here');
-}
-
-function showOrders() {
-    if (!checkPermission('view_orders')) return;
-    
-    alert('Order management view would open here');
-}
-
-// Check specific permission
-function checkPermission(permission) {
-    if (userRole === 'admin') return true;
-    
-    const role = currentUser?.role || 'waiter';
-    const permissions = rolePermissions[role] || DEFAULT_PERMISSIONS[role] || {};
-    
-    if (permissions[permission] !== true) {
-        alert(`You don't have permission to ${permission.replace(/_/g, ' ')}`);
-        return false;
-    }
-    
-    return true;
-}
-
-    async function loadRestaurantData(restaurantId) {
-    try {
-        // ... existing code ...
-        
-        // Update UI based on loaded data
-        updateStaffUIAfterDataLoad();
-        
-        // Apply permissions to UI
-        updateUIBasedOnPermissions();
-        
-        console.log('✓ Restaurant data loaded successfully');
-        
-    } catch (error) {
-        console.error('❌ Error loading restaurant data:', error);
-        dishes = [];
-        users = [];
-        updateStaffUIAfterDataLoad();
-    }
-}
-
-    // Setup UI for staff
-function setupStaffUI() {
-    // ... existing code ...
-    
-    // Apply permissions immediately
-    updateUIBasedOnPermissions();
-}
-
-    /* Update this section in updateMenuManagementPermissions
-if (!permissions.manage_categories) {
-    // Find table headers by checking their text
-    const allTh = document.querySelectorAll('th');
-    allTh.forEach(th => {
-        if (th.textContent.trim().toLowerCase().includes('category')) {
-            th.style.display = 'none';
-            // Also hide corresponding cells in all rows
-            const columnIndex = Array.from(th.parentNode.children).indexOf(th);
-            const allRows = document.querySelectorAll('tr');
-            allRows.forEach(row => {
-                const cell = row.children[columnIndex];
-                if (cell) cell.style.display = 'none';
-            });
-        }
-    });
-    
-    // Also hide standalone category badges
-    const categoryCells = document.querySelectorAll('.category-badge');
-    categoryCells.forEach(cell => cell.style.display = 'none');
-} 
-
-    document.querySelectorAll('th[data-column="category"]');
-     */
 // Initialize the dashboard
 initDashboard();
 </script>
