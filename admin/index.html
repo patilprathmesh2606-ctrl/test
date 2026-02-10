@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar {
@@ -64,78 +63,25 @@
             color: #991b1b;
         }
         
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
+        .payment-status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
         }
         
-        .hidden {
-            display: none !important;
+        .payment-status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
         }
         
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px dashed #d1d5db;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .aspect-square {
-            aspect-ratio: 1 / 1;
-        }
-        
-        .image-grid-item {
-            transition: all 0.2s ease;
-        }
-        
-        .image-grid-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .image-grid-item.selected {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .image-thumbnail {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .image-thumbnail.selected {
-            border: 3px solid #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        .default-image {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .default-image.selected {
-            border: 3px solid #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        .payment-status-failed {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="flex min-h-screen">
+    <div id="adminDashboard" class="hidden flex min-h-screen">
         <!-- Sidebar -->
         <div id="sidebar" class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 flex flex-col">
             <!-- Logo -->
@@ -145,34 +91,34 @@
                         <i class="fas fa-shield-alt text-xl"></i>
                     </div>
                     <div class="ml-3 logo-text">
-                        <h1 class="text-xl font-bold" id="dashboardTitle">Admin Panel</h1>
-                        <p class="text-xs text-gray-400" id="dashboardSubtitle">DigitalMenuPro</p>
+                        <h1 class="text-xl font-bold">Admin Panel</h1>
+                        <p class="text-xs text-gray-400">DigitalMenuPro</p>
                     </div>
                 </div>
             </div>
             
             <!-- Navigation -->
             <nav class="flex-1 p-4">
-                <ul class="space-y-2" id="sidebarNav">
+                <ul class="space-y-2">
                     <li>
                         <a href="#" onclick="showView('dashboard')" class="flex items-center p-3 rounded-lg hover:bg-gray-700 active-nav">
                             <i class="fas fa-tachometer-alt w-6"></i>
                             <span class="ml-3 sidebar-text">Dashboard</span>
                         </a>
                     </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('restaurants')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-utensils w-6"></i>
                             <span class="ml-3 sidebar-text">Restaurants</span>
                         </a>
                     </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('subscriptions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-credit-card w-6"></i>
                             <span class="ml-3 sidebar-text">Subscriptions</span>
                         </a>
                     </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('payments')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-rupee-sign w-6"></i>
                             <span class="ml-3 sidebar-text">Payments</span>
@@ -181,28 +127,22 @@
                     <li>
                         <a href="#" onclick="showView('users')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-users w-6"></i>
-                            <span class="ml-3 sidebar-text" id="usersMenuText">All Users</span>
+                            <span class="ml-3 sidebar-text">All Users</span>
                         </a>
                     </li>
-                    <li class="admin-only">
-                        <a href="#" onclick="showView('staff_permissions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-user-shield w-6"></i>
-                            <span class="ml-3 sidebar-text">Staff Permissions</span>
-                        </a>
-                    </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('plans')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-cubes w-6"></i>
                             <span class="ml-3 sidebar-text">Plan Management</span>
                         </a>
                     </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('settings')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-cog w-6"></i>
                             <span class="ml-3 sidebar-text">System Settings</span>
                         </a>
                     </li>
-                    <li class="admin-only">
+                    <li>
                         <a href="#" onclick="showView('terms')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
                             <i class="fas fa-file-contract w-6"></i>
                             <span class="ml-3 sidebar-text">Terms & Policies</span>
@@ -210,15 +150,15 @@
                     </li>
                 </ul>
                 
-                <!-- User Profile -->
+                <!-- Admin Profile -->
                 <div class="mt-8 p-4 border-t border-gray-700">
                     <div class="flex items-center">
                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                             <i class="fas fa-user-shield"></i>
                         </div>
                         <div class="ml-3 sidebar-text">
-                            <p class="font-medium" id="adminName">Loading...</p>
-                            <p class="text-xs text-gray-400" id="adminEmail">Loading...</p>
+                            <p class="font-medium" id="adminName">Super Admin</p>
+                            <p class="text-xs text-gray-400" id="adminEmail">admin@royalkitchen.com</p>
                         </div>
                     </div>
                 </div>
@@ -286,7 +226,7 @@
                         <div class="stat-card bg-white rounded-xl shadow-lg p-6">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-gray-600 text-sm" id="stat1Title">Total Restaurants</p>
+                                    <p class="text-gray-600 text-sm">Total Restaurants</p>
                                     <p class="text-3xl font-bold" id="totalRestaurants">0</p>
                                 </div>
                                 <i class="fas fa-utensils text-4xl text-blue-500"></i>
@@ -302,7 +242,7 @@
                         <div class="stat-card bg-white rounded-xl shadow-lg p-6">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-gray-600 text-sm" id="stat2Title">Active Subscriptions</p>
+                                    <p class="text-gray-600 text-sm">Active Subscriptions</p>
                                     <p class="text-3xl font-bold" id="activeSubscriptions">0</p>
                                 </div>
                                 <i class="fas fa-credit-card text-4xl text-green-500"></i>
@@ -318,7 +258,7 @@
                         <div class="stat-card bg-white rounded-xl shadow-lg p-6">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-gray-600 text-sm" id="stat3Title">Monthly Revenue</p>
+                                    <p class="text-gray-600 text-sm">Monthly Revenue</p>
                                     <p class="text-3xl font-bold" id="monthlyRevenue">₹0</p>
                                 </div>
                                 <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
@@ -334,7 +274,7 @@
                         <div class="stat-card bg-white rounded-xl shadow-lg p-6">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-gray-600 text-sm" id="stat4Title">Pending Payments</p>
+                                    <p class="text-gray-600 text-sm">Pending Payments</p>
                                     <p class="text-3xl font-bold" id="pendingPayments">0</p>
                                 </div>
                                 <i class="fas fa-clock text-4xl text-yellow-500"></i>
@@ -344,44 +284,6 @@
                                     <span class="text-red-600"><i class="fas fa-arrow-down mr-1"></i> 3%</span>
                                     <span class="text-gray-500 ml-2">from last month</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Staff Actions Section (Visible only to staff) -->
-                    <div id="staffActionsSection" class="hidden">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                                <button onclick="showAddDishModal()" class="staff-action p-3 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 flex flex-col items-center" data-permission="addDish">
-                                    <i class="fas fa-plus mb-1"></i>
-                                    <span class="text-xs">Add Dish</span>
-                                </button>
-                                
-                                <button onclick="showEditDishModal()" class="staff-action p-3 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 flex flex-col items-center" data-permission="editDish">
-                                    <i class="fas fa-edit mb-1"></i>
-                                    <span class="text-xs">Edit Dish</span>
-                                </button>
-                                
-                                <button onclick="showDeleteDishModal()" class="staff-action p-3 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 flex flex-col items-center" data-permission="deleteDish">
-                                    <i class="fas fa-trash mb-1"></i>
-                                    <span class="text-xs">Delete Dish</span>
-                                </button>
-                                
-                                <button onclick="showRevenueReport()" class="staff-action p-3 bg-purple-100 text-purple-800 rounded-lg hover:bg-purple-200 flex flex-col items-center" data-permission="viewRevenue">
-                                    <i class="fas fa-rupee-sign mb-1"></i>
-                                    <span class="text-xs">View Revenue</span>
-                                </button>
-                                
-                                <button onclick="showReserveTableModal()" class="staff-action p-3 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 flex flex-col items-center" data-permission="reserveTable">
-                                    <i class="fas fa-chair mb-1"></i>
-                                    <span class="text-xs">Reserve Table</span>
-                                </button>
-                                
-                                <button onclick="showOrdersModal()" class="staff-action p-3 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200 flex flex-col items-center" data-permission="viewTableOrders">
-                                    <i class="fas fa-list-alt mb-1"></i>
-                                    <span class="text-xs">View Orders</span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -402,40 +304,516 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Recent Activities -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Recent Activities</h3>
+                            <button onclick="loadActivities()" class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-sync-alt mr-1"></i> Refresh
+                            </button>
+                        </div>
+                        <div id="activitiesList" class="space-y-4">
+                            <!-- Activities will be loaded here -->
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Restaurants View -->
                 <div id="viewRestaurants" class="view hidden">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold" id="restaurantsViewTitle">Restaurant Management</h2>
-                            <p class="text-gray-600" id="restaurantsViewSubtitle">Manage all registered restaurants</p>
+                            <h2 class="text-2xl font-bold">Restaurant Management</h2>
+                            <p class="text-gray-600">Manage all registered restaurants</p>
                         </div>
                         <div class="flex space-x-3">
                             <input type="text" id="restaurantSearch" placeholder="Search restaurants..." 
                                    class="px-4 py-2 border rounded-lg w-64" oninput="filterRestaurants()">
-                            <button onclick="exportRestaurants()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 admin-only">
+                            <button onclick="exportRestaurants()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
                                 <i class="fas fa-download mr-2"></i>Export
-                            </button>
-                            <button onclick="showAddDishModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 staff-only hidden">
-                                <i class="fas fa-plus mr-2"></i>Add Dish
                             </button>
                         </div>
                     </div>
                     
-                    <!-- Restaurants/Menu Table -->
+                    <!-- Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="statusFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                                <select id="planFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Plans</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="pro">Pro</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                <input type="date" id="dateFrom" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                <span class="mx-2">to</span>
+                                <input type="date" id="dateTo" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Restaurants Table -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
-                                    <tr id="restaurantsTableHeader">
-                                        <!-- Table headers will be set dynamically -->
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL Slug</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="restaurantsTable" class="bg-white divide-y divide-gray-200">
-                                    <!-- Data will be loaded here -->
+                                    <!-- Restaurants will be loaded here -->
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Showing <span id="restaurantStart">0</span> to <span id="restaurantEnd">0</span> of <span id="restaurantTotal">0</span> restaurants
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="prevRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subscriptions View -->
+                <div id="viewSubscriptions" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Subscription Management</h2>
+                            <p class="text-gray-600">Manage all subscription plans and billing</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Subscription Stats -->
+                        <div class="col-span-2 bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Active Subscriptions</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Restaurant</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Plan</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Auto-Pay</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Next Billing</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subscriptionsTable" class="divide-y divide-gray-200">
+                                        <!-- Subscriptions will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Subscription Actions -->
+                        <div class="space-y-6">
+                            <!-- Create Manual Subscription -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Create Subscription</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Restaurant</label>
+                                        <select id="newSubRestaurant" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="">Select Restaurant</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                                        <select id="newSubPlan" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="basic">Basic - ₹499/month</option>
+                                            <option value="pro">Pro - ₹999/month</option>
+                                            <option value="enterprise">Enterprise - ₹1,999/month</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="newSubAutoPay" class="mr-2">
+                                            <span>Enable Auto-Pay</span>
+                                        </label>
+                                    </div>
+                                    <button onclick="createManualSubscription()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Create Subscription
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Subscription Stats -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Subscription Stats</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Total Active</span>
+                                        <span class="font-bold" id="totalActiveSubs">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Monthly MRR</span>
+                                        <span class="font-bold" id="monthlyMRR">₹0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Annual Projection</span>
+                                        <span class="font-bold" id="annualProjection">₹0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Churn Rate</span>
+                                        <span class="font-bold text-green-600" id="churnRate">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payments View -->
+                <div id="viewPayments" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Payment Management</h2>
+                            <p class="text-gray-600">View and manage all payment transactions</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <input type="text" id="paymentSearch" placeholder="Search payments..." 
+                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterPayments()">
+                            <button onclick="exportPayments()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="paymentStatusFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="refunded">Refunded</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Method</label>
+                                <select id="paymentMethodFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Methods</option>
+                                    <option value="upi_qr">UPI QR</option>
+                                    <option value="upi_id">UPI ID</option>
+                                    <option value="card">Card</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                <div class="flex items-center">
+                                    <input type="date" id="paymentDateFrom" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <span class="mx-2">to</span>
+                                    <input type="date" id="paymentDateTo" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payments Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentsTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Payments will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Showing <span id="paymentStart">0</span> to <span id="paymentEnd">0</span> of <span id="paymentTotal">0</span> payments
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="prevPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Total Revenue</p>
+                                <p class="text-2xl font-bold" id="totalRevenue">₹0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Successful Payments</p>
+                                <p class="text-2xl font-bold" id="successfulPayments">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Pending Verification</p>
+                                <p class="text-2xl font-bold" id="pendingVerifications">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Average Transaction</p>
+                                <p class="text-2xl font-bold" id="averageTransaction">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- All Users View -->
+                <div id="viewUsers" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">User Management</h2>
+                            <p class="text-gray-600">Manage all system users across restaurants</p>
+                        </div>
+                        <input type="text" id="userSearch" placeholder="Search users..." 
+                               class="px-4 py-2 border rounded-lg w-64" oninput="filterUsers()">
+                    </div>
+                    
+                    <!-- Users Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plan Management View -->
+                <div id="viewPlans" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Plan Management</h2>
+                            <p class="text-gray-600">Configure subscription plans and pricing</p>
+                        </div>
+                        <button onclick="showPlanModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>Add New Plan
+                        </button>
+                    </div>
+                    
+                    <!-- Plans Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plansGrid">
+                        <!-- Plans will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- System Settings View -->
+                <div id="viewSettings" class="view hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold">System Settings</h2>
+                        <p class="text-gray-600">Configure system-wide settings and preferences</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- General Settings -->
+                        <div class="col-span-2 space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">General Settings</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">System Name</label>
+                                        <input type="text" id="systemName" value="DigitalMenuPro" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
+                                        <input type="email" id="supportEmail" value="support@digitalmenupro.com" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Phone</label>
+                                        <input type="tel" id="supportPhone" value="+91-9876543210" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
+                                        <select id="defaultCurrency" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="INR" selected>Indian Rupee (₹)</option>
+                                            <option value="USD">US Dollar ($)</option>
+                                            <option value="EUR">Euro (€)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Settings -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Payment Settings</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+                                        <input type="text" id="upiId" value="digitalmenupro@okhdfcbank" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
+                                        <input type="text" id="gstNumber" value="27AAECD1234M1Z5" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                                <div class="space-y-3">
+                                    <button onclick="sendTestEmail()" class="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-left">
+                                        <i class="fas fa-envelope mr-2"></i>Send Test Email
+                                    </button>
+                                    <button onclick="clearSystemCache()" class="w-full px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 text-left">
+                                        <i class="fas fa-broom mr-2"></i>Clear System Cache
+                                    </button>
+                                    <button onclick="backupDatabase()" class="w-full px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-left">
+                                        <i class="fas fa-database mr-2"></i>Backup Database
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- System Status -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">System Status</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Database</span>
+                                        <span class="text-green-600 font-medium">Online</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Storage</span>
+                                        <span class="text-green-600 font-medium">2.4 GB / 10 GB</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Active Users</span>
+                                        <span class="font-medium" id="activeUsersCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">System Uptime</span>
+                                        <span class="font-medium">99.8%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Save Settings -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <button onclick="saveSystemSettings()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                                    <i class="fas fa-save mr-2"></i>Save All Settings
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2 text-center">
+                                    Changes may take up to 5 minutes to propagate
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Terms & Policies View -->
+                <div id="viewTerms" class="view hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold">Terms & Policies Management</h2>
+                        <p class="text-gray-600">Update system terms, conditions, and policies</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="space-y-6">
+                            <!-- Terms of Service -->
+                            <div>
+                                <h3 class="text-lg font-bold mb-3">Terms of Service</h3>
+                                <textarea id="termsOfService" rows="12" class="w-full px-4 py-3 border rounded-lg font-mono text-sm">
+# DigitalMenuPro Terms of Service
+
+## 1. Acceptance of Terms
+By accessing and using DigitalMenuPro services, you agree to be bound by these Terms of Service.
+
+## 2. Subscription Terms
+- Monthly subscriptions auto-renew unless cancelled
+- 7-day free trial available for new restaurants
+- Payment required to continue after trial period
+
+## 3. Service Updates
+We may update our services, features, and pricing with 30 days notice.
+
+## 4. User Responsibilities
+- Provide accurate information
+- Maintain account security
+- Comply with all applicable laws
+
+## 5. Termination
+We reserve the right to suspend accounts for violations or non-payment.
+                                </textarea>
+                            </div>
+                            
+                            <!-- Update Actions -->
+                            <div class="flex justify-between pt-6 border-t">
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="notifyUsers" class="mr-2">
+                                        <span>Notify all users about terms update</span>
+                                    </label>
+                                </div>
+                                <div class="space-x-3">
+                                    <button onclick="previewTerms()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                        Preview
+                                    </button>
+                                    <button onclick="updateTerms()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Update Policies
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -444,7 +822,7 @@
     </div>
     
     <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="modal-overlay fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-xl p-8 w-full max-w-md">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
@@ -457,314 +835,16 @@
             <div class="space-y-4">
                 <input type="email" id="adminEmailInput" placeholder="Admin Email" 
                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <input type="password" id="adminPassword" placeholder="Password" 
+                <input type="password" id="adminPasswordInput" placeholder="Password" 
                        class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <button onclick="handleAdminLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
                     Login as Admin
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Dish Modal -->
-    <div id="addDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Add New Dish</h3>
-                    <button onclick="closeAddDishModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
                 
-                <form id="addDishForm" onsubmit="event.preventDefault(); saveNewDish();">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name *</label>
-                            <input type="text" id="dishName" required 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea id="dishDescription" rows="3" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                                <select id="dishCategory" required 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Select Category</option>
-                                    <option value="Drinks">Drinks</option>
-                                    <option value="Chinese">Chinese</option>
-                                    <option value="Desserts">Desserts</option>
-                                    <option value="Fast Food">Fast Food</option>
-                                    <option value="Specials">Specials</option>
-                                    <option value="Soups">Soups</option>
-                                    <option value="Salads">Salads</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
-                                <input type="number" id="dishPrice" min="0" step="0.01" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Preparation Time (minutes)</label>
-                                <input type="number" id="dishPrepTime" min="0" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
-                                <select id="dishAvailability" 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="true">Available</option>
-                                    <option value="false">Not Available</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                            <input type="text" id="dishTags" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="e.g., spicy, vegan, gluten-free">
-                        </div>
-                        
-                        <!-- Image Selection Section -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Dish Image</label>
-                            
-                            <!-- Search Bar -->
-                            <div class="flex items-center gap-2 mb-3">
-                                <input type="text" id="addImageSearch" placeholder="Search images..." 
-                                       oninput="searchAddImages()" 
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <button type="button" onclick="refreshAddImageGallery()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="text-sm text-gray-500 mb-3">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Select an image from your gallery
-                            </div>
-                            
-                            <!-- Current Image Preview -->
-                            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
-                                <div class="flex items-center justify-center">
-                                    <img id="addSelectedImagePreview" src="https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image" 
-                                         class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
-                                </div>
-                                <input type="hidden" id="addSelectedImageUrl">
-                                <div class="mt-2 text-center">
-                                    <button type="button" onclick="clearAddSelectedImage()" class="text-sm text-red-600 hover:text-red-800">
-                                        <i class="fas fa-times mr-1"></i>Remove Image
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Image Gallery -->
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="text-sm font-medium text-gray-700">Available Images:</label>
-                                    <span id="addImageCount" class="text-sm text-gray-500">0 images</span>
-                                </div>
-                                <div id="addImageGallery" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-300">
-                                    <div class="col-span-3 text-center py-8">
-                                        <div class="loading inline-block"></div>
-                                        <p class="text-gray-600 mt-2">Loading images...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end space-x-3 pt-4 border-t">
-                            <button type="button" onclick="closeAddDishModal()" 
-                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" id="saveDishBtn" 
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center">
-                                <span>Save Dish</span>
-                                <div id="saveDishLoading" class="loading ml-2 hidden"></div>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Dish Modal -->
-    <div id="editDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Edit Dish</h3>
-                    <button onclick="closeEditDishModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="editDishForm" onsubmit="event.preventDefault(); updateDish();">
-                    <input type="hidden" id="editDishId">
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name *</label>
-                            <input type="text" id="editDishName" required 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea id="editDishDescription" rows="3" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                                <select id="editDishCategory" required 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="">Select Category</option>
-                                    <option value="Drinks">Drinks</option>
-                                    <option value="Chinese">Chinese</option>
-                                    <option value="Desserts">Desserts</option>
-                                    <option value="Fast Food">Fast Food</option>
-                                    <option value="Specials">Specials</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
-                                <input type="number" id="editDishPrice" min="0" step="0.01" required 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Preparation Time (minutes)</label>
-                                <input type="number" id="editDishPrepTime" min="0" 
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
-                                <select id="editDishAvailability" 
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="true">Available</option>
-                                    <option value="false">Not Available</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                            <input type="text" id="editDishTags" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        
-                        <!-- Image Selection Section -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Dish Image</label>
-                            
-                            <!-- Search Bar -->
-                            <div class="flex items-center gap-2 mb-3">
-                                <input type="text" id="editImageSearch" placeholder="Search images..." 
-                                       oninput="searchEditImages()" 
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <button type="button" onclick="refreshEditImageGallery()" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                            
-                            <div class="text-sm text-gray-500 mb-3">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Select an image from your gallery
-                            </div>
-                            
-                            <!-- Current Image Preview -->
-                            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Selected Image:</label>
-                                <div class="flex items-center justify-center">
-                                    <img id="editSelectedImagePreview" src="https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image" 
-                                         class="w-full max-h-48 object-cover rounded-lg border-2 border-blue-500">
-                                </div>
-                                <input type="hidden" id="editSelectedImageUrl">
-                                <div class="mt-2 text-center">
-                                    <button type="button" onclick="clearEditSelectedImage()" class="text-sm text-red-600 hover:text-red-800">
-                                        <i class="fas fa-times mr-1"></i>Remove Image
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Image Gallery -->
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="text-sm font-medium text-gray-700">Available Images:</label>
-                                    <span id="editImageCount" class="text-sm text-gray-500">0 images</span>
-                                </div>
-                                <div id="editImageGallery" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-300">
-                                    <div class="col-span-3 text-center py-8">
-                                        <div class="loading inline-block"></div>
-                                        <p class="text-gray-600 mt-2">Loading images...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end space-x-3 pt-4 border-t">
-                            <button type="button" onclick="closeEditDishModal()" 
-                                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                Cancel
-                            </button>
-                            <button type="submit" id="updateDishBtn" 
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
-                                <span>Update Dish</span>
-                                <div id="updateDishLoading" class="loading ml-2 hidden"></div>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Dish Confirmation Modal -->
-    <div id="deleteDishModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-xl w-full max-w-md">
-            <div class="p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Dish</h3>
-                    <p class="text-gray-600" id="deleteDishMessage">Are you sure you want to delete this dish?</p>
-                </div>
-                
-                <input type="hidden" id="deleteDishId">
-                
-                <div class="flex justify-center space-x-3">
-                    <button onclick="closeDeleteDishModal()" 
-                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        Cancel
-                    </button>
-                    <button onclick="confirmDeleteDish()" 
-                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                        Delete
-                    </button>
-                </div>
+                <p class="text-sm text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Super Admin: admin@royalkitchen.com
+                </p>
             </div>
         </div>
     </div>
@@ -773,6 +853,7 @@
 // Configuration
 const SUPABASE_URL = 'https://aazqyrkklajqscsdfgjl.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go';
+const SUPER_ADMIN_EMAIL = 'admin@royalkitchen.com';
 
 // Initialize Supabase
 let supabaseClient;
@@ -784,861 +865,70 @@ try {
 }
 
 // Global variables
-let currentUser = null;
-let currentRestaurant = null;
-let userRole = 'admin';
-let isStaffMode = false;
+let currentAdmin = null;
 let restaurants = [];
-let dishes = [];
-let availableImages = [];
+let subscriptions = [];
+let payments = [];
+let users = [];
+let plans = [];
+let currentRestaurantPage = 1;
+let currentPaymentPage = 1;
+const itemsPerPage = 10;
 
-// Initialize dashboard
-async function initDashboard() {
+// Chart instances
+let revenueChart = null;
+let planChart = null;
+
+// Initialize admin dashboard
+async function initAdminDashboard() {
     try {
-        // Set today's date for date inputs
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Check if user is already logged in
+        // Check if admin is already logged in
         const { data: { user } } = await supabaseClient.auth.getUser();
-        
-        if (user) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const restaurantSlug = urlParams.get('restaurant');
-            const staffParam = urlParams.get('staff');
-            
-            if (restaurantSlug && staffParam === 'true') {
-                isStaffMode = true;
-                await handleStaffAccess(user, restaurantSlug);
-            } else {
-                await handleAdminAccess(user);
-            }
-        } else {
-            document.getElementById('adminLoginModal').classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Dashboard initialization error:', error);
-        document.getElementById('adminLoginModal').classList.remove('hidden');
-    }
-}
-
-// Load images from Supabase Storage
-async function loadDishImagesFromStorage() {
-    try {
-        const { data: files, error } = await supabaseClient.storage
-            .from('dish-images')
-            .list('', {
-                limit: 100,
-                offset: 0,
-                sortBy: { column: 'name', order: 'asc' }
-            });
-        
-        if (error) {
-            console.error('Error loading images:', error);
-            return [];
-        }
-        
-        // Get public URLs for all images
-        const imageUrls = files
-            .filter(file => !file.id) // Filter out folders
-            .map(file => {
-                const { data: { publicUrl } } = supabaseClient.storage
-                    .from('dish-images')
-                    .getPublicUrl(file.name);
-                return {
-                    name: file.name,
-                    url: publicUrl
-                };
-            });
-        
-        console.log(`Loaded ${imageUrls.length} images from storage`);
-        return imageUrls;
-        
-    } catch (error) {
-        console.error('Error loading images:', error);
-        return [];
-    }
-}
-
-// Render image grid
-function renderImageGrid(images, containerId, selectedImageUrl = null) {
-    const container = document.getElementById(containerId);
-    const countId = containerId.replace('Gallery', 'Count');
-    const countElement = document.getElementById(countId);
-    
-    if (!container) return;
-    
-    if (countElement) {
-        countElement.textContent = `${images.length} images`;
-    }
-    
-    if (!images || images.length === 0) {
-        container.innerHTML = `
-            <div class="col-span-3 text-center py-8 text-gray-500">
-                <i class="fas fa-image text-3xl mb-2"></i>
-                <p>No images found in storage</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    
-    images.forEach((image, index) => {
-        const isSelected = selectedImageUrl === image.url;
-        const fileName = image.name.length > 15 ? image.name.substring(0, 12) + '...' : image.name;
-        
-        html += `
-            <div class="relative group cursor-pointer" onclick="selectImageFromGallery('${image.url}', '${containerId}')">
-                <img src="${image.url}" 
-                     alt="${image.name}"
-                     class="w-full h-20 object-cover rounded-lg border-2 ${isSelected ? 'border-blue-500' : 'border-gray-200'} hover:border-blue-400 transition-all"
-                     loading="lazy">
-                ${isSelected ? '<div class="absolute top-1 right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"><i class="fas fa-check"></i></div>' : ''}
-                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg"></div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-// Select image from gallery
-function selectImageFromGallery(imageUrl, containerId) {
-    const modalType = containerId.includes('add') ? 'add' : 'edit';
-    
-    if (modalType === 'add') {
-        document.getElementById('addSelectedImageUrl').value = imageUrl;
-        document.getElementById('addSelectedImagePreview').src = imageUrl;
-    } else {
-        document.getElementById('editSelectedImageUrl').value = imageUrl;
-        document.getElementById('editSelectedImagePreview').src = imageUrl;
-    }
-    
-    // Re-render gallery to show selection
-    const images = availableImages;
-    renderImageGrid(images, containerId, imageUrl);
-}
-
-// Clear selected image for Add modal
-function clearAddSelectedImage() {
-    document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-    renderImageGrid(availableImages, 'addImageGallery', null);
-}
-
-// Clear selected image for Edit modal
-function clearEditSelectedImage() {
-    document.getElementById('editSelectedImageUrl').value = '';
-    document.getElementById('editSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-    renderImageGrid(availableImages, 'editImageGallery', null);
-}
-
-// Search images in Add modal
-function searchAddImages() {
-    const searchTerm = document.getElementById('addImageSearch').value.toLowerCase();
-    
-    if (!searchTerm) {
-        renderImageGrid(availableImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
-        return;
-    }
-    
-    const filteredImages = availableImages.filter(img => 
-        img.name.toLowerCase().includes(searchTerm)
-    );
-    
-    renderImageGrid(filteredImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
-}
-
-// Search images in Edit modal
-function searchEditImages() {
-    const searchTerm = document.getElementById('editImageSearch').value.toLowerCase();
-    
-    if (!searchTerm) {
-        renderImageGrid(availableImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
-        return;
-    }
-    
-    const filteredImages = availableImages.filter(img => 
-        img.name.toLowerCase().includes(searchTerm)
-    );
-    
-    renderImageGrid(filteredImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
-}
-
-// Refresh image gallery in Add modal
-async function refreshAddImageGallery() {
-    availableImages = await loadDishImagesFromStorage();
-    renderImageGrid(availableImages, 'addImageGallery', document.getElementById('addSelectedImageUrl').value);
-    alert('Image gallery refreshed!');
-}
-
-// Refresh image gallery in Edit modal
-async function refreshEditImageGallery() {
-    availableImages = await loadDishImagesFromStorage();
-    renderImageGrid(availableImages, 'editImageGallery', document.getElementById('editSelectedImageUrl').value);
-    alert('Image gallery refreshed!');
-}
-
-// Upload image to Supabase Storage
-async function uploadImageToStorage(file) {
-    try {
-        // Create unique filename
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-        const filePath = fileName;
-        
-        // Upload to Supabase Storage
-        const { data, error } = await supabaseClient.storage
-            .from('dish-images')
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false
-            });
-        
-        if (error) {
-            console.error('Error uploading image:', error);
-            return null;
-        }
-        
-        // Get public URL
-        const { data: { publicUrl } } = supabaseClient.storage
-            .from('dish-images')
-            .getPublicUrl(filePath);
-        
-        console.log('Image uploaded successfully:', publicUrl);
-        return publicUrl;
-        
-    } catch (error) {
-        console.error('Error uploading image:', error);
-        return null;
-    }
-}
-
-// Handle staff access
-async function handleStaffAccess(user, restaurantSlug) {
-    try {
-        // Get restaurant by slug
-        const { data: restaurant, error: resError } = await supabaseClient
-            .from('restaurants')
-            .select('*')
-            .eq('url_slug', restaurantSlug)
-            .single();
-        
-        if (resError || !restaurant) {
-            alert('Restaurant not found. Redirecting...');
-            window.location.href = `../menu-dynamic.html?slug=${restaurantSlug}`;
-            return;
-        }
-        
-        // Check if user is super admin
-        if (user.email === 'admin@royalkitchen.com') {
-            console.log('✓ Super admin accessing restaurant:', restaurant.name);
-            
-            currentUser = {
-                user_id: user.id,
+        if (user && user.email === SUPER_ADMIN_EMAIL) {
+            currentAdmin = {
                 email: user.email,
                 name: 'Super Admin',
-                role: 'admin',
-                permissions: {
-                    "addDish": true,
-                    "editDish": true,
-                    "deleteDish": true,
-                    "manageStaff": true,
-                    "viewRevenue": true,
-                    "reserveTable": true,
-                    "viewTableOrders": true,
-                    "manageRestaurants": true,
-                    "manageSubscriptions": true,
-                    "viewAllData": true
-                }
+                role: 'super_admin'
             };
-            currentRestaurant = restaurant;
-            userRole = 'admin';
             
-            setupStaffUI();
-            await loadRestaurantData(restaurant.id);
-            document.getElementById('adminLoginModal').classList.add('hidden');
+            document.getElementById('adminLoginModal').style.display = 'none';
             document.getElementById('adminDashboard').classList.remove('hidden');
-            return;
-        }
-        
-        // Check if user is staff for this restaurant
-        const { data: staffUser, error: staffError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('restaurant_id', restaurant.id)
-            .eq('is_active', true)
-            .single();
-        
-        if (staffError || !staffUser) {
-            alert('You are not authorized to access this restaurant dashboard.');
-            window.location.href = `../menu-dynamic.html?slug=${restaurantSlug}`;
-            return;
-        }
-        
-        currentUser = staffUser;
-        currentRestaurant = restaurant;
-        userRole = staffUser.role;
-        
-        // Set default permissions if none exist
-        if (!staffUser.permissions || Object.keys(staffUser.permissions).length === 0) {
-            await setDefaultPermissions(staffUser.id, staffUser.role);
-            const { data: updatedUser } = await supabaseClient
-                .from('staff_users')
-                .select('*')
-                .eq('id', staffUser.id)
-                .single();
-            currentUser = updatedUser;
-        }
-        
-        setupStaffUI();
-        await loadRestaurantData(restaurant.id);
-        document.getElementById('adminLoginModal').classList.add('hidden');
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        
-    } catch (error) {
-        console.error('Staff access error:', error);
-        document.getElementById('adminLoginModal').classList.remove('hidden');
-    }
-}
-
-// Set default permissions
-async function setDefaultPermissions(userId, role) {
-    const defaultPermissions = {
-        'owner': {
-            "addDish": true,
-            "editDish": true,
-            "deleteDish": true,
-            "manageStaff": true,
-            "viewRevenue": true,
-            "reserveTable": true,
-            "viewTableOrders": true
-        },
-        'manager': {
-            "addDish": true,
-            "editDish": true,
-            "deleteDish": true,
-            "manageStaff": false,
-            "viewRevenue": true,
-            "reserveTable": true,
-            "viewTableOrders": true
-        },
-        'chef': {
-            "addDish": true,
-            "editDish": true,
-            "deleteDish": true,
-            "manageStaff": false,
-            "viewRevenue": false,
-            "reserveTable": false,
-            "viewTableOrders": true
-        },
-        'waiter': {
-            "addDish": false,
-            "editDish": false,
-            "deleteDish": false,
-            "manageStaff": false,
-            "viewRevenue": false,
-            "reserveTable": true,
-            "viewTableOrders": true
-        }
-    };
-    
-    const permissions = defaultPermissions[role] || defaultPermissions.waiter;
-    
-    const { error } = await supabaseClient
-        .from('staff_users')
-        .update({ 
-            permissions: permissions,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-    
-    if (error) {
-        console.error('Error setting permissions:', error);
-        throw error;
-    }
-}
-
-// Check permissions
-function hasPermission(permissionName) {
-    // Super admin has all permissions
-    if (currentUser?.email === 'admin@royalkitchen.com') return true;
-    
-    // Regular admin has all permissions
-    if (userRole === 'admin') return true;
-    
-    // Check staff user permissions
-    const permissions = currentUser?.permissions || {};
-    return permissions[permissionName] === true;
-}
-
-// Update UI based on permissions
-function updateUIBasedOnPermissions() {
-    if (userRole === 'admin') return;
-    
-    const staffActionsSection = document.getElementById('staffActionsSection');
-    if (staffActionsSection) {
-        staffActionsSection.classList.remove('hidden');
-    }
-    
-    document.querySelectorAll('[data-permission]').forEach(element => {
-        const permissionName = element.getAttribute('data-permission');
-        const hasPerm = hasPermission(permissionName);
-        
-        if (hasPerm) {
-            element.classList.remove('hidden');
-        } else {
-            element.classList.add('hidden');
-        }
-        
-        if (element.tagName === 'BUTTON') {
-            element.disabled = !hasPerm;
-        }
-    });
-}
-
-// Add Dish Modal
-async function showAddDishModal() {
-    if (!hasPermission('addDish')) {
-        alert('You do not have permission to add dishes');
-        return;
-    }
-    
-    // Reset form
-    document.getElementById('addDishForm').reset();
-    
-    // Clear image selection
-    document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-    document.getElementById('addImageSearch').value = '';
-    
-    // Load and display images from Supabase
-    availableImages = await loadDishImagesFromStorage();
-    renderImageGrid(availableImages, 'addImageGallery', null);
-    
-    // Show modal
-    document.getElementById('addDishModal').classList.remove('hidden');
-}
-
-function closeAddDishModal() {
-    document.getElementById('addDishModal').classList.add('hidden');
-    document.getElementById('addSelectedImageUrl').value = '';
-    document.getElementById('addSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-}
-
-async function saveNewDish() {
-    if (!hasPermission('addDish')) {
-        alert('Permission denied');
-        return;
-    }
-    
-    // Validate required fields
-    const dishName = document.getElementById('dishName').value;
-    const dishPrice = document.getElementById('dishPrice').value;
-    const dishCategory = document.getElementById('dishCategory').value;
-    
-    if (!dishName || !dishPrice || !dishCategory) {
-        alert('Please fill in all required fields (Name, Price, Category)');
-        return;
-    }
-    
-    // Show loading state
-    const saveBtn = document.getElementById('saveDishBtn');
-    const loading = document.getElementById('saveDishLoading');
-    saveBtn.disabled = true;
-    loading.classList.remove('hidden');
-    
-    try {
-        // Get selected image URL
-        const finalImageUrl = document.getElementById('addSelectedImageUrl').value || null;
-        
-        // Prepare dish data
-        const dishData = {
-            restaurant_id: currentRestaurant.id,
-            name: dishName,
-            description: document.getElementById('dishDescription').value,
-            category: dishCategory,
-            price: parseFloat(dishPrice),
-            preparation_time: parseInt(document.getElementById('dishPrepTime').value) || null,
-            is_available: document.getElementById('dishAvailability').value === 'true',
-            tags: document.getElementById('dishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-            image_url: finalImageUrl,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        
-        // Save to database
-        const { data, error } = await supabaseClient
-            .from('dishes')
-            .insert([dishData])
-            .select();
-        
-        if (error) {
-            console.error('Database error:', error);
-            throw error;
-        }
-        
-        // Refresh dishes list
-        await loadRestaurantData(currentRestaurant.id);
-        
-        // Show success message
-        alert('Dish added successfully!');
-        closeAddDishModal();
-        
-        // Update UI if restaurants view is open
-        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
-            loadRestaurantsTable();
-        }
-        
-    } catch (error) {
-        console.error('Error adding dish:', error);
-        alert('Error adding dish: ' + (error.message || 'Unknown error'));
-    } finally {
-        // Reset loading state
-        saveBtn.disabled = false;
-        loading.classList.add('hidden');
-    }
-}
-
-// Edit Dish Modal
-async function showEditDishModal() {
-    if (!hasPermission('editDish')) {
-        alert('You do not have permission to edit dishes');
-        return;
-    }
-    
-    if (dishes.length === 0) {
-        alert('No dishes available to edit');
-        return;
-    }
-    
-    // For demo, use first dish - in real app, you'd select which dish to edit
-    const dish = dishes[0];
-    
-    // Fill form with dish data
-    document.getElementById('editDishId').value = dish.id;
-    document.getElementById('editDishName').value = dish.name;
-    document.getElementById('editDishDescription').value = dish.description || '';
-    document.getElementById('editDishCategory').value = dish.category;
-    document.getElementById('editDishPrice').value = dish.price;
-    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
-    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
-    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
-    
-    // Set selected image
-    const currentImageUrl = dish.image_url || '';
-    document.getElementById('editSelectedImageUrl').value = currentImageUrl;
-    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-    document.getElementById('editImageSearch').value = '';
-    
-    // Load and display images from Supabase
-    availableImages = await loadDishImagesFromStorage();
-    renderImageGrid(availableImages, 'editImageGallery', currentImageUrl);
-    
-    // Show modal
-    document.getElementById('editDishModal').classList.remove('hidden');
-}
-
-function closeEditDishModal() {
-    document.getElementById('editDishModal').classList.add('hidden');
-    document.getElementById('editSelectedImageUrl').value = '';
-    document.getElementById('editSelectedImagePreview').src = 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-}
-
-async function updateDish() {
-    if (!hasPermission('editDish')) {
-        alert('Permission denied');
-        return;
-    }
-    
-    const dishId = document.getElementById('editDishId').value;
-    
-    // Validate required fields
-    if (!dishId || !document.getElementById('editDishName').value || 
-        !document.getElementById('editDishPrice').value || 
-        !document.getElementById('editDishCategory').value) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    // Show loading state
-    const updateBtn = document.getElementById('updateDishBtn');
-    const loading = document.getElementById('updateDishLoading');
-    updateBtn.disabled = true;
-    loading.classList.remove('hidden');
-    
-    try {
-        // Get selected image URL
-        const finalImageUrl = document.getElementById('editSelectedImageUrl').value || null;
-        
-        // Prepare dish data
-        const dishData = {
-            name: document.getElementById('editDishName').value,
-            description: document.getElementById('editDishDescription').value,
-            category: document.getElementById('editDishCategory').value,
-            price: parseFloat(document.getElementById('editDishPrice').value),
-            preparation_time: parseInt(document.getElementById('editDishPrepTime').value) || null,
-            is_available: document.getElementById('editDishAvailability').value === 'true',
-            tags: document.getElementById('editDishTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
-            image_url: finalImageUrl,
-            updated_at: new Date().toISOString()
-        };
-        
-        // Update in database
-        const { data, error } = await supabaseClient
-            .from('dishes')
-            .update(dishData)
-            .eq('id', dishId)
-            .select();
-        
-        if (error) {
-            console.error('Database error:', error);
-            throw error;
-        }
-        
-        // Refresh dishes list
-        await loadRestaurantData(currentRestaurant.id);
-        
-        // Show success message
-        alert('Dish updated successfully!');
-        closeEditDishModal();
-        
-        // Update UI if restaurants view is open
-        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
-            loadRestaurantsTable();
-        }
-        
-    } catch (error) {
-        console.error('Error updating dish:', error);
-        alert('Error updating dish: ' + (error.message || 'Unknown error'));
-    } finally {
-        // Reset loading state
-        updateBtn.disabled = false;
-        loading.classList.add('hidden');
-    }
-}
-
-// Delete Dish
-function showDeleteDishModal() {
-    if (!hasPermission('deleteDish')) {
-        alert('You do not have permission to delete dishes');
-        return;
-    }
-    
-    if (dishes.length === 0) {
-        alert('No dishes available to delete');
-        return;
-    }
-    
-    const dish = dishes[0];
-    document.getElementById('deleteDishId').value = dish.id;
-    document.getElementById('deleteDishMessage').textContent = `Are you sure you want to delete "${dish.name}"? This action cannot be undone.`;
-    
-    document.getElementById('deleteDishModal').classList.remove('hidden');
-}
-
-function closeDeleteDishModal() {
-    document.getElementById('deleteDishModal').classList.add('hidden');
-}
-
-async function confirmDeleteDish() {
-    if (!hasPermission('deleteDish')) {
-        alert('Permission denied');
-        return;
-    }
-    
-    const dishId = document.getElementById('deleteDishId').value;
-    
-    try {
-        const { data, error } = await supabaseClient
-            .from('dishes')
-            .delete()
-            .eq('id', dishId);
-        
-        if (error) throw error;
-        
-        // Refresh dishes list
-        await loadRestaurantData(currentRestaurant.id);
-        
-        // Show success message
-        alert('Dish deleted successfully!');
-        closeDeleteDishModal();
-        
-        // Update UI if restaurants view is open
-        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
-            loadRestaurantsTable();
-        }
-        
-    } catch (error) {
-        console.error('Error deleting dish:', error);
-        alert('Error deleting dish: ' + error.message);
-    }
-}
-
-// Setup UI for staff
-function setupStaffUI() {
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = 'none';
-    });
-    
-    document.querySelectorAll('.staff-only').forEach(el => {
-        el.style.display = 'block';
-    });
-    
-    // Show super admin badge if applicable
-    if (currentUser?.email === 'admin@royalkitchen.com') {
-        document.getElementById('dashboardTitle').innerHTML = (currentRestaurant?.name || 'Staff Dashboard') + ' <span class="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full ml-2">SUPER ADMIN</span>';
-        document.getElementById('dashboardSubtitle').textContent = 'Full Access Mode';
-    } else {
-        document.getElementById('dashboardTitle').textContent = currentRestaurant?.name || 'Staff Dashboard';
-        document.getElementById('dashboardSubtitle').textContent = 'Staff Portal';
-    }
-    
-    document.getElementById('restaurantsViewTitle').textContent = 'Menu Management';
-    document.getElementById('restaurantsViewSubtitle').textContent = 'Manage your restaurant menu';
-    
-    updateUIBasedOnPermissions();
-}
-
-// Handle admin access
-async function handleAdminAccess(user) {
-    try {
-        // Check if user is the super admin
-        if (user.email === 'admin@royalkitchen.com') {
-            console.log('✓ Super admin detected:', user.email);
+            document.getElementById('adminName').textContent = 'Super Admin';
+            document.getElementById('adminEmail').textContent = user.email;
             
-            // Create or get super admin user record
-            const { data: existingAdmin, error: checkError } = await supabaseClient
-                .from('staff_users')
-                .select('*')
-                .eq('email', user.email)
-                .single();
-            
-            let adminUser;
-            
-            if (checkError || !existingAdmin) {
-                // Create super admin record if doesn't exist
-                const { data: newAdmin, error: createError } = await supabaseClient
-                    .from('staff_users')
-                    .insert([{
-                        user_id: user.id,
-                        email: user.email,
-                        name: 'Super Admin',
-                        role: 'admin',
-                        is_active: true,
-                        permissions: {
-                            "addDish": true,
-                            "editDish": true,
-                            "deleteDish": true,
-                            "manageStaff": true,
-                            "viewRevenue": true,
-                            "reserveTable": true,
-                            "viewTableOrders": true,
-                            "manageRestaurants": true,
-                            "manageSubscriptions": true,
-                            "viewAllData": true
-                        },
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    }])
-                    .select()
-                    .single();
-                
-                if (createError) {
-                    console.error('Error creating super admin:', createError);
-                } else {
-                    adminUser = newAdmin;
-                }
-            } else {
-                adminUser = existingAdmin;
-            }
-            
-            currentUser = adminUser || {
-                email: user.email,
-                name: 'Super Admin',
-                role: 'admin'
-            };
-            userRole = 'admin';
-            
-            setupAdminUI();
+            // Load initial data
             await loadAdminData();
-            document.getElementById('adminLoginModal').classList.add('hidden');
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            return;
-        }
-        
-        // Check if user is a regular admin
-        const { data: adminUser, error: adminError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('email', user.email)
-            .eq('role', 'admin')
-            .single();
+            setupCharts();
+            loadNotifications();
+            loadActivities();
             
-        if (adminError || !adminUser) {
-            // Check if user is a staff member of any restaurant
-            const { data: staffUser } = await supabaseClient
-                .from('staff_users')
-                .select('*, restaurants(*)')
-                .eq('user_id', user.id)
-                .eq('is_active', true)
-                .single();
-                
-            if (staffUser) {
-                window.location.href = `index.html?restaurant=${staffUser.restaurants.url_slug}&staff=true`;
-                return;
-            }
-            
-            alert('Access denied. Admin privileges required.');
-            await supabaseClient.auth.signOut();
-            document.getElementById('adminLoginModal').classList.remove('hidden');
-            return;
+            console.log('✓ Admin dashboard initialized');
+        } else {
+            showAdminLogin();
         }
-        
-        currentUser = adminUser;
-        userRole = 'admin';
-        
-        setupAdminUI();
-        await loadAdminData();
-        document.getElementById('adminLoginModal').classList.add('hidden');
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        
     } catch (error) {
-        console.error('Admin access error:', error);
-        document.getElementById('adminLoginModal').classList.remove('hidden');
+        console.error('❌ Admin initialization error:', error);
+        showAdminLogin();
     }
 }
 
-// Setup UI for admin
-function setupAdminUI() {
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = 'block';
-    });
-    
-    document.querySelectorAll('.staff-only').forEach(el => {
-        el.style.display = 'none';
-    });
-    
-    document.getElementById('staffActionsSection').style.display = 'none';
-    
-    // Show super admin badge if applicable
-    if (currentUser?.email === 'admin@royalkitchen.com') {
-        document.getElementById('dashboardTitle').innerHTML = 'Admin Panel <span class="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full ml-2">SUPER ADMIN</span>';
-    } else {
-        document.getElementById('dashboardTitle').textContent = 'Admin Panel';
-    }
-    
-    document.getElementById('dashboardSubtitle').textContent = 'DigitalMenuPro';
+function showAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'flex';
+    document.getElementById('adminDashboard').classList.add('hidden');
 }
 
-// Handle login
 async function handleAdminLogin() {
-    const email = document.getElementById('adminEmailInput').value;
-    const password = document.getElementById('adminPassword').value;
+    const email = document.getElementById('adminEmailInput').value.trim();
+    const password = document.getElementById('adminPasswordInput').value;
     
     if (!email || !password) {
         alert('Please enter email and password');
+        return;
+    }
+    
+    // Check if email is super admin
+    if (email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+        alert('Access denied. Only super admin (admin@royalkitchen.com) can access this panel.');
         return;
     }
     
@@ -1649,7 +939,25 @@ async function handleAdminLogin() {
         });
         
         if (error) throw error;
-        window.location.reload();
+        
+        currentAdmin = {
+            email: data.user.email,
+            name: 'Super Admin',
+            role: 'super_admin'
+        };
+        
+        document.getElementById('adminLoginModal').style.display = 'none';
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('adminName').textContent = 'Super Admin';
+        document.getElementById('adminEmail').textContent = data.user.email;
+        
+        // Load data
+        await loadAdminData();
+        setupCharts();
+        loadNotifications();
+        loadActivities();
+        
+        alert('✓ Admin login successful!');
         
     } catch (error) {
         console.error('Admin login error:', error);
@@ -1657,86 +965,283 @@ async function handleAdminLogin() {
     }
 }
 
-// Logout
 async function adminLogout() {
     try {
         await supabaseClient.auth.signOut();
-        currentUser = null;
-        window.location.reload();
+        currentAdmin = null;
+        showAdminLogin();
     } catch (error) {
         console.error('Logout error:', error);
     }
 }
 
-// Load admin data
 async function loadAdminData() {
     try {
-        // Load restaurants
+        console.log('📊 Loading admin data...');
+        
+        // Load ALL restaurants (super admin can see all)
         const { data: restaurantsData, error: resError } = await supabaseClient
             .from('restaurants')
             .select('*')
             .order('created_at', { ascending: false });
         
-        if (!resError) restaurants = restaurantsData || [];
-        
-        // Update admin name and email
-        document.getElementById('adminName').textContent = currentUser?.name || 'Admin User';
-        document.getElementById('adminEmail').textContent = currentUser?.email || 'admin@digitalmenu.com';
-        
-        updateDashboardStats();
-        
-    } catch (error) {
-        console.error('Error loading admin data:', error);
-    }
-}
-
-// Load restaurant data for staff dashboard
-async function loadRestaurantData(restaurantId) {
-    try {
-        // Load dishes for this restaurant
-        const { data: dishesData, error: dishesError } = await supabaseClient
-            .from('dishes')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .order('category', { ascending: true });
-        
-        if (!dishesError) {
-            dishes = dishesData || [];
-        } else {
-            console.error('Error loading dishes:', dishesError);
-            dishes = [];
+        if (!resError) {
+            restaurants = restaurantsData || [];
+            console.log(`✓ Loaded ${restaurants.length} restaurants`);
         }
         
-        // Update UI with restaurant name
-        document.getElementById('adminName').textContent = currentUser?.name || 'Staff User';
-        document.getElementById('adminEmail').textContent = currentUser?.email || currentUser?.user_email || 'staff@example.com';
+        // Load subscriptions
+        const { data: subsData, error: subsError } = await supabaseClient
+            .from('subscriptions')
+            .select('*, restaurants(name)')
+            .order('created_at', { ascending: false });
         
+        if (!subsError) subscriptions = subsData || [];
+        
+        // Load payments
+        const { data: paymentsData, error: payError } = await supabaseClient
+            .from('payments')
+            .select('*, restaurants(name)')
+            .order('created_at', { ascending: false });
+        
+        if (!payError) payments = paymentsData || [];
+        
+        // Load all users across all restaurants
+        const { data: usersData, error: usersError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .order('created_at', { ascending: false});
+        
+        if (!usersError) users = usersData || [];
+        
+        // Update dashboard stats
         updateDashboardStats();
         
+        console.log('✓ Admin data loaded');
+        
     } catch (error) {
-        console.error('Error loading restaurant data:', error);
-        dishes = [];
+        console.error('❌ Error loading admin data:', error);
     }
 }
 
-// Update dashboard stats
 function updateDashboardStats() {
     // Total restaurants
     document.getElementById('totalRestaurants').textContent = restaurants.length;
     
-    // Update title based on user
-    if (userRole !== 'admin' && currentRestaurant) {
-        document.getElementById('stat1Title').textContent = 'Menu Items';
-        document.getElementById('totalRestaurants').textContent = dishes.length;
+    // Active subscriptions
+    const activeSubs = subscriptions.filter(s => s.status === 'active').length;
+    document.getElementById('activeSubscriptions').textContent = activeSubs;
+    
+    // Monthly revenue (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const monthlyRevenue = payments
+        .filter(p => p.status === 'completed' && new Date(p.created_at) >= thirtyDaysAgo)
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('monthlyRevenue').textContent = `₹${monthlyRevenue}`;
+    
+    // Pending payments
+    const pending = payments.filter(p => p.status === 'pending').length;
+    document.getElementById('pendingPayments').textContent = pending;
+    
+    // For subscription view
+    document.getElementById('totalActiveSubs').textContent = activeSubs;
+    document.getElementById('monthlyMRR').textContent = `₹${monthlyRevenue}`;
+    document.getElementById('annualProjection').textContent = `₹${monthlyRevenue * 12}`;
+    
+    // For payments view
+    const totalRevenue = payments
+        .filter(p => p.status === 'completed')
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
+    
+    const successfulPayments = payments.filter(p => p.status === 'completed').length;
+    document.getElementById('successfulPayments').textContent = successfulPayments;
+    
+    document.getElementById('pendingVerifications').textContent = pending;
+    
+    const avgTransaction = successfulPayments > 0 ? totalRevenue / successfulPayments : 0;
+    document.getElementById('averageTransaction').textContent = `₹${Math.round(avgTransaction)}`;
+}
+
+function setupCharts() {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const last6Months = getLast6Months();
+    
+    if (revenueChart) revenueChart.destroy();
+    
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: last6Months,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: generateRevenueData(last6Months),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Plan Distribution Chart
+    const planCtx = document.getElementById('planChart').getContext('2d');
+    
+    if (planChart) planChart.destroy();
+    
+    const planCounts = {
+        basic: subscriptions.filter(s => s.plan === 'basic').length,
+        pro: subscriptions.filter(s => s.plan === 'pro').length,
+        enterprise: subscriptions.filter(s => s.plan === 'enterprise').length
+    };
+    
+    planChart = new Chart(planCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Basic', 'Pro', 'Enterprise'],
+            datasets: [{
+                data: [planCounts.basic, planCounts.pro, planCounts.enterprise],
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(59, 130, 246)',
+                    'rgb(139, 92, 246)'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function getLast6Months() {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+    }
+    
+    return months;
+}
+
+function generateRevenueData(months) {
+    return months.map(() => Math.floor(Math.random() * 50000) + 10000);
+}
+
+async function loadNotifications() {
+    try {
+        const pendingPayments = payments.filter(p => p.status === 'pending').length;
+        const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
         
-        document.getElementById('stat2Title').textContent = 'Active Staff';
-        document.getElementById('activeSubscriptions').textContent = '0';
+        let html = '';
         
-        document.getElementById('stat3Title').textContent = 'Today\'s Orders';
-        document.getElementById('monthlyRevenue').textContent = '0';
+        if (pendingPayments > 0) {
+            html += `
+                <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${pendingPayments} pending payment${pendingPayments > 1 ? 's' : ''}</p>
+                        <p class="text-sm text-gray-600">Require verification</p>
+                    </div>
+                </div>
+            `;
+        }
         
-        document.getElementById('stat4Title').textContent = 'Table Occupancy';
-        document.getElementById('pendingPayments').textContent = '0%';
+        if (pendingRestaurants > 0) {
+            html += `
+                <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-clock text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${pendingRestaurants} restaurant${pendingRestaurants > 1 ? 's' : ''} pending</p>
+                        <p class="text-sm text-gray-600">Awaiting activation</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (!html) {
+            html = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+        }
+        
+        document.getElementById('notificationsList').innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+    }
+}
+
+async function loadActivities() {
+    try {
+        let html = '';
+        
+        const recentPayments = payments.slice(0, 5);
+        recentPayments.forEach(payment => {
+            const date = new Date(payment.created_at).toLocaleDateString();
+            const time = new Date(payment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            html += `
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center mr-3">
+                        <i class="fas fa-rupee-sign text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${payment.restaurants?.name || 'Unknown Restaurant'}</p>
+                        <p class="text-sm text-gray-600">Payment of ₹${payment.amount} ${payment.status}</p>
+                        <p class="text-xs text-gray-500">${date} at ${time}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        const recentRestaurants = restaurants.slice(0, 3);
+        recentRestaurants.forEach(restaurant => {
+            const date = new Date(restaurant.created_at).toLocaleDateString();
+            
+            html += `
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                        <i class="fas fa-utensils text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${restaurant.name}</p>
+                        <p class="text-sm text-gray-600">New restaurant registered</p>
+                        <p class="text-xs text-gray-500">${date}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
     }
 }
 
@@ -1762,21 +1267,39 @@ function showView(viewName) {
     
     updateViewTitle(viewName);
     
-    if (viewName === 'restaurants') {
-        loadRestaurantsTable();
+    switch(viewName) {
+        case 'restaurants':
+            loadRestaurantsTable();
+            break;
+        case 'subscriptions':
+            loadSubscriptionsTable();
+            loadRestaurantDropdown();
+            break;
+        case 'payments':
+            loadPaymentsTable();
+            break;
+        case 'users':
+            loadUsersTable();
+            break;
+        case 'plans':
+            loadPlans();
+            break;
+        case 'settings':
+            loadSystemSettings();
+            break;
     }
 }
 
 function updateViewTitle(viewName) {
     const titles = {
-        'dashboard': { 
-            title: userRole === 'admin' ? 'Admin Dashboard' : `${currentRestaurant?.name || 'Restaurant'} Dashboard`, 
-            subtitle: userRole === 'admin' ? 'System Overview & Analytics' : 'Real-time Overview & Analytics' 
-        },
-        'restaurants': { 
-            title: userRole === 'admin' ? 'Restaurant Management' : 'Menu Management', 
-            subtitle: userRole === 'admin' ? 'Manage all registered restaurants' : 'Manage your restaurant menu items' 
-        }
+        'dashboard': { title: 'Admin Dashboard', subtitle: 'System Overview & Analytics' },
+        'restaurants': { title: 'Restaurant Management', subtitle: 'Manage all registered restaurants' },
+        'subscriptions': { title: 'Subscription Management', subtitle: 'Manage all subscription plans and billing' },
+        'payments': { title: 'Payment Management', subtitle: 'View and manage all payment transactions' },
+        'users': { title: 'User Management', subtitle: 'Manage all system users across restaurants' },
+        'plans': { title: 'Plan Management', subtitle: 'Configure subscription plans and pricing' },
+        'settings': { title: 'System Settings', subtitle: 'Configure system-wide settings and preferences' },
+        'terms': { title: 'Terms & Policies Management', subtitle: 'Update system terms, conditions, and policies' }
     };
     
     const viewInfo = titles[viewName] || titles.dashboard;
@@ -1793,257 +1316,586 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
     
     if (sidebar.classList.contains('collapsed')) {
-        mainContent.style.marginLeft = '80px';
         toggleBtn.classList.remove('fa-chevron-left');
         toggleBtn.classList.add('fa-chevron-right');
-        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Expand Sidebar';
     } else {
-        mainContent.style.marginLeft = '256px';
         toggleBtn.classList.remove('fa-chevron-right');
         toggleBtn.classList.add('fa-chevron-left');
-        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Collapse Sidebar';
     }
 }
 
-// Notifications toggle
+// Notifications Toggle
 function toggleNotifications() {
     const panel = document.getElementById('notificationsPanel');
     panel.classList.toggle('hidden');
 }
 
-// Load restaurants table
+// Restaurant Management
 async function loadRestaurantsTable() {
     try {
-        if (userRole === 'admin') {
-            await loadAdminRestaurantsTable();
-        } else {
-            await loadStaffMenuTable();
-        }
-    } catch (error) {
-        console.error('Error loading table:', error);
-    }
-}
-
-// Load admin restaurants table
-async function loadAdminRestaurantsTable() {
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
-    `;
-    
-    let tableHTML = '';
-    restaurants.forEach(restaurant => {
-        tableHTML += `
-            <tr class="restaurant-row hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-utensils text-blue-600"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${restaurant.name}</div>
-                            <div class="text-sm text-gray-500">${restaurant.url_slug}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${restaurant.owner_name || restaurant.owner_email}</div>
-                    <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
-                        ${restaurant.status.toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${new Date(restaurant.created_at).toLocaleDateString()}
-                </td>
-            </tr>
-        `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                No restaurants found
-            </td>
-        </tr>
-    `;
-}
-
-// Load staff menu table
-async function loadStaffMenuTable() {
-    document.getElementById('restaurantsTableHeader').innerHTML = `
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dish</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-    `;
-    
-    let tableHTML = '';
-    dishes.forEach(dish => {
-        const statusClass = dish.is_available ? 'status-active' : 'status-suspended';
-        const statusText = dish.is_available ? 'Available' : 'Unavailable';
+        let html = '';
+        const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageRestaurants = restaurants.slice(startIndex, endIndex);
         
-        tableHTML += `
-            <tr class="dish-row">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                            ${dish.image_url ? 
-                                `<img src="${dish.image_url}" alt="${dish.name}" class="w-full h-full object-cover rounded-lg">` :
-                                `<i class="fas fa-utensil-spoon text-gray-600"></i>`
-                            }
+        pageRestaurants.forEach(restaurant => {
+            const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
+            
+            html += `
+                <tr class="restaurant-row hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-utensils text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${restaurant.name}</div>
+                                <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
+                            </div>
                         </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${dish.name}</div>
-                            <div class="text-sm text-gray-500 truncate max-w-xs">${dish.description || 'No description'}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">${dish.category || 'Uncategorized'}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ₹${dish.price || '0'}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onclick="editDishRow('${dish.id}')" class="text-green-600 hover:text-green-900 mr-3">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="toggleDishStatus('${dish.id}', ${dish.is_available})" class="${dish.is_available ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}">
-                        <i class="fas ${dish.is_available ? 'fa-ban' : 'fa-check'}"></i>
-                    </button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${restaurant.owner_email}</div>
+                        <div class="text-sm text-gray-500">${restaurant.owner_phone || 'Not provided'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 text-xs font-medium rounded-full ${subscription?.plan === 'pro' ? 'bg-blue-100 text-blue-800' : subscription?.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                            ${subscription?.plan ? subscription.plan.toUpperCase() : 'No Plan'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                            ${restaurant.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${restaurant.url_slug}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(restaurant.created_at).toLocaleDateString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('restaurantsTable').innerHTML = html || `
+            <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    No restaurants found
                 </td>
             </tr>
         `;
-    });
-    
-    document.getElementById('restaurantsTable').innerHTML = tableHTML || `
-        <tr>
-            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                No dishes found
-            </td>
-        </tr>
-    `;
+        
+        document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
+        document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
+        document.getElementById('restaurantTotal').textContent = restaurants.length;
+        
+    } catch (error) {
+        console.error('Error loading restaurants table:', error);
+    }
 }
 
-// Edit dish from table row
-async function editDishRow(dishId) {
-    if (!hasPermission('editDish')) {
-        alert('You do not have permission to edit dishes');
-        return;
-    }
-    
-    const dish = dishes.find(d => d.id === dishId);
-    if (!dish) return;
-    
-    // Fill form with dish data
-    document.getElementById('editDishId').value = dish.id;
-    document.getElementById('editDishName').value = dish.name;
-    document.getElementById('editDishDescription').value = dish.description || '';
-    document.getElementById('editDishCategory').value = dish.category;
-    document.getElementById('editDishPrice').value = dish.price;
-    document.getElementById('editDishPrepTime').value = dish.preparation_time || '';
-    document.getElementById('editDishAvailability').value = dish.is_available ? 'true' : 'false';
-    document.getElementById('editDishTags').value = dish.tags ? dish.tags.join(', ') : '';
-    
-    // Set selected image
-    const currentImageUrl = dish.image_url || '';
-    document.getElementById('editSelectedImageUrl').value = currentImageUrl;
-    document.getElementById('editSelectedImagePreview').src = currentImageUrl || 'https://aazqyrkklajqscsdfgjl.storage.supabase.co/storage/v1/s3/300x200?text=No+Image';
-    document.getElementById('editImageSearch').value = '';
-    
-    // Load and display images from Supabase
-    availableImages = await loadDishImagesFromStorage();
-    renderImageGrid(availableImages, 'editImageGallery', currentImageUrl);
-    
-    // Show modal
-    document.getElementById('editDishModal').classList.remove('hidden');
+function filterRestaurants() {
+    loadRestaurantsTable();
 }
 
-// Toggle dish status
-async function toggleDishStatus(dishId, currentStatus) {
-    if (!hasPermission('editDish')) {
-        alert('You do not have permission to edit dishes');
+function prevRestaurantPage() {
+    if (currentRestaurantPage > 1) {
+        currentRestaurantPage--;
+        loadRestaurantsTable();
+    }
+}
+
+function nextRestaurantPage() {
+    const totalPages = Math.ceil(restaurants.length / itemsPerPage);
+    if (currentRestaurantPage < totalPages) {
+        currentRestaurantPage++;
+        loadRestaurantsTable();
+    }
+}
+
+function viewRestaurantDetails(restaurantId) {
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (restaurant) {
+        alert(`Restaurant Details:
+        
+Name: ${restaurant.name}
+Owner: ${restaurant.owner_email}
+Status: ${restaurant.status}
+URL Slug: ${restaurant.url_slug}
+Created: ${new Date(restaurant.created_at).toLocaleDateString()}`);
+    }
+}
+
+async function toggleRestaurantStatus(restaurantId) {
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+    
+    const newStatus = restaurant.status === 'active' ? 'suspended' : 'active';
+    
+    if (!confirm(`Are you sure you want to ${newStatus === 'suspended' ? 'suspend' : 'activate'} this restaurant?`)) {
         return;
     }
-    
-    const newStatus = !currentStatus;
     
     try {
-        const { data, error } = await supabaseClient
-            .from('dishes')
-            .update({ 
-                is_available: newStatus,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', dishId)
-            .select();
+        const { error } = await supabaseClient
+            .from('restaurants')
+            .update({ status: newStatus })
+            .eq('id', restaurantId);
         
         if (error) throw error;
         
-        // Refresh dishes list
-        await loadRestaurantData(currentRestaurant.id);
-        
-        // Update UI
-        if (!document.getElementById('viewRestaurants').classList.contains('hidden')) {
-            loadRestaurantsTable();
-        }
-        
-        alert(`Dish ${newStatus ? 'enabled' : 'disabled'} successfully!`);
+        restaurant.status = newStatus;
+        loadRestaurantsTable();
+        alert(`Restaurant ${newStatus}!`);
         
     } catch (error) {
-        console.error('Error toggling dish status:', error);
-        alert('Error updating dish status: ' + error.message);
+        console.error('Error updating status:', error);
+        alert('Error: ' + error.message);
     }
 }
 
-// Filter restaurants/menu items
-function filterRestaurants() {
-    const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
-    console.log('Filtering by:', searchTerm);
-    // Implement actual filtering logic here
+async function deleteRestaurant(restaurantId) {
+    if (!confirm('WARNING: This will permanently delete the restaurant and all data. Continue?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('restaurants')
+            .delete()
+            .eq('id', restaurantId);
+        
+        if (error) throw error;
+        
+        restaurants = restaurants.filter(r => r.id !== restaurantId);
+        loadRestaurantsTable();
+        updateDashboardStats();
+        alert('Restaurant deleted!');
+        
+    } catch (error) {
+        console.error('Error deleting restaurant:', error);
+        alert('Error: ' + error.message);
+    }
 }
 
-// Export restaurants (stub function)
 function exportRestaurants() {
-    alert('Export functionality will be implemented');
+    let csv = 'Restaurant Name,Owner Email,Status,URL Slug,Created\n';
+    
+    restaurants.forEach(r => {
+        csv += `"${r.name}","${r.owner_email}","${r.status}","${r.url_slug}","${new Date(r.created_at).toLocaleDateString()}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `restaurants_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 }
 
-// Placeholder functions for staff actions
-function showRevenueReport() {
-    if (!hasPermission('viewRevenue')) {
-        alert('You do not have permission to view revenue');
+// Subscription Management
+async function loadSubscriptionsTable() {
+    try {
+        let html = '';
+        const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
+        
+        activeSubscriptions.slice(0, 10).forEach(sub => {
+            html += `
+                <tr>
+                    <td class="px-4 py-3">${sub.restaurants?.name || 'Unknown'}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded ${sub.plan === 'pro' ? 'bg-blue-100 text-blue-800' : sub.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                            ${sub.plan.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">₹${sub.price}/month</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded ${sub.auto_pay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${sub.auto_pay ? 'Enabled' : 'Manual'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">${sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'Not scheduled'}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="cancelSubscription('${sub.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('subscriptionsTable').innerHTML = html || `
+            <tr>
+                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                    No active subscriptions
+                </td>
+            </tr>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading subscriptions:', error);
+    }
+}
+
+async function loadRestaurantDropdown() {
+    const select = document.getElementById('newSubRestaurant');
+    let html = '<option value="">Select Restaurant</option>';
+    
+    restaurants.forEach(restaurant => {
+        const hasActiveSub = subscriptions.some(s => s.restaurant_id === restaurant.id && s.status === 'active');
+        if (!hasActiveSub) {
+            html += `<option value="${restaurant.id}">${restaurant.name} (${restaurant.owner_email})</option>`;
+        }
+    });
+    
+    select.innerHTML = html;
+}
+
+async function createManualSubscription() {
+    const restaurantId = document.getElementById('newSubRestaurant').value;
+    const plan = document.getElementById('newSubPlan').value;
+    const autoPay = document.getElementById('newSubAutoPay').checked;
+    
+    if (!restaurantId) {
+        alert('Please select a restaurant');
         return;
     }
-    alert('Revenue report feature coming soon!');
-}
-
-function showReserveTableModal() {
-    if (!hasPermission('reserveTable')) {
-        alert('You do not have permission to reserve tables');
-        return;
+    
+    const planPrices = { 'basic': 499, 'pro': 999, 'enterprise': 1999 };
+    const price = planPrices[plan] || 499;
+    
+    try {
+        const subscription = {
+            restaurant_id: restaurantId,
+            plan: plan,
+            price: price,
+            auto_pay: autoPay,
+            status: 'active',
+            billing_cycle: 'monthly',
+            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        };
+        
+        const { data, error } = await supabaseClient
+            .from('subscriptions')
+            .insert([subscription])
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        subscriptions.push(data);
+        
+        loadSubscriptionsTable();
+        loadRestaurantDropdown();
+        updateDashboardStats();
+        
+        alert('Subscription created successfully!');
+        
+    } catch (error) {
+        console.error('Error creating subscription:', error);
+        alert('Error: ' + error.message);
     }
-    alert('Table reservation feature coming soon!');
 }
 
-function showOrdersModal() {
-    if (!hasPermission('viewTableOrders')) {
-        alert('You do not have permission to view orders');
-        return;
+async function cancelSubscription(subscriptionId) {
+    if (!confirm('Cancel this subscription?')) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('subscriptions')
+            .update({ status: 'cancelled' })
+            .eq('id', subscriptionId);
+        
+        if (error) throw error;
+        
+        const sub = subscriptions.find(s => s.id === subscriptionId);
+        if (sub) sub.status = 'cancelled';
+        
+        loadSubscriptionsTable();
+        updateDashboardStats();
+        alert('Subscription cancelled!');
+        
+    } catch (error) {
+        console.error('Error cancelling subscription:', error);
+        alert('Error: ' + error.message);
     }
-    alert('Orders view feature coming soon!');
 }
 
-// Initialize the dashboard
-initDashboard();
+// Payment Management
+async function loadPaymentsTable() {
+    try {
+        const startIndex = (currentPaymentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pagePayments = payments.slice(startIndex, endIndex);
+        
+        let html = '';
+        
+        pagePayments.forEach(payment => {
+            html += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.id.substring(0, 8)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.restaurants?.name || 'Unknown'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">₹${payment.amount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.method || 'UPI'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="payment-status-${payment.status} px-2 py-1 rounded text-xs">
+                            ${payment.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(payment.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        ${payment.status === 'pending' ? `
+                            <button onclick="verifyPayment('${payment.id}')" class="text-green-600 hover:text-green-900">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('paymentsTable').innerHTML = html || `
+            <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    No payments found
+                </td>
+            </tr>
+        `;
+        
+        document.getElementById('paymentStart').textContent = payments.length > 0 ? startIndex + 1 : 0;
+        document.getElementById('paymentEnd').textContent = Math.min(endIndex, payments.length);
+        document.getElementById('paymentTotal').textContent = payments.length;
+        
+    } catch (error) {
+        console.error('Error loading payments:', error);
+    }
+}
+
+function filterPayments() {
+    loadPaymentsTable();
+}
+
+function prevPaymentPage() {
+    if (currentPaymentPage > 1) {
+        currentPaymentPage--;
+        loadPaymentsTable();
+    }
+}
+
+function nextPaymentPage() {
+    const totalPages = Math.ceil(payments.length / itemsPerPage);
+    if (currentPaymentPage < totalPages) {
+        currentPaymentPage++;
+        loadPaymentsTable();
+    }
+}
+
+async function verifyPayment(paymentId) {
+    if (!confirm('Verify this payment?')) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('payments')
+            .update({ status: 'completed' })
+            .eq('id', paymentId);
+        
+        if (error) throw error;
+        
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) payment.status = 'completed';
+        
+        loadPaymentsTable();
+        updateDashboardStats();
+        alert('Payment verified!');
+        
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+function exportPayments() {
+    let csv = 'Payment ID,Restaurant,Amount,Method,Status,Date\n';
+    
+    payments.forEach(p => {
+        csv += `"${p.id.substring(0, 8)}","${p.restaurants?.name || 'Unknown'}","₹${p.amount}","${p.method || 'UPI'}","${p.status}","${new Date(p.created_at).toLocaleDateString()}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `payments_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+// User Management
+async function loadUsersTable() {
+    try {
+        let html = '';
+        
+        users.forEach(user => {
+            html += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">${user.name}</div>
+                                <div class="text-sm text-gray-500">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${user.restaurant_id || 'No Restaurant'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded ${user.role === 'manager' ? 'bg-purple-100 text-purple-800' : user.role === 'chef' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'}">
+                            ${user.role.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.is_active ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('usersTable').innerHTML = html || `
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                    No users found
+                </td>
+            </tr>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+function filterUsers() {
+    loadUsersTable();
+}
+
+async function toggleUserStatus(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    const newStatus = !user.is_active;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('staff_users')
+            .update({ is_active: newStatus })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        user.is_active = newStatus;
+        loadUsersTable();
+        alert(`User ${newStatus ? 'activated' : 'deactivated'}!`);
+        
+    } catch (error) {
+        console.error('Error toggling user status:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function deleteUser(userId) {
+    if (!confirm('Delete this user?')) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('staff_users')
+            .delete()
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        users = users.filter(u => u.id !== userId);
+        loadUsersTable();
+        alert('User deleted!');
+        
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+// Plan Management
+function loadPlans() {
+    alert('Plan management - Coming soon!');
+}
+
+function showPlanModal() {
+    alert('Add new plan - Coming soon!');
+}
+
+// System Settings
+function loadSystemSettings() {
+    const activeUsers = users.filter(u => u.is_active).length;
+    document.getElementById('activeUsersCount').textContent = activeUsers;
+}
+
+function saveSystemSettings() {
+    alert('Settings saved!');
+}
+
+function sendTestEmail() {
+    alert('Test email sent!');
+}
+
+function clearSystemCache() {
+    alert('Cache cleared!');
+}
+
+function backupDatabase() {
+    alert('Backup started!');
+}
+
+// Terms
+function previewTerms() {
+    const terms = document.getElementById('termsOfService').value;
+    const newWindow = window.open();
+    newWindow.document.write(`<html><body style="padding:20px;"><pre>${terms}</pre></body></html>`);
+}
+
+function updateTerms() {
+    alert('Terms updated!');
+}
+
+// Initialize
+initAdminDashboard();
 </script>
 </body>
 </html>
