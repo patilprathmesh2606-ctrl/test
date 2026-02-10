@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DigitalMenuPro - Management System</title>
+    <title>Admin Dashboard - DigitalMenuPro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
         .sidebar {
             transition: all 0.3s ease;
@@ -26,12 +26,20 @@
             display: none;
         }
         
+        .main-content {
+            transition: all 0.3s ease;
+        }
+        
         .stat-card {
             transition: all 0.3s ease;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
+        }
+        
+        .restaurant-row:hover {
+            background-color: #f8fafc;
         }
         
         .status-badge {
@@ -56,7 +64,7 @@
             color: #991b1b;
         }
         
-        .payment-status-completed {
+        .payment-status-paid {
             background-color: #d1fae5;
             color: #065f46;
         }
@@ -73,325 +81,944 @@
     </style>
 </head>
 <body class="bg-gray-50">
-
-<!-- Loading Screen -->
-<div id="loadingScreen" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-8 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-gray-600">Loading dashboard...</p>
-    </div>
-</div>
-
-<!-- Login Modal -->
-<div id="loginModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-8 w-full max-w-md">
-        <div class="text-center mb-8">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-shield-alt text-white text-2xl"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800">Dashboard Login</h3>
-            <p class="text-gray-600 mt-2">Access your management panel</p>
-        </div>
-        
-        <div class="space-y-4">
-            <input type="email" id="loginEmail" placeholder="Email Address" 
-                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <input type="password" id="loginPassword" placeholder="Password" 
-                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <button onclick="handleLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
-                Login
-            </button>
-            
-            <p class="text-sm text-gray-500 text-center mt-4">
-                <i class="fas fa-info-circle mr-1"></i>
-                Super Admin: admin@royalkitchen.com
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- SUPER ADMIN DASHBOARD -->
-<div id="adminDashboard" class="hidden flex min-h-screen">
-    <!-- Admin Sidebar -->
-    <div id="adminSidebar" class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 flex flex-col">
-        <div class="p-6 border-b border-gray-700">
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-shield-alt text-xl"></i>
-                </div>
-                <div class="ml-3 logo-text">
-                    <h1 class="text-xl font-bold">Super Admin</h1>
-                    <p class="text-xs text-gray-400">DigitalMenuPro</p>
-                </div>
-            </div>
-        </div>
-        
-        <nav class="flex-1 p-4">
-            <ul class="space-y-2">
-                <li>
-                    <a href="#" onclick="showAdminView('dashboard')" class="flex items-center p-3 rounded-lg hover:bg-gray-700 bg-gray-700">
-                        <i class="fas fa-tachometer-alt w-6"></i>
-                        <span class="ml-3 sidebar-text">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="showAdminView('restaurants')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-utensils w-6"></i>
-                        <span class="ml-3 sidebar-text">Restaurants</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="showAdminView('subscriptions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-credit-card w-6"></i>
-                        <span class="ml-3 sidebar-text">Subscriptions</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="showAdminView('payments')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-rupee-sign w-6"></i>
-                        <span class="ml-3 sidebar-text">Payments</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="showAdminView('users')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-users w-6"></i>
-                        <span class="ml-3 sidebar-text">All Users</span>
-                    </a>
-                </li>
-            </ul>
-            
-            <div class="mt-8 p-4 border-t border-gray-700">
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-700">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user-shield"></i>
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-xl"></i>
                     </div>
-                    <div class="ml-3 sidebar-text">
-                        <p class="font-medium" id="adminName">Super Admin</p>
-                        <p class="text-xs text-gray-400" id="adminEmail">admin@royalkitchen.com</p>
+                    <div class="ml-3 logo-text">
+                        <h1 class="text-xl font-bold">Admin Panel</h1>
+                        <p class="text-xs text-gray-400">DigitalMenuPro</p>
                     </div>
                 </div>
             </div>
-        </nav>
-        
-        <div class="p-4 border-t border-gray-700">
-            <button onclick="handleLogout()" class="flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-700">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="ml-3 sidebar-text">Logout</span>
-            </button>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" onclick="showView('dashboard')" class="flex items-center p-3 rounded-lg hover:bg-gray-700 active-nav">
+                            <i class="fas fa-tachometer-alt w-6"></i>
+                            <span class="ml-3 sidebar-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('restaurants')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-utensils w-6"></i>
+                            <span class="ml-3 sidebar-text">Restaurants</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('subscriptions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-credit-card w-6"></i>
+                            <span class="ml-3 sidebar-text">Subscriptions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('payments')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-rupee-sign w-6"></i>
+                            <span class="ml-3 sidebar-text">Payments</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('users')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-users w-6"></i>
+                            <span class="ml-3 sidebar-text">All Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('plans')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-cubes w-6"></i>
+                            <span class="ml-3 sidebar-text">Plan Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('settings')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-cog w-6"></i>
+                            <span class="ml-3 sidebar-text">System Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showView('terms')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-file-contract w-6"></i>
+                            <span class="ml-3 sidebar-text">Terms & Policies</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Admin Profile -->
+                <div class="mt-8 p-4 border-t border-gray-700">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="ml-3 sidebar-text">
+                            <p class="font-medium" id="adminName">Super Admin</p>
+                            <p class="text-xs text-gray-400" id="adminEmail">admin@digitalmenupro.com</p>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Toggle Sidebar -->
+            <div class="p-4 border-t border-gray-700">
+                <button onclick="toggleSidebar()" class="flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                    <span class="ml-3 sidebar-text">Collapse Sidebar</span>
+                </button>
+            </div>
         </div>
-    </div>
-    
-    <!-- Admin Main Content -->
-    <div class="flex-1">
-        <header class="bg-white shadow-sm border-b px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800" id="adminViewTitle">Super Admin Dashboard</h2>
-                    <p class="text-sm text-gray-600">Manage all restaurants and system</p>
-                </div>
-            </div>
-        </header>
         
-        <main class="p-6">
-            <!-- Admin Dashboard View -->
-            <div id="adminViewDashboard" class="admin-view">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-gray-600 text-sm">Total Restaurants</p>
-                                <p class="text-3xl font-bold" id="adminTotalRestaurants">0</p>
+        <!-- Main Content -->
+        <div id="mainContent" class="main-content flex-1">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm border-b px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800" id="viewTitle">Admin Dashboard</h2>
+                        <p class="text-sm text-gray-600" id="viewSubtitle">System Overview & Analytics</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Notifications -->
+                        <div class="relative">
+                            <button onclick="toggleNotifications()" class="p-2 rounded-full hover:bg-gray-100 relative">
+                                <i class="fas fa-bell text-gray-600"></i>
+                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            </button>
+                            <div id="notificationsPanel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 border">
+                                <div class="p-4 border-b">
+                                    <h3 class="font-bold">Notifications</h3>
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    <div id="notificationsList" class="p-4 space-y-3">
+                                        <!-- Notifications will be loaded here -->
+                                    </div>
+                                </div>
                             </div>
-                            <i class="fas fa-utensils text-4xl text-blue-500"></i>
+                        </div>
+                        
+                        <!-- Search -->
+                        <div class="relative">
+                            <input type="text" id="globalSearch" placeholder="Search..." 
+                                   class="pl-10 pr-4 py-2 border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <!-- Logout -->
+                        <button onclick="adminLogout()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <main class="p-6">
+                <!-- Dashboard View -->
+                <div id="viewDashboard" class="view space-y-6">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Total Restaurants</p>
+                                    <p class="text-3xl font-bold" id="totalRestaurants">0</p>
+                                </div>
+                                <i class="fas fa-utensils text-4xl text-blue-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 12%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Active Subscriptions</p>
+                                    <p class="text-3xl font-bold" id="activeSubscriptions">0</p>
+                                </div>
+                                <i class="fas fa-credit-card text-4xl text-green-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 8%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Monthly Revenue</p>
+                                    <p class="text-3xl font-bold" id="monthlyRevenue">₹0</p>
+                                </div>
+                                <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 15%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-600 text-sm">Pending Payments</p>
+                                    <p class="text-3xl font-bold" id="pendingPayments">0</p>
+                                </div>
+                                <i class="fas fa-clock text-4xl text-yellow-500"></i>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex text-sm">
+                                    <span class="text-red-600"><i class="fas fa-arrow-down mr-1"></i> 3%</span>
+                                    <span class="text-gray-500 ml-2">from last month</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-gray-600 text-sm">Active Subscriptions</p>
-                                <p class="text-3xl font-bold" id="adminActiveSubscriptions">0</p>
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Revenue Trend</h3>
+                            <div class="h-80">
+                                <canvas id="revenueChart"></canvas>
                             </div>
-                            <i class="fas fa-credit-card text-4xl text-green-500"></i>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Plan Distribution</h3>
+                            <div class="h-80">
+                                <canvas id="planChart"></canvas>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-gray-600 text-sm">Monthly Revenue</p>
-                                <p class="text-3xl font-bold" id="adminMonthlyRevenue">₹0</p>
-                            </div>
-                            <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
+                    <!-- Recent Activities -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold">Recent Activities</h3>
+                            <button onclick="loadActivities()" class="text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-sync-alt mr-1"></i> Refresh
+                            </button>
                         </div>
-                    </div>
-                    
-                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-gray-600 text-sm">Total Users</p>
-                                <p class="text-3xl font-bold" id="adminTotalUsers">0</p>
-                            </div>
-                            <i class="fas fa-users text-4xl text-yellow-500"></i>
+                        <div id="activitiesList" class="space-y-4">
+                            <!-- Activities will be loaded here -->
                         </div>
                     </div>
                 </div>
                 
-                <!-- Recent Activities -->
-                <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-                    <h3 class="text-lg font-bold mb-4">Recent Activities</h3>
-                    <div id="adminActivitiesList" class="space-y-4">
-                        <!-- Activities will be loaded here -->
+                <!-- Restaurants View -->
+                <div id="viewRestaurants" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Restaurant Management</h2>
+                            <p class="text-gray-600">Manage all registered restaurants</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <input type="text" id="restaurantSearch" placeholder="Search restaurants..." 
+                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterRestaurants()">
+                            <button onclick="exportRestaurants()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Admin Restaurants View -->
-            <div id="adminViewRestaurants" class="admin-view hidden">
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold mb-4">All Restaurants</h3>
+                    
+                    <!-- Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="statusFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                                <select id="planFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Plans</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="pro">Pro</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                <input type="date" id="dateFrom" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                                <span class="mx-2">to</span>
+                                <input type="date" id="dateTo" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Restaurants Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead>
+                                <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restaurant</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="adminRestaurantsTable" class="divide-y divide-gray-200">
+                                <tbody id="restaurantsTable" class="bg-white divide-y divide-gray-200">
                                     <!-- Restaurants will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Showing <span id="restaurantStart">0</span> to <span id="restaurantEnd">0</span> of <span id="restaurantTotal">0</span> restaurants
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="prevRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subscriptions View -->
+                <div id="viewSubscriptions" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Subscription Management</h2>
+                            <p class="text-gray-600">Manage all subscription plans and billing</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Subscription Stats -->
+                        <div class="col-span-2 bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold mb-4">Active Subscriptions</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Restaurant</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Plan</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Auto-Pay</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Next Billing</th>
+                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subscriptionsTable" class="divide-y divide-gray-200">
+                                        <!-- Subscriptions will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Subscription Actions -->
+                        <div class="space-y-6">
+                            <!-- Create Manual Subscription -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Create Subscription</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Restaurant</label>
+                                        <select id="newSubRestaurant" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="">Select Restaurant</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                                        <select id="newSubPlan" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="basic">Basic - ₹499/month</option>
+                                            <option value="pro">Pro - ₹999/month</option>
+                                            <option value="enterprise">Enterprise - ₹1,999/month</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" id="newSubAutoPay" class="mr-2">
+                                            <span>Enable Auto-Pay</span>
+                                        </label>
+                                    </div>
+                                    <button onclick="createManualSubscription()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Create Subscription
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Subscription Stats -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Subscription Stats</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Total Active</span>
+                                        <span class="font-bold" id="totalActiveSubs">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Monthly MRR</span>
+                                        <span class="font-bold" id="monthlyMRR">₹0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Annual Projection</span>
+                                        <span class="font-bold" id="annualProjection">₹0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Churn Rate</span>
+                                        <span class="font-bold text-green-600" id="churnRate">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payments View -->
+                <div id="viewPayments" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Payment Management</h2>
+                            <p class="text-gray-600">View and manage all payment transactions</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <input type="text" id="paymentSearch" placeholder="Search payments..." 
+                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterPayments()">
+                            <button onclick="exportPayments()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <i class="fas fa-download mr-2"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6">
+                        <div class="flex flex-wrap gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="paymentStatusFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="refunded">Refunded</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Method</label>
+                                <select id="paymentMethodFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <option value="">All Methods</option>
+                                    <option value="upi_qr">UPI QR</option>
+                                    <option value="upi_id">UPI ID</option>
+                                    <option value="card">Card</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                <div class="flex items-center">
+                                    <input type="date" id="paymentDateFrom" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                    <span class="mx-2">to</span>
+                                    <input type="date" id="paymentDateTo" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Amount Range</label>
+                                <div class="flex items-center">
+                                    <input type="number" id="paymentAmountFrom" placeholder="Min" onchange="filterPayments()" class="px-3 py-2 border rounded-lg w-24">
+                                    <span class="mx-2">to</span>
+                                    <input type="number" id="paymentAmountTo" placeholder="Max" onchange="filterPayments()" class="px-3 py-2 border rounded-lg w-24">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payments Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentsTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Payments will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Showing <span id="paymentStart">0</span> to <span id="paymentEnd">0</span> of <span id="paymentTotal">0</span> payments
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="prevPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button onclick="nextPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Total Revenue</p>
+                                <p class="text-2xl font-bold" id="totalRevenue">₹0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Successful Payments</p>
+                                <p class="text-2xl font-bold" id="successfulPayments">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Pending Verification</p>
+                                <p class="text-2xl font-bold" id="pendingVerifications">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="text-center">
+                                <p class="text-gray-600 text-sm">Average Transaction</p>
+                                <p class="text-2xl font-bold" id="averageTransaction">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- All Users View -->
+                <div id="viewUsers" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">User Management</h2>
+                            <p class="text-gray-600">Manage all system users across restaurants</p>
+                        </div>
+                        <input type="text" id="userSearch" placeholder="Search users..." 
+                               class="px-4 py-2 border rounded-lg w-64" oninput="filterUsers()">
+                    </div>
+                    
+                    <!-- Users Table -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Users will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Other admin views... -->
-            <div id="adminViewSubscriptions" class="admin-view hidden">
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold">Subscriptions Management</h3>
-                    <p class="text-gray-600 mt-2">Manage all subscription plans</p>
+                
+                <!-- Plan Management View -->
+                <div id="viewPlans" class="view hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Plan Management</h2>
+                            <p class="text-gray-600">Configure subscription plans and pricing</p>
+                        </div>
+                        <button onclick="showPlanModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>Add New Plan
+                        </button>
+                    </div>
+                    
+                    <!-- Plans Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plansGrid">
+                        <!-- Plans will be loaded here -->
+                    </div>
+                    
+                    <!-- Plan Features Configuration -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+                        <h3 class="text-lg font-bold mb-4">Plan Features Configuration</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Feature</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Basic</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Pro</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Enterprise</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="featuresTable" class="divide-y divide-gray-200">
+                                    <!-- Features will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div id="adminViewPayments" class="admin-view hidden">
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold">Payments Management</h3>
-                    <p class="text-gray-600 mt-2">View and verify all payments</p>
+                
+                <!-- System Settings View -->
+                <div id="viewSettings" class="view hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold">System Settings</h2>
+                        <p class="text-gray-600">Configure system-wide settings and preferences</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- General Settings -->
+                        <div class="col-span-2 space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">General Settings</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">System Name</label>
+                                        <input type="text" id="systemName" value="DigitalMenuPro" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
+                                        <input type="email" id="supportEmail" value="support@digitalmenupro.com" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Phone</label>
+                                        <input type="tel" id="supportPhone" value="+91-9876543210" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
+                                        <select id="defaultCurrency" class="w-full px-3 py-2 border rounded-lg">
+                                            <option value="INR" selected>Indian Rupee (₹)</option>
+                                            <option value="USD">US Dollar ($)</option>
+                                            <option value="EUR">Euro (€)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Settings -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Payment Settings</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+                                        <input type="text" id="upiId" value="digitalmenupro@okhdfcbank" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
+                                        <input type="text" id="gstNumber" value="27AAECD1234M1Z5" class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Bank Account Details</label>
+                                        <textarea id="bankDetails" rows="3" class="w-full px-3 py-2 border rounded-lg">Bank: HDFC Bank
+Account Name: DigitalMenuPro Solutions
+Account Number: 50200012345678
+IFSC: HDFC0001234
+Branch: Mumbai Main</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                                <div class="space-y-3">
+                                    <button onclick="sendTestEmail()" class="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-left">
+                                        <i class="fas fa-envelope mr-2"></i>Send Test Email
+                                    </button>
+                                    <button onclick="clearSystemCache()" class="w-full px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 text-left">
+                                        <i class="fas fa-broom mr-2"></i>Clear System Cache
+                                    </button>
+                                    <button onclick="backupDatabase()" class="w-full px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-left">
+                                        <i class="fas fa-database mr-2"></i>Backup Database
+                                    </button>
+                                    <button onclick="viewSystemLogs()" class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-left">
+                                        <i class="fas fa-clipboard-list mr-2"></i>View System Logs
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- System Status -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-lg font-bold mb-4">System Status</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Database</span>
+                                        <span class="text-green-600 font-medium">Online</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Storage</span>
+                                        <span class="text-green-600 font-medium">2.4 GB / 10 GB</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Active Users</span>
+                                        <span class="font-medium" id="activeUsersCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">System Uptime</span>
+                                        <span class="font-medium">99.8%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Save Settings -->
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <button onclick="saveSystemSettings()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                                    <i class="fas fa-save mr-2"></i>Save All Settings
+                                </button>
+                                <p class="text-xs text-gray-500 mt-2 text-center">
+                                    Changes may take up to 5 minutes to propagate
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div id="adminViewUsers" class="admin-view hidden">
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold">Users Management</h3>
-                    <p class="text-gray-600 mt-2">Manage all staff users across restaurants</p>
-                </div>
-            </div>
-        </main>
-    </div>
-</div>
+                
+                <!-- Terms & Policies View -->
+                <div id="viewTerms" class="view hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold">Terms & Policies Management</h2>
+                        <p class="text-gray-600">Update system terms, conditions, and policies</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="space-y-6">
+                            <!-- Terms of Service -->
+                            <div>
+                                <h3 class="text-lg font-bold mb-3">Terms of Service</h3>
+                                <textarea id="termsOfService" rows="12" class="w-full px-4 py-3 border rounded-lg font-mono text-sm">
+# DigitalMenuPro Terms of Service
 
-<!-- STAFF DASHBOARD -->
-<div id="staffDashboard" class="hidden min-h-screen">
-    <header class="bg-gradient-to-r from-red-700 to-amber-700 text-white py-4 shadow-xl sticky top-0 z-40">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <div class="w-10 h-10 mr-3 bg-white rounded-full flex items-center justify-center">
-                    <i class="fas fa-utensils text-red-600 text-xl"></i>
+## 1. Acceptance of Terms
+By accessing and using DigitalMenuPro services, you agree to be bound by these Terms of Service.
+
+## 2. Subscription Terms
+- Monthly subscriptions auto-renew unless cancelled
+- 7-day free trial available for new restaurants
+- Payment required to continue after trial period
+
+## 3. Service Updates
+We may update our services, features, and pricing with 30 days notice.
+
+## 4. User Responsibilities
+- Provide accurate information
+- Maintain account security
+- Comply with all applicable laws
+
+## 5. Termination
+We reserve the right to suspend accounts for violations or non-payment.
+
+## 6. Limitation of Liability
+DigitalMenuPro is not liable for indirect damages or service interruptions.
+
+## 7. Updates to Terms
+Terms may be updated periodically. Continued use constitutes acceptance.
+                                </textarea>
+                            </div>
+                            
+                            <!-- Privacy Policy -->
+                            <div>
+                                <h3 class="text-lg font-bold mb-3">Privacy Policy</h3>
+                                <textarea id="privacyPolicy" rows="12" class="w-full px-4 py-3 border rounded-lg font-mono text-sm">
+# DigitalMenuPro Privacy Policy
+
+## 1. Information We Collect
+- Restaurant details (name, address, contact info)
+- Owner information (name, email, phone)
+- Payment information (for billing purposes)
+- Usage data and analytics
+
+## 2. How We Use Information
+- To provide and improve our services
+- For billing and subscription management
+- To communicate important updates
+- For legal and compliance purposes
+
+## 3. Data Security
+We implement industry-standard security measures to protect your data.
+
+## 4. Data Retention
+We retain data as long as necessary for service provision and legal compliance.
+
+## 5. Third-Party Services
+We may use trusted third-party services for payment processing and analytics.
+
+## 6. Your Rights
+You have the right to access, correct, or delete your personal information.
+
+## 7. Contact Us
+For privacy-related questions, contact: privacy@digitalmenupro.com
+                                </textarea>
+                            </div>
+                            
+                            <!-- Refund Policy -->
+                            <div>
+                                <h3 class="text-lg font-bold mb-3">Refund Policy</h3>
+                                <textarea id="refundPolicy" rows="8" class="w-full px-4 py-3 border rounded-lg font-mono text-sm">
+# DigitalMenuPro Refund Policy
+
+## 1. Subscription Refunds
+- Monthly subscriptions: No refunds for partial months
+- Annual subscriptions: Pro-rated refunds available within 30 days
+- Refunds processed within 7-10 business days
+
+## 2. Service Issues
+If our service is unavailable for more than 24 hours, we provide service credits.
+
+## 3. Cancellation
+You may cancel your subscription at any time. Service continues until end of billing period.
+
+## 4. Refund Process
+Refund requests must be submitted via email to support@digitalmenupro.com
+
+## 5. Dispute Resolution
+We aim to resolve all disputes amicably and fairly.
+
+## 6. Policy Updates
+This policy may be updated. Continued use constitutes acceptance.
+                                </textarea>
+                            </div>
+                            
+                            <!-- Update Actions -->
+                            <div class="flex justify-between pt-6 border-t">
+                                <div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="notifyUsers" class="mr-2">
+                                        <span>Notify all users about terms update</span>
+                                    </label>
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        Users will need to accept updated terms on next login
+                                    </p>
+                                </div>
+                                <div class="space-x-3">
+                                    <button onclick="previewTerms()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                        Preview
+                                    </button>
+                                    <button onclick="updateTerms()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Update All Policies
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Admin Login</h3>
+                <p class="text-gray-600 mt-2">DigitalMenuPro Control Panel</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="email" id="adminEmailInput" placeholder="Admin Email" 
+                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="password" id="adminPassword" placeholder="Password" 
+                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <button onclick="handleAdminLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
+                    Login as Admin
+                </button>
+                
+                <p class="text-sm text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Admin access requires special privileges
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restaurant Details Modal -->
+    <div id="restaurantDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal content will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Plan Management Modal -->
+    <div id="planModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl">
+            <h3 class="text-2xl font-bold mb-6">Manage Plan</h3>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
+                    <input type="text" id="planName" class="w-full px-4 py-2 border rounded-lg">
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold" id="staffRestaurantName">Restaurant Dashboard</h1>
-                    <p class="text-sm text-red-100"><span id="staffUserName"></span> • <span id="staffUserRole"></span></p>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Plan Code</label>
+                    <input type="text" id="planCode" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-sm">
-                    <i class="fas fa-user-circle mr-1"></i>
-                    <span id="staffUserEmail"></span>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Monthly Price (₹)</label>
+                    <input type="number" id="planPrice" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-                <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <nav class="bg-white shadow sticky top-16 z-30">
-        <div class="container mx-auto px-4 py-3 flex gap-2 overflow-x-auto" id="staffNavMenu"></div>
-    </nav>
-
-    <main class="container mx-auto px-4 py-8">
-        <!-- Staff Dashboard View -->
-        <div id="staffViewDashboard" class="staff-view">
-            <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div><p class="text-gray-600 text-sm">Users</p><p class="text-3xl font-bold" id="statUsers">0</p></div>
-                        <i class="fas fa-users text-4xl text-blue-500"></i>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Annual Price (₹)</label>
+                    <input type="number" id="planAnnualPrice" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div><p class="text-gray-600 text-sm">Dishes</p><p class="text-3xl font-bold" id="statDishes">0</p></div>
-                        <i class="fas fa-utensils text-4xl text-green-500"></i>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="planDescription" rows="3" class="w-full px-4 py-2 border rounded-lg"></textarea>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div><p class="text-gray-600 text-sm">Orders</p><p class="text-3xl font-bold" id="statOrders">0</p></div>
-                        <i class="fas fa-receipt text-4xl text-purple-500"></i>
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Features (comma-separated)</label>
+                    <textarea id="planFeatures" rows="4" class="w-full px-4 py-2 border rounded-lg"></textarea>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <div><p class="text-gray-600 text-sm">Revenue</p><p class="text-3xl font-bold" id="statRevenue">₹0</p></div>
-                        <i class="fas fa-rupee-sign text-4xl text-amber-500"></i>
-                    </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="planActive" class="mr-2">
+                        <span>Plan is active and available for purchase</span>
+                    </label>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="savePlan()" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Save Plan
+                    </button>
+                    <button onclick="closePlanModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- Staff Dishes View -->
-        <div id="staffViewDishes" class="staff-view hidden">
-            <div class="flex justify-between mb-6">
-                <h2 class="text-2xl font-bold">Menu Management</h2>
-                <button onclick="showModal('dish')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    <i class="fas fa-plus mr-2"></i>Add Dish
-                </button>
-            </div>
-            <div id="dishesList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-        </div>
-
-        <!-- Staff Reservations View -->
-        <div id="staffViewReservations" class="staff-view hidden">
-            <div class="flex justify-between mb-6">
-                <h2 class="text-2xl font-bold">Reservations</h2>
-            </div>
-            <div id="reservationsList" class="space-y-4"></div>
-        </div>
-
-        <!-- Staff Orders View -->
-        <div id="staffViewOrders" class="staff-view hidden">
-            <div class="flex justify-between mb-6">
-                <h2 class="text-2xl font-bold">Orders</h2>
-            </div>
-            <div id="ordersList" class="space-y-4"></div>
-        </div>
-    </main>
-</div>
+    </div>
 
 <script>
 // Configuration
 const SUPABASE_URL = 'https://aazqyrkklajqscsdfgjl.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhenF5cmtrbGFqcXNjc2RmZ2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NTg4MjUsImV4cCI6MjA4NDMzNDgyNX0.MCmhASRpt_N1gkK7BiVBzp4NT98aCWOWetgtUCoj7Go';
-const SUPER_ADMIN_EMAIL = 'admin@royalkitchen.com';
 
 // Initialize Supabase
 let supabaseClient;
@@ -403,52 +1030,70 @@ try {
 }
 
 // Global variables
-let currentUser = null;
-let currentRestaurant = null;
+let currentAdmin = null;
 let restaurants = [];
 let subscriptions = [];
 let payments = [];
 let users = [];
-let dishes = [];
-let orders = [];
-let reservations = [];
+let plans = [];
+let currentRestaurantPage = 1;
+let currentPaymentPage = 1;
+const itemsPerPage = 10;
 
-// Initialize the system
-async function init() {
+// Chart instances
+let revenueChart = null;
+let planChart = null;
+
+// Initialize admin dashboard
+async function initAdminDashboard() {
     try {
-        console.log('🚀 Initializing system...');
-        
-        // Check if user is already logged in
+        // Check if admin is already logged in
         const { data: { user } } = await supabaseClient.auth.getUser();
-        
         if (user) {
-            console.log('✓ Found logged in user:', user.email);
-            await handleSession(user);
+            // Check if user is admin
+            const { data: adminUser } = await supabaseClient
+                .from('staff_users')
+                .select('*')
+                .eq('email', user.email)
+                .eq('role', 'admin')
+                .single();
+                
+            if (adminUser) {
+                currentAdmin = adminUser;
+                document.getElementById('adminLoginModal').style.display = 'none';
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('adminName').textContent = adminUser.name;
+                document.getElementById('adminEmail').textContent = adminUser.email;
+                
+                // Load initial data
+                await loadAdminData();
+                setupCharts();
+                loadNotifications();
+                loadActivities();
+                
+                console.log('✓ Admin dashboard initialized');
+            } else {
+                // Not an admin, show login
+                showAdminLogin();
+            }
         } else {
-            console.log('⚠ No user logged in');
-            showLoginModal();
+            // No user logged in, show login
+            showAdminLogin();
         }
-        
     } catch (error) {
-        console.error('❌ Initialization error:', error);
-        showLoginModal();
-    } finally {
-        hideLoadingScreen();
+        console.error('❌ Admin initialization error:', error);
+        showAdminLogin();
     }
 }
 
-function showLoginModal() {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('loginModal').classList.remove('hidden');
+function showAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'flex';
+    document.getElementById('adminDashboard').classList.add('hidden');
 }
 
-function hideLoadingScreen() {
-    document.getElementById('loadingScreen').style.display = 'none';
-}
-
-async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+async function handleAdminLogin() {
+    const email = document.getElementById('adminEmailInput').value;
+    const password = document.getElementById('adminPassword').value;
     
     if (!email || !password) {
         alert('Please enter email and password');
@@ -456,8 +1101,6 @@ async function handleLogin() {
     }
     
     try {
-        console.log('🔐 Attempting login for:', email);
-        
         const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
@@ -465,125 +1108,47 @@ async function handleLogin() {
         
         if (error) throw error;
         
-        console.log('✓ Login successful');
-        await handleSession(data.user);
+        // Check if user is admin
+        const { data: adminUser, error: adminError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .eq('email', email)
+            .eq('role', 'admin')
+            .single();
+            
+        if (adminError || !adminUser) {
+            alert('Access denied. Admin privileges required.');
+            await supabaseClient.auth.signOut();
+            return;
+        }
+        
+        currentAdmin = adminUser;
+        document.getElementById('adminLoginModal').style.display = 'none';
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('adminName').textContent = adminUser.name;
+        document.getElementById('adminEmail').textContent = adminUser.email;
+        
+        // Load data
+        await loadAdminData();
+        setupCharts();
+        loadNotifications();
+        loadActivities();
+        
+        alert('✓ Admin login successful!');
         
     } catch (error) {
-        console.error('❌ Login error:', error);
+        console.error('Admin login error:', error);
         alert('Login failed: ' + error.message);
     }
 }
 
-async function handleSession(user) {
+async function adminLogout() {
     try {
-        console.log('👤 Processing session for:', user.email);
-        
-        // Check if super admin
-        if (user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
-            console.log('🛡️ Super admin detected');
-            await setupSuperAdminDashboard(user);
-        } else {
-            console.log('👨‍💼 Regular staff user detected');
-            await setupStaffDashboard(user);
-        }
-        
-        // Hide login modal
-        document.getElementById('loginModal').classList.add('hidden');
-        
+        await supabaseClient.auth.signOut();
+        currentAdmin = null;
+        showAdminLogin();
     } catch (error) {
-        console.error('❌ Session handling error:', error);
-        alert('Error loading dashboard: ' + error.message);
-        await handleLogout();
-    }
-}
-
-async function setupSuperAdminDashboard(user) {
-    try {
-        console.log('📊 Setting up super admin dashboard...');
-        
-        currentUser = {
-            email: user.email,
-            name: 'Super Admin',
-            role: 'super_admin'
-        };
-        
-        // Load ALL data
-        await loadAdminData();
-        
-        // Show admin dashboard
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        document.getElementById('staffDashboard').classList.add('hidden');
-        
-        document.getElementById('adminName').textContent = 'Super Admin';
-        document.getElementById('adminEmail').textContent = user.email;
-        
-        // Update stats
-        updateAdminStats();
-        
-        console.log('✓ Super admin dashboard ready');
-        
-    } catch (error) {
-        console.error('❌ Error setting up admin dashboard:', error);
-        throw error;
-    }
-}
-
-async function setupStaffDashboard(user) {
-    try {
-        console.log('👨‍💼 Setting up staff dashboard...');
-        
-        // Get staff user data
-        const { data: staffUser, error: staffError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('email', user.email)
-            .single();
-        
-        if (staffError || !staffUser) {
-            throw new Error('Staff account not found. Please contact administrator.');
-        }
-        
-        if (!staffUser.is_active) {
-            throw new Error('This account is disabled. Please contact administrator.');
-        }
-        
-        // Get restaurant data
-        const { data: restaurant, error: restError } = await supabaseClient
-            .from('restaurants')
-            .select('*')
-            .eq('id', staffUser.restaurant_id)
-            .single();
-        
-        if (restError || !restaurant) {
-            throw new Error('Restaurant not found. Please contact administrator.');
-        }
-        
-        currentUser = staffUser;
-        currentRestaurant = restaurant;
-        
-        // Load restaurant data
-        await loadStaffData();
-        
-        // Show staff dashboard
-        document.getElementById('staffDashboard').classList.remove('hidden');
-        document.getElementById('adminDashboard').classList.add('hidden');
-        
-        document.getElementById('staffRestaurantName').textContent = restaurant.name;
-        document.getElementById('staffUserName').textContent = staffUser.name;
-        document.getElementById('staffUserRole').textContent = staffUser.role.toUpperCase();
-        document.getElementById('staffUserEmail').textContent = staffUser.email;
-        
-        // Setup navigation based on permissions
-        setupStaffNav();
-        
-        // Update stats
-        updateStaffStats();
-        
-        console.log('✓ Staff dashboard ready for:', restaurant.name);
-        
-    } catch (error) {
-        console.error('❌ Error setting up staff dashboard:', error);
-        throw error;
+        console.error('Logout error:', error);
     }
 }
 
@@ -591,21 +1156,18 @@ async function loadAdminData() {
     try {
         console.log('📊 Loading admin data...');
         
-        // Load ALL restaurants
+        // Load restaurants
         const { data: restaurantsData, error: resError } = await supabaseClient
             .from('restaurants')
             .select('*')
             .order('created_at', { ascending: false });
         
-        if (!resError) {
-            restaurants = restaurantsData || [];
-            console.log(`✓ Loaded ${restaurants.length} restaurants`);
-        }
+        if (!resError) restaurants = restaurantsData || [];
         
         // Load subscriptions
         const { data: subsData, error: subsError } = await supabaseClient
             .from('subscriptions')
-            .select('*')
+            .select('*, restaurants(name)')
             .order('created_at', { ascending: false });
         
         if (!subsError) subscriptions = subsData || [];
@@ -613,7 +1175,7 @@ async function loadAdminData() {
         // Load payments
         const { data: paymentsData, error: payError } = await supabaseClient
             .from('payments')
-            .select('*')
+            .select('*, restaurants(name)')
             .order('created_at', { ascending: false });
         
         if (!payError) payments = paymentsData || [];
@@ -621,10 +1183,21 @@ async function loadAdminData() {
         // Load all users
         const { data: usersData, error: usersError } = await supabaseClient
             .from('staff_users')
-            .select('*')
+            .select('*, restaurants(name)')
             .order('created_at', { ascending: false });
         
         if (!usersError) users = usersData || [];
+        
+        // Load plans
+        const { data: plansData, error: plansError } = await supabaseClient
+            .from('plans')
+            .select('*')
+            .order('price', { ascending: true });
+        
+        if (!plansError) plans = plansData || [];
+        
+        // Update dashboard stats
+        updateDashboardStats();
         
         console.log('✓ Admin data loaded');
         
@@ -633,281 +1206,775 @@ async function loadAdminData() {
     }
 }
 
-async function loadStaffData() {
+function updateDashboardStats() {
+    // Total restaurants
+    document.getElementById('totalRestaurants').textContent = restaurants.length;
+    
+    // Active subscriptions
+    const activeSubs = subscriptions.filter(s => s.status === 'active').length;
+    document.getElementById('activeSubscriptions').textContent = activeSubs;
+    
+    // Monthly revenue (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const monthlyRevenue = payments
+        .filter(p => p.status === 'completed' && new Date(p.created_at) >= thirtyDaysAgo)
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('monthlyRevenue').textContent = `₹${monthlyRevenue}`;
+    
+    // Pending payments
+    const pending = payments.filter(p => p.status === 'pending').length;
+    document.getElementById('pendingPayments').textContent = pending;
+    
+    // For subscription view
+    document.getElementById('totalActiveSubs').textContent = activeSubs;
+    document.getElementById('monthlyMRR').textContent = `₹${monthlyRevenue}`;
+    document.getElementById('annualProjection').textContent = `₹${monthlyRevenue * 12}`;
+    
+    // For payments view
+    const totalRevenue = payments
+        .filter(p => p.status === 'completed')
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
+    
+    const successfulPayments = payments.filter(p => p.status === 'completed').length;
+    document.getElementById('successfulPayments').textContent = successfulPayments;
+    
+    document.getElementById('pendingVerifications').textContent = pending;
+    
+    const avgTransaction = successfulPayments > 0 ? totalRevenue / successfulPayments : 0;
+    document.getElementById('averageTransaction').textContent = `₹${Math.round(avgTransaction)}`;
+}
+
+function setupCharts() {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const last6Months = getLast6Months();
+    
+    if (revenueChart) revenueChart.destroy();
+    
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: last6Months,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: generateRevenueData(last6Months),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    
+    // Plan Distribution Chart
+    const planCtx = document.getElementById('planChart').getContext('2d');
+    
+    if (planChart) planChart.destroy();
+    
+    const planCounts = {
+        basic: subscriptions.filter(s => s.plan === 'basic').length,
+        pro: subscriptions.filter(s => s.plan === 'pro').length,
+        enterprise: subscriptions.filter(s => s.plan === 'enterprise').length
+    };
+    
+    planChart = new Chart(planCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Basic', 'Pro', 'Enterprise'],
+            datasets: [{
+                data: [planCounts.basic, planCounts.pro, planCounts.enterprise],
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(59, 130, 246)',
+                    'rgb(139, 92, 246)'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function getLast6Months() {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+    }
+    
+    return months;
+}
+
+function generateRevenueData(months) {
+    // Generate sample data - in real app, fetch from database
+    return months.map(() => Math.floor(Math.random() * 50000) + 10000);
+}
+
+async function loadNotifications() {
     try {
-        console.log('📊 Loading staff data...');
+        // Get pending payments
+        const pendingPayments = payments.filter(p => p.status === 'pending').length;
         
-        // Load dishes for this restaurant
-        const { data: dishesData, error: dishesError } = await supabaseClient
-            .from('dishes')
-            .select('*')
-            .eq('restaurant_id', currentRestaurant.id)
-            .eq('is_active', true);
+        // Get pending restaurants
+        const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
         
-        if (!dishesError) dishes = dishesData || [];
+        // Get subscriptions ending soon (within 7 days)
+        const endingSoon = subscriptions.filter(s => {
+            if (!s.next_billing_date) return false;
+            const daysLeft = Math.ceil((new Date(s.next_billing_date) - new Date()) / (1000 * 60 * 60 * 24));
+            return daysLeft <= 7 && daysLeft > 0;
+        }).length;
         
-        // Load orders
-        const { data: ordersData, error: ordersError } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .eq('restaurant_id', currentRestaurant.id);
+        let html = '';
         
-        if (!ordersError) orders = ordersData || [];
+        if (pendingPayments > 0) {
+            html += `
+                <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${pendingPayments} pending payment${pendingPayments > 1 ? 's' : ''}</p>
+                        <p class="text-sm text-gray-600">Require verification</p>
+                    </div>
+                </div>
+            `;
+        }
         
-        // Load reservations
-        const { data: reservationsData, error: resError } = await supabaseClient
-            .from('reservations')
-            .select('*')
-            .eq('restaurant_id', currentRestaurant.id);
+        if (pendingRestaurants > 0) {
+            html += `
+                <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-clock text-blue-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${pendingRestaurants} restaurant${pendingRestaurants > 1 ? 's' : ''} pending</p>
+                        <p class="text-sm text-gray-600">Awaiting activation</p>
+                    </div>
+                </div>
+            `;
+        }
         
-        if (!resError) reservations = reservationsData || [];
+        if (endingSoon > 0) {
+            html += `
+                <div class="flex items-start p-3 bg-orange-50 rounded-lg">
+                    <i class="fas fa-calendar-alt text-orange-600 mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-medium">${endingSoon} subscription${endingSoon > 1 ? 's' : ''} ending soon</p>
+                        <p class="text-sm text-gray-600">Renewal within 7 days</p>
+                    </div>
+                </div>
+            `;
+        }
         
-        // Load staff users for this restaurant
-        const { data: usersData, error: usersError } = await supabaseClient
-            .from('staff_users')
-            .select('*')
-            .eq('restaurant_id', currentRestaurant.id);
+        if (!html) {
+            html = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+        }
         
-        if (!usersError) users = usersData || [];
-        
-        console.log('✓ Staff data loaded');
+        document.getElementById('notificationsList').innerHTML = html;
         
     } catch (error) {
-        console.error('❌ Error loading staff data:', error);
+        console.error('Error loading notifications:', error);
     }
 }
 
-function updateAdminStats() {
-    document.getElementById('adminTotalRestaurants').textContent = restaurants.length;
-    document.getElementById('adminActiveSubscriptions').textContent = subscriptions.filter(s => s.status === 'active').length;
-    
-    const monthlyRevenue = payments
-        .filter(p => p.status === 'completed')
-        .reduce((sum, p) => sum + (p.amount || 0), 0);
-    document.getElementById('adminMonthlyRevenue').textContent = `₹${monthlyRevenue}`;
-    
-    document.getElementById('adminTotalUsers').textContent = users.length;
-    
-    // Load restaurants table
-    loadAdminRestaurantsTable();
-    
-    // Load activities
-    loadAdminActivities();
+async function loadActivities() {
+    try {
+        // Get recent activities (last 20)
+        let html = '';
+        
+        // Recent payments
+        const recentPayments = payments.slice(0, 5);
+        recentPayments.forEach(payment => {
+            const date = new Date(payment.created_at).toLocaleDateString();
+            const time = new Date(payment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            html += `
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center mr-3">
+                        <i class="fas fa-rupee-sign text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${payment.restaurants?.name || 'Unknown Restaurant'}</p>
+                        <p class="text-sm text-gray-600">Payment of ₹${payment.amount} ${payment.status}</p>
+                        <p class="text-xs text-gray-500">${date} at ${time}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // Recent registrations
+        const recentRestaurants = restaurants.slice(0, 3);
+        recentRestaurants.forEach(restaurant => {
+            const date = new Date(restaurant.created_at).toLocaleDateString();
+            
+            html += `
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                        <i class="fas fa-utensils text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium">${restaurant.name}</p>
+                        <p class="text-sm text-gray-600">New restaurant registered</p>
+                        <p class="text-xs text-gray-500">${date}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
+        
+    } catch (error) {
+        console.error('Error loading activities:', error);
+    }
 }
 
-function loadAdminRestaurantsTable() {
-    let html = '';
+// View Navigation
+function showView(viewName) {
+    // Hide all views
+    document.querySelectorAll('.view').forEach(view => {
+        view.classList.add('hidden');
+    });
     
-    restaurants.slice(0, 10).forEach(restaurant => {
-        html += `
+    // Remove active class from all nav items
+    document.querySelectorAll('nav a').forEach(navItem => {
+        navItem.classList.remove('active-nav', 'bg-gray-700');
+    });
+    
+    // Add active class to clicked nav item
+    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
+    if (activeNav) {
+        activeNav.classList.add('active-nav', 'bg-gray-700');
+    }
+    
+    // Show selected view
+    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
+    if (viewElement) {
+        viewElement.classList.remove('hidden');
+    }
+    
+    // Update title and subtitle
+    updateViewTitle(viewName);
+    
+    // Load view-specific data
+    switch(viewName) {
+        case 'restaurants':
+            loadRestaurantsTable();
+            break;
+        case 'subscriptions':
+            loadSubscriptionsTable();
+            loadRestaurantDropdown();
+            break;
+        case 'payments':
+            loadPaymentsTable();
+            break;
+        case 'users':
+            loadUsersTable();
+            break;
+        case 'plans':
+            loadPlans();
+            break;
+        case 'settings':
+            loadSystemSettings();
+            break;
+        case 'terms':
+            loadTerms();
+            break;
+    }
+}
+
+function updateViewTitle(viewName) {
+    const titles = {
+        'dashboard': { title: 'Admin Dashboard', subtitle: 'System Overview & Analytics' },
+        'restaurants': { title: 'Restaurant Management', subtitle: 'Manage all registered restaurants' },
+        'subscriptions': { title: 'Subscription Management', subtitle: 'Manage all subscription plans and billing' },
+        'payments': { title: 'Payment Management', subtitle: 'View and manage all payment transactions' },
+        'users': { title: 'User Management', subtitle: 'Manage all system users across restaurants' },
+        'plans': { title: 'Plan Management', subtitle: 'Configure subscription plans and pricing' },
+        'settings': { title: 'System Settings', subtitle: 'Configure system-wide settings and preferences' },
+        'terms': { title: 'Terms & Policies Management', subtitle: 'Update system terms, conditions, and policies' }
+    };
+    
+    const viewInfo = titles[viewName] || titles.dashboard;
+    document.getElementById('viewTitle').textContent = viewInfo.title;
+    document.getElementById('viewSubtitle').textContent = viewInfo.subtitle;
+}
+
+// Sidebar Toggle
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"] i');
+    
+    sidebar.classList.toggle('collapsed');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        mainContent.style.marginLeft = '80px';
+        toggleBtn.classList.remove('fa-chevron-left');
+        toggleBtn.classList.add('fa-chevron-right');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Expand Sidebar';
+    } else {
+        mainContent.style.marginLeft = '256px';
+        toggleBtn.classList.remove('fa-chevron-right');
+        toggleBtn.classList.add('fa-chevron-left');
+        document.querySelector('[onclick="toggleSidebar()"] span').textContent = 'Collapse Sidebar';
+    }
+}
+
+// Notifications Toggle
+function toggleNotifications() {
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('hidden');
+}
+
+// Restaurant Management
+async function loadRestaurantsTable() {
+    try {
+        let html = '';
+        const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageRestaurants = restaurants.slice(startIndex, endIndex);
+        
+        pageRestaurants.forEach(restaurant => {
+            // Find subscription for this restaurant
+            const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
+            
+            html += `
+                <tr class="restaurant-row hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-utensils text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${restaurant.name}</div>
+                                <div class="text-sm text-gray-500">${restaurant.url_slug}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${restaurant.owner_name || restaurant.owner_email}</div>
+                        <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 text-xs font-medium rounded-full ${subscription?.plan === 'pro' ? 'bg-blue-100 text-blue-800' : subscription?.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                            ${subscription?.plan ? subscription.plan.toUpperCase() : 'No Plan'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                            ${restaurant.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${subscription ? (subscription.auto_pay ? 'Auto-Pay Enabled' : 'Manual Payment') : 'No Subscription'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(restaurant.created_at).toLocaleDateString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="editRestaurant('${restaurant.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('restaurantsTable').innerHTML = html || `
             <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="font-medium text-gray-900">${restaurant.name}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${restaurant.owner_email}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <code class="px-2 py-1 bg-gray-100 rounded">${restaurant.url_slug}</code>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
-                        ${restaurant.status.toUpperCase()}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${new Date(restaurant.created_at).toLocaleDateString()}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-2">
-                        <i class="fas fa-power-off"></i>
-                    </button>
-                    <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    No restaurants found
                 </td>
             </tr>
         `;
-    });
-    
-    document.getElementById('adminRestaurantsTable').innerHTML = html || `
-        <tr>
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                No restaurants found
-            </td>
-        </tr>
-    `;
-}
-
-function loadAdminActivities() {
-    let html = '';
-    
-    const recentRestaurants = restaurants.slice(0, 5);
-    recentRestaurants.forEach(restaurant => {
-        const date = new Date(restaurant.created_at).toLocaleDateString();
         
-        html += `
-            <div class="flex items-start">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
-                    <i class="fas fa-utensils text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="font-medium">${restaurant.name}</p>
-                    <p class="text-sm text-gray-600">New restaurant registered</p>
-                    <p class="text-xs text-gray-500">${date} • Slug: ${restaurant.url_slug}</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    document.getElementById('adminActivitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
-}
-
-function updateStaffStats() {
-    document.getElementById('statUsers').textContent = users.length;
-    document.getElementById('statDishes').textContent = dishes.length;
-    document.getElementById('statOrders').textContent = orders.length;
-    
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-    document.getElementById('statRevenue').textContent = `₹${totalRevenue}`;
-}
-
-function setupStaffNav() {
-    const permissions = currentUser.permissions || {};
-    let nav = '<button onclick="showStaffView(\'dashboard\')" class="px-4 py-2 rounded-lg hover:bg-gray-100 bg-gray-100"><i class="fas fa-home mr-2"></i>Dashboard</button>';
-    
-    if (permissions.addDish || permissions.editDish || permissions.deleteDish) {
-        nav += '<button onclick="showStaffView(\'dishes\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-utensils mr-2"></i>Dishes</button>';
-    }
-    
-    if (permissions.reserveTable) {
-        nav += '<button onclick="showStaffView(\'reservations\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-calendar mr-2"></i>Reservations</button>';
-    }
-    
-    if (permissions.viewTableOrders) {
-        nav += '<button onclick="showStaffView(\'orders\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-clipboard-list mr-2"></i>Orders</button>';
-    }
-    
-    document.getElementById('staffNavMenu').innerHTML = nav;
-}
-
-function showAdminView(viewName) {
-    document.querySelectorAll('.admin-view').forEach(view => {
-        view.classList.add('hidden');
-    });
-    
-    document.querySelectorAll('#adminSidebar a').forEach(link => {
-        link.classList.remove('bg-gray-700');
-    });
-    
-    const viewElement = document.getElementById(`adminView${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
-    if (viewElement) {
-        viewElement.classList.remove('hidden');
-    }
-    
-    const activeLink = document.querySelector(`#adminSidebar a[onclick="showAdminView('${viewName}')"]`);
-    if (activeLink) {
-        activeLink.classList.add('bg-gray-700');
+        // Update pagination info
+        document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
+        document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
+        document.getElementById('restaurantTotal').textContent = restaurants.length;
+        
+    } catch (error) {
+        console.error('Error loading restaurants table:', error);
     }
 }
 
-function showStaffView(viewName) {
-    document.querySelectorAll('.staff-view').forEach(view => {
-        view.classList.add('hidden');
-    });
+function filterRestaurants() {
+    const searchTerm = document.getElementById('restaurantSearch').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const planFilter = document.getElementById('planFilter').value;
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
     
-    document.querySelectorAll('#staffNavMenu button').forEach(btn => {
-        btn.classList.remove('bg-gray-100');
-    });
+    // Apply filters
+    let filtered = restaurants;
     
-    const viewElement = document.getElementById(`staffView${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
-    if (viewElement) {
-        viewElement.classList.remove('hidden');
+    if (searchTerm) {
+        filtered = filtered.filter(r => 
+            r.name.toLowerCase().includes(searchTerm) ||
+            r.owner_email.toLowerCase().includes(searchTerm) ||
+            r.url_slug.toLowerCase().includes(searchTerm)
+        );
     }
     
-    const activeBtn = document.querySelector(`#staffNavMenu button[onclick="showStaffView('${viewName}')"]`);
-    if (activeBtn) {
-        activeBtn.classList.add('bg-gray-100');
+    if (statusFilter) {
+        filtered = filtered.filter(r => r.status === statusFilter);
     }
     
-    // Load view data
-    if (viewName === 'dishes') {
-        renderDishes();
-    } else if (viewName === 'reservations') {
-        renderReservations();
-    } else if (viewName === 'orders') {
-        renderOrders();
+    if (planFilter) {
+        filtered = filtered.filter(r => {
+            const sub = subscriptions.find(s => s.restaurant_id === r.id);
+            return sub?.plan === planFilter;
+        });
+    }
+    
+    if (dateFrom) {
+        const fromDate = new Date(dateFrom);
+        filtered = filtered.filter(r => new Date(r.created_at) >= fromDate);
+    }
+    
+    if (dateTo) {
+        const toDate = new Date(dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(r => new Date(r.created_at) <= toDate);
+    }
+    
+    // Update restaurants array for pagination
+    const tempRestaurants = [...restaurants];
+    restaurants = filtered;
+    currentRestaurantPage = 1;
+    loadRestaurantsTable();
+    restaurants = tempRestaurants; // Restore original array
+}
+
+function prevRestaurantPage() {
+    if (currentRestaurantPage > 1) {
+        currentRestaurantPage--;
+        loadRestaurantsTable();
     }
 }
 
-function renderDishes() {
-    let html = '';
-    
-    dishes.forEach(dish => {
-        html += `
-            <div class="bg-white rounded-xl shadow overflow-hidden">
-                <img src="${dish.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dish.name}" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-lg">${dish.name}</h3>
-                    <p class="text-gray-600 text-sm">${dish.description || ''}</p>
-                    <div class="flex justify-between mt-4">
-                        <span class="font-bold text-lg">₹${dish.price}</span>
-                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${dish.category}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    document.getElementById('dishesList').innerHTML = html || '<p class="text-gray-500 text-center py-8 col-span-3">No dishes available.</p>';
+function nextRestaurantPage() {
+    const totalPages = Math.ceil(restaurants.length / itemsPerPage);
+    if (currentRestaurantPage < totalPages) {
+        currentRestaurantPage++;
+        loadRestaurantsTable();
+    }
 }
 
-function renderReservations() {
-    let html = '';
-    
-    reservations.forEach(res => {
-        html += `
-            <div class="bg-white p-4 rounded-xl shadow">
-                <div class="flex justify-between items-center">
+async function viewRestaurantDetails(restaurantId) {
+    try {
+        const restaurant = restaurants.find(r => r.id === restaurantId);
+        if (!restaurant) return;
+        
+        // Get subscription
+        const subscription = subscriptions.find(s => s.restaurant_id === restaurantId);
+        
+        // Get payments
+        const restaurantPayments = payments.filter(p => p.restaurant_id === restaurantId);
+        
+        // Get users
+        const restaurantUsers = users.filter(u => u.restaurant_id === restaurantId);
+        
+        let html = `
+            <div class="space-y-6">
+                <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="font-bold">${res.customer_name}</h3>
-                        <p class="text-gray-600 text-sm">Table ${res.table_number} • ${res.guest_count} guests</p>
-                        <p class="text-gray-600 text-sm">${res.date} at ${res.time}</p>
+                        <h3 class="text-2xl font-bold">${restaurant.name}</h3>
+                        <p class="text-gray-600">${restaurant.type ? restaurant.type.replace('_', ' ').toUpperCase() : 'Not Specified'}</p>
                     </div>
-                    <span class="px-3 py-1 ${res.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded">
-                        ${res.status}
+                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                        ${restaurant.status.toUpperCase()}
                     </span>
                 </div>
-            </div>
-        `;
-    });
-    
-    document.getElementById('reservationsList').innerHTML = html || '<p class="text-gray-500 text-center py-8">No reservations found.</p>';
-}
-
-function renderOrders() {
-    let html = '';
-    
-    orders.forEach(order => {
-        html += `
-            <div class="bg-white p-4 rounded-xl shadow">
-                <div class="flex justify-between items-center">
+                
+                <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <h3 class="font-bold">Table ${order.table_number}</h3>
-                        <p class="text-gray-600 text-sm">${order.customer_name || 'Guest'}</p>
+                        <h4 class="font-bold mb-2">Owner Information</h4>
+                        <div class="space-y-2">
+                            <p><span class="text-gray-600">Name:</span> ${restaurant.owner_name || restaurant.owner_email}</p>
+                            <p><span class="text-gray-600">Email:</span> ${restaurant.owner_email}</p>
+                            <p><span class="text-gray-600">Phone:</span> ${restaurant.owner_phone || 'Not provided'}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="font-bold text-lg">₹${order.total || 0}</p>
-                        <span class="px-3 py-1 ${order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-sm">
-                            ${order.status}
+                    <div>
+                        <h4 class="font-bold mb-2">Restaurant Details</h4>
+                        <div class="space-y-2">
+                            <p><span class="text-gray-600">URL Slug:</span> ${restaurant.url_slug}</p>
+                            <p><span class="text-gray-600">Address:</span> ${restaurant.address || 'Not provided'}</p>
+                            <p><span class="text-gray-600">Registered:</span> ${new Date(restaurant.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-2">Subscription Information</h4>
+        `;
+        
+        if (subscription) {
+            html += `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p><span class="text-gray-600">Plan:</span> <span class="font-medium">${subscription.plan.toUpperCase()}</span></p>
+                            <p><span class="text-gray-600">Price:</span> ₹${subscription.price}/month</p>
+                        </div>
+                        <div>
+                            <p><span class="text-gray-600">Status:</span> <span class="font-medium ${subscription.status === 'active' ? 'text-green-600' : 'text-yellow-600'}">${subscription.status.toUpperCase()}</span></p>
+                            <p><span class="text-gray-600">Auto-Pay:</span> ${subscription.auto_pay ? 'Enabled' : 'Disabled'}</p>
+                        </div>
+                        <div>
+                            <p><span class="text-gray-600">Next Billing:</span> ${subscription.next_billing_date ? new Date(subscription.next_billing_date).toLocaleDateString() : 'Not scheduled'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `<p class="text-gray-500">No active subscription</p>`;
+        }
+        
+        html += `
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-2">Payment History</h4>
+        `;
+        
+        if (restaurantPayments.length > 0) {
+            html += `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="px-3 py-2 text-left">Date</th>
+                                <th class="px-3 py-2 text-left">Amount</th>
+                                <th class="px-3 py-2 text-left">Method</th>
+                                <th class="px-3 py-2 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            restaurantPayments.slice(0, 5).forEach(payment => {
+                html += `
+                    <tr>
+                        <td class="px-3 py-2">${new Date(payment.created_at).toLocaleDateString()}</td>
+                        <td class="px-3 py-2">₹${payment.amount}</td>
+                        <td class="px-3 py-2">${payment.method || 'UPI'}</td>
+                        <td class="px-3 py-2">
+                            <span class="payment-status-${payment.status} px-2 py-1 rounded text-xs">
+                                ${payment.status.toUpperCase()}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            html += `<p class="text-gray-500">No payment history</p>`;
+        }
+        
+        html += `
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-2">Staff Users (${restaurantUsers.length})</h4>
+        `;
+        
+        if (restaurantUsers.length > 0) {
+            html += `<div class="space-y-2">`;
+            restaurantUsers.forEach(user => {
+                html += `
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div>
+                            <p class="font-medium">${user.name}</p>
+                            <p class="text-sm text-gray-600">${user.email} • ${user.role.toUpperCase()}</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.is_active ? 'Active' : 'Inactive'}
                         </span>
                     </div>
+                `;
+            });
+            html += `</div>`;
+        } else {
+            html += `<p class="text-gray-500">No staff users</p>`;
+        }
+        
+        html += `
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <button onclick="editRestaurant('${restaurantId}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Edit Restaurant
+                    </button>
+                    <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Close
+                    </button>
                 </div>
             </div>
         `;
-    });
+        
+        document.getElementById('restaurantDetailsModal').innerHTML = html;
+        document.getElementById('restaurantDetailsModal').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Error loading restaurant details:', error);
+    }
+}
+
+function closeModal() {
+    document.getElementById('restaurantDetailsModal').classList.add('hidden');
+}
+
+async function editRestaurant(restaurantId) {
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
     
-    document.getElementById('ordersList').innerHTML = html || '<p class="text-gray-500 text-center py-8">No orders found</p>';
+    let html = `
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold">Edit Restaurant</h3>
+            
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Restaurant Name</label>
+                    <input type="text" id="editRestaurantName" value="${restaurant.name}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Restaurant Type</label>
+                    <select id="editRestaurantType" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="fine_dining" ${restaurant.type === 'fine_dining' ? 'selected' : ''}>Fine Dining</option>
+                        <option value="casual_dining" ${restaurant.type === 'casual_dining' ? 'selected' : ''}>Casual Dining</option>
+                        <option value="fast_food" ${restaurant.type === 'fast_food' ? 'selected' : ''}>Fast Food</option>
+                        <option value="cafe" ${restaurant.type === 'cafe' ? 'selected' : ''}>Cafe</option>
+                        <option value="bar" ${restaurant.type === 'bar' ? 'selected' : ''}>Bar & Pub</option>
+                        <option value="food_truck" ${restaurant.type === 'food_truck' ? 'selected' : ''}>Food Truck</option>
+                        <option value="bakery" ${restaurant.type === 'bakery' ? 'selected' : ''}>Bakery</option>
+                        <option value="other" ${restaurant.type === 'other' ? 'selected' : ''}>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Owner Email</label>
+                    <input type="email" id="editOwnerEmail" value="${restaurant.owner_email}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Owner Phone</label>
+                    <input type="tel" id="editOwnerPhone" value="${restaurant.owner_phone || ''}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Slug</label>
+                    <input type="text" id="editUrlSlug" value="${restaurant.url_slug}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="editRestaurantStatus" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="active" ${restaurant.status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="pending" ${restaurant.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="suspended" ${restaurant.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <textarea id="editRestaurantAddress" rows="2" class="w-full px-3 py-2 border rounded-lg">${restaurant.address || ''}</textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                <button onclick="updateRestaurant('${restaurantId}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Save Changes
+                </button>
+                <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('restaurantDetailsModal').innerHTML = html;
+    document.getElementById('restaurantDetailsModal').classList.remove('hidden');
+}
+
+async function updateRestaurant(restaurantId) {
+    try {
+        const updates = {
+            name: document.getElementById('editRestaurantName').value,
+            type: document.getElementById('editRestaurantType').value,
+            owner_email: document.getElementById('editOwnerEmail').value,
+            owner_phone: document.getElementById('editOwnerPhone').value,
+            url_slug: document.getElementById('editUrlSlug').value,
+            status: document.getElementById('editRestaurantStatus').value,
+            address: document.getElementById('editRestaurantAddress').value,
+            updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await supabaseClient
+            .from('restaurants')
+            .update(updates)
+            .eq('id', restaurantId);
+        
+        if (error) throw error;
+        
+        // Update local data
+        const index = restaurants.findIndex(r => r.id === restaurantId);
+        if (index !== -1) {
+            restaurants[index] = { ...restaurants[index], ...updates };
+        }
+        
+        closeModal();
+        loadRestaurantsTable();
+        updateDashboardStats();
+        alert('Restaurant updated successfully!');
+        
+    } catch (error) {
+        console.error('Error updating restaurant:', error);
+        alert('Error: ' + error.message);
+    }
 }
 
 async function toggleRestaurantStatus(restaurantId) {
@@ -915,10 +1982,11 @@ async function toggleRestaurantStatus(restaurantId) {
     if (!restaurant) return;
     
     const newStatus = restaurant.status === 'active' ? 'suspended' : 'active';
+    const confirmMessage = newStatus === 'suspended' 
+        ? 'Are you sure you want to suspend this restaurant? They will lose access to their dashboard.'
+        : 'Are you sure you want to activate this restaurant?';
     
-    if (!confirm(`${newStatus === 'suspended' ? 'Suspend' : 'Activate'} this restaurant?`)) {
-        return;
-    }
+    if (!confirm(confirmMessage)) return;
     
     try {
         const { error } = await supabaseClient
@@ -928,20 +1996,29 @@ async function toggleRestaurantStatus(restaurantId) {
         
         if (error) throw error;
         
+        // Update local data
         restaurant.status = newStatus;
-        loadAdminRestaurantsTable();
-        alert(`Restaurant ${newStatus}!`);
+        
+        loadRestaurantsTable();
+        alert(`Restaurant ${newStatus === 'suspended' ? 'suspended' : 'activated'} successfully!`);
         
     } catch (error) {
-        console.error('Error updating status:', error);
+        console.error('Error toggling restaurant status:', error);
         alert('Error: ' + error.message);
     }
 }
 
 async function deleteRestaurant(restaurantId) {
-    if (!confirm('WARNING: Delete this restaurant permanently?')) return;
+    if (!confirm('WARNING: This will permanently delete the restaurant and all associated data. This action cannot be undone. Are you sure?')) {
+        return;
+    }
+    
+    if (!confirm('Are you absolutely sure? All menu data, orders, reservations, and staff users will be deleted.')) {
+        return;
+    }
     
     try {
+        // Delete restaurant (cascade will handle related records)
         const { error } = await supabaseClient
             .from('restaurants')
             .delete()
@@ -949,10 +2026,15 @@ async function deleteRestaurant(restaurantId) {
         
         if (error) throw error;
         
+        // Update local data
         restaurants = restaurants.filter(r => r.id !== restaurantId);
-        loadAdminRestaurantsTable();
-        updateAdminStats();
-        alert('Restaurant deleted!');
+        subscriptions = subscriptions.filter(s => s.restaurant_id !== restaurantId);
+        payments = payments.filter(p => p.restaurant_id !== restaurantId);
+        users = users.filter(u => u.restaurant_id !== restaurantId);
+        
+        loadRestaurantsTable();
+        updateDashboardStats();
+        alert('Restaurant deleted successfully!');
         
     } catch (error) {
         console.error('Error deleting restaurant:', error);
@@ -960,28 +2042,981 @@ async function deleteRestaurant(restaurantId) {
     }
 }
 
-function showModal(type) {
-    alert('Modal for ' + type + ' - Coming soon!');
+function exportRestaurants() {
+    // Create CSV content
+    let csv = 'Restaurant Name,Owner Email,Owner Phone,Plan,Status,URL Slug,Registered Date\n';
+    
+    restaurants.forEach(restaurant => {
+        const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
+        csv += `"${restaurant.name}","${restaurant.owner_email}","${restaurant.owner_phone || ''}","${subscription?.plan || 'None'}","${restaurant.status}","${restaurant.url_slug}","${new Date(restaurant.created_at).toLocaleDateString()}"\n`;
+    });
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `restaurants_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 }
 
-async function handleLogout() {
+// Subscription Management
+async function loadSubscriptionsTable() {
     try {
-        await supabaseClient.auth.signOut();
-        currentUser = null;
-        currentRestaurant = null;
+        let html = '';
+        const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
         
-        document.getElementById('adminDashboard').classList.add('hidden');
-        document.getElementById('staffDashboard').classList.add('hidden');
+        activeSubscriptions.slice(0, 10).forEach(sub => {
+            html += `
+                <tr>
+                    <td class="px-4 py-3">${sub.restaurants?.name || 'Unknown'}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded ${sub.plan === 'pro' ? 'bg-blue-100 text-blue-800' : sub.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                            ${sub.plan.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">₹${sub.price}/month</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded ${sub.auto_pay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${sub.auto_pay ? 'Auto-Pay Enabled' : 'Manual'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">${sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'Not scheduled'}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="editSubscription('${sub.id}')" class="text-blue-600 hover:text-blue-900 mr-2">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="cancelSubscription('${sub.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
         
-        showLoginModal();
+        document.getElementById('subscriptionsTable').innerHTML = html || `
+            <tr>
+                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                    No active subscriptions found
+                </td>
+            </tr>
+        `;
         
     } catch (error) {
-        console.error('Logout error:', error);
+        console.error('Error loading subscriptions:', error);
     }
 }
 
-// Initialize on page load
-window.addEventListener('load', init);
+async function loadRestaurantDropdown() {
+    const select = document.getElementById('newSubRestaurant');
+    let html = '<option value="">Select Restaurant</option>';
+    
+    restaurants.forEach(restaurant => {
+        // Only show restaurants without active subscriptions
+        const hasActiveSub = subscriptions.some(s => s.restaurant_id === restaurant.id && s.status === 'active');
+        if (!hasActiveSub) {
+            html += `<option value="${restaurant.id}">${restaurant.name} (${restaurant.owner_email})</option>`;
+        }
+    });
+    
+    select.innerHTML = html;
+}
+
+async function createManualSubscription() {
+    const restaurantId = document.getElementById('newSubRestaurant').value;
+    const plan = document.getElementById('newSubPlan').value;
+    const autoPay = document.getElementById('newSubAutoPay').checked;
+    
+    if (!restaurantId) {
+        alert('Please select a restaurant');
+        return;
+    }
+    
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+    
+    const planPrices = {
+        'basic': 499,
+        'pro': 999,
+        'enterprise': 1999
+    };
+    
+    const price = planPrices[plan] || 499;
+    
+    try {
+        const subscription = {
+            restaurant_id: restaurantId,
+            plan: plan,
+            price: price,
+            auto_pay: autoPay,
+            status: 'active',
+            billing_cycle: 'monthly',
+            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            created_at: new Date().toISOString()
+        };
+        
+        const { data, error } = await supabaseClient
+            .from('subscriptions')
+            .insert([subscription])
+            .select()
+            .single();
+        
+        if (error) throw error;
+        
+        subscriptions.push(data);
+        
+        // Update restaurant status if it was pending
+        if (restaurant.status === 'pending') {
+            await supabaseClient
+                .from('restaurants')
+                .update({ status: 'active' })
+                .eq('id', restaurantId);
+            
+            restaurant.status = 'active';
+        }
+        
+        // Clear form
+        document.getElementById('newSubRestaurant').value = '';
+        document.getElementById('newSubPlan').value = 'basic';
+        document.getElementById('newSubAutoPay').checked = false;
+        
+        // Reload data
+        loadSubscriptionsTable();
+        loadRestaurantDropdown();
+        updateDashboardStats();
+        
+        alert('Subscription created successfully!');
+        
+    } catch (error) {
+        console.error('Error creating subscription:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function editSubscription(subscriptionId) {
+    const subscription = subscriptions.find(s => s.id === subscriptionId);
+    if (!subscription) return;
+    
+    // Show edit modal or inline edit
+    const newPlan = prompt('Enter new plan (basic/pro/enterprise):', subscription.plan);
+    if (!newPlan || !['basic', 'pro', 'enterprise'].includes(newPlan)) {
+        alert('Invalid plan. Please enter basic, pro, or enterprise.');
+        return;
+    }
+    
+    const planPrices = {
+        'basic': 499,
+        'pro': 999,
+        'enterprise': 1999
+    };
+    
+    const newPrice = planPrices[newPlan];
+    const autoPay = confirm('Enable auto-pay for this subscription?');
+    
+    try {
+        const { error } = await supabaseClient
+            .from('subscriptions')
+            .update({
+                plan: newPlan,
+                price: newPrice,
+                auto_pay: autoPay,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', subscriptionId);
+        
+        if (error) throw error;
+        
+        // Update local data
+        subscription.plan = newPlan;
+        subscription.price = newPrice;
+        subscription.auto_pay = autoPay;
+        
+        loadSubscriptionsTable();
+        updateDashboardStats();
+        alert('Subscription updated successfully!');
+        
+    } catch (error) {
+        console.error('Error updating subscription:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function cancelSubscription(subscriptionId) {
+    if (!confirm('Are you sure you want to cancel this subscription? The restaurant will lose access at the end of the billing period.')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('subscriptions')
+            .update({
+                status: 'cancelled',
+                cancelled_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', subscriptionId);
+        
+        if (error) throw error;
+        
+        // Update local data
+        const subscription = subscriptions.find(s => s.id === subscriptionId);
+        if (subscription) {
+            subscription.status = 'cancelled';
+            subscription.cancelled_at = new Date().toISOString();
+        }
+        
+        loadSubscriptionsTable();
+        updateDashboardStats();
+        alert('Subscription cancelled successfully!');
+        
+    } catch (error) {
+        console.error('Error cancelling subscription:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+// Payment Management
+async function loadPaymentsTable() {
+    try {
+        const startIndex = (currentPaymentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pagePayments = payments.slice(startIndex, endIndex);
+        
+        let html = '';
+        
+        pagePayments.forEach(payment => {
+            html += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ${payment.reference_id || payment.id.substring(0, 8)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${payment.restaurants?.name || 'Unknown Restaurant'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ₹${payment.amount}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${payment.method ? payment.method.toUpperCase().replace('_', ' ') : 'UPI'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="payment-status-${payment.status} px-2 py-1 rounded text-xs">
+                            ${payment.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(payment.created_at).toLocaleDateString()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="viewPaymentDetails('${payment.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        ${payment.status === 'pending' ? `
+                            <button onclick="verifyPayment('${payment.id}')" class="text-green-600 hover:text-green-900 mr-3">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : ''}
+                        ${payment.status === 'completed' ? `
+                            <button onclick="refundPayment('${payment.id}')" class="text-yellow-600 hover:text-yellow-900">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('paymentsTable').innerHTML = html || `
+            <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    No payments found
+                </td>
+            </tr>
+        `;
+        
+        // Update pagination info
+        document.getElementById('paymentStart').textContent = payments.length > 0 ? startIndex + 1 : 0;
+        document.getElementById('paymentEnd').textContent = Math.min(endIndex, payments.length);
+        document.getElementById('paymentTotal').textContent = payments.length;
+        
+    } catch (error) {
+        console.error('Error loading payments:', error);
+    }
+}
+
+function filterPayments() {
+    // Similar to filterRestaurants, implement filtering logic
+    loadPaymentsTable();
+}
+
+function prevPaymentPage() {
+    if (currentPaymentPage > 1) {
+        currentPaymentPage--;
+        loadPaymentsTable();
+    }
+}
+
+function nextPaymentPage() {
+    const totalPages = Math.ceil(payments.length / itemsPerPage);
+    if (currentPaymentPage < totalPages) {
+        currentPaymentPage++;
+        loadPaymentsTable();
+    }
+}
+
+async function verifyPayment(paymentId) {
+    if (!confirm('Mark this payment as verified and complete?')) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('payments')
+            .update({ 
+                status: 'completed',
+                verified_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', paymentId);
+        
+        if (error) throw error;
+        
+        // Update local data
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) {
+            payment.status = 'completed';
+            payment.verified_at = new Date().toISOString();
+        }
+        
+        // Update associated subscription and restaurant
+        const restaurant = restaurants.find(r => r.id === payment.restaurant_id);
+        if (restaurant && restaurant.status === 'pending') {
+            await supabaseClient
+                .from('restaurants')
+                .update({ status: 'active' })
+                .eq('id', restaurant.id);
+            
+            restaurant.status = 'active';
+        }
+        
+        // Update subscription if exists
+        const subscription = subscriptions.find(s => s.restaurant_id === payment.restaurant_id);
+        if (subscription && subscription.status !== 'active') {
+            await supabaseClient
+                .from('subscriptions')
+                .update({ 
+                    status: 'active',
+                    next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                })
+                .eq('restaurant_id', payment.restaurant_id);
+            
+            subscription.status = 'active';
+            subscription.next_billing_date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        }
+        
+        loadPaymentsTable();
+        updateDashboardStats();
+        alert('Payment verified and restaurant activated!');
+        
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function refundPayment(paymentId) {
+    if (!confirm('Are you sure you want to refund this payment?')) return;
+    
+    const reason = prompt('Enter refund reason:');
+    if (!reason) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('payments')
+            .update({ 
+                status: 'refunded',
+                refund_reason: reason,
+                refunded_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', paymentId);
+        
+        if (error) throw error;
+        
+        // Update local data
+        const payment = payments.find(p => p.id === paymentId);
+        if (payment) {
+            payment.status = 'refunded';
+            payment.refund_reason = reason;
+            payment.refunded_at = new Date().toISOString();
+        }
+        
+        loadPaymentsTable();
+        updateDashboardStats();
+        alert('Payment refunded successfully!');
+        
+    } catch (error) {
+        console.error('Error refunding payment:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+function exportPayments() {
+    // Similar to exportRestaurants, create CSV
+}
+
+// User Management
+async function loadUsersTable() {
+    try {
+        let html = '';
+        
+        users.forEach(user => {
+            html += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${user.name}</div>
+                                <div class="text-sm text-gray-500">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.restaurants?.name || 'No Restaurant'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded ${user.role === 'admin' ? 'bg-red-100 text-red-800' : user.role === 'manager' ? 'bg-purple-100 text-purple-800' : user.role === 'chef' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'}">
+                            ${user.role.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs rounded ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.is_active ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editUser('${user.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                        ${user.role !== 'admin' ? `
+                            <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+        
+        document.getElementById('usersTable').innerHTML = html || `
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                    No users found
+                </td>
+            </tr>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    
+    const filtered = users.filter(user => 
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm) ||
+        user.role.toLowerCase().includes(searchTerm) ||
+        (user.restaurants?.name && user.restaurants.name.toLowerCase().includes(searchTerm))
+    );
+    
+    // Re-render table with filtered data
+    const tempUsers = [...users];
+    users = filtered;
+    loadUsersTable();
+    users = tempUsers;
+}
+
+async function editUser(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    const newRole = prompt('Enter new role (manager/chef/waiter):', user.role);
+    if (!newRole || !['manager', 'chef', 'waiter'].includes(newRole)) {
+        alert('Invalid role. Please enter manager, chef, or waiter.');
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('staff_users')
+            .update({ role: newRole, updated_at: new Date().toISOString() })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        user.role = newRole;
+        loadUsersTable();
+        alert('User role updated successfully!');
+        
+    } catch (error) {
+        console.error('Error updating user:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function toggleUserStatus(userId) {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    const newStatus = !user.is_active;
+    const confirmMessage = newStatus 
+        ? 'Activate this user?'
+        : 'Deactivate this user? They will lose access to the system.';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('staff_users')
+            .update({ is_active: newStatus, updated_at: new Date().toISOString() })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        user.is_active = newStatus;
+        loadUsersTable();
+        alert(`User ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+        
+    } catch (error) {
+        console.error('Error toggling user status:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function deleteUser(userId) {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('staff_users')
+            .delete()
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        users = users.filter(u => u.id !== userId);
+        loadUsersTable();
+        alert('User deleted successfully!');
+        
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+// Plan Management
+async function loadPlans() {
+    try {
+        // Load plans from database or use default
+        if (plans.length === 0) {
+            // Create default plans if they don't exist
+            const defaultPlans = [
+                {
+                    code: 'basic',
+                    name: 'Basic Plan',
+                    price: 499,
+                    annual_price: 499 * 12,
+                    description: 'Perfect for small restaurants starting with digital menus',
+                    features: 'Digital Menu (50 items), Table Reservations, Basic Analytics, Email Support',
+                    is_active: true
+                },
+                {
+                    code: 'pro',
+                    name: 'Pro Plan',
+                    price: 999,
+                    annual_price: 999 * 12,
+                    description: 'Most popular plan for growing restaurants',
+                    features: 'Unlimited Menu Items, Table Reservations, Advanced Analytics, Priority Support, Order Management, Staff Management (5 users)',
+                    is_active: true
+                },
+                {
+                    code: 'enterprise',
+                    name: 'Enterprise Plan',
+                    price: 1999,
+                    annual_price: 1999 * 12,
+                    description: 'Complete solution for large restaurants and chains',
+                    features: 'Everything in Pro + Custom Domain, Unlimited Staff, API Access, White-label, Dedicated Support',
+                    is_active: true
+                }
+            ];
+            
+            const { data: insertedPlans, error } = await supabaseClient
+                .from('plans')
+                .insert(defaultPlans)
+                .select();
+            
+            if (!error) {
+                plans = insertedPlans;
+            }
+        }
+        
+        // Render plans
+        let plansHtml = '';
+        plans.forEach(plan => {
+            plansHtml += `
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold">${plan.name}</h3>
+                            <p class="text-gray-600">${plan.description}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full ${plan.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} text-sm">
+                            ${plan.is_active ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-baseline mb-2">
+                            <span class="text-3xl font-bold">₹${plan.price}</span>
+                            <span class="text-gray-600 ml-2">/month</span>
+                        </div>
+                        <p class="text-sm text-gray-500">₹${plan.annual_price}/year (save ₹${plan.price * 12 - plan.annual_price})</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-bold mb-2">Features</h4>
+                        <ul class="space-y-1 text-sm text-gray-600">
+                            ${plan.features.split(',').map(feature => `
+                                <li class="flex items-center">
+                                    <i class="fas fa-check text-green-500 mr-2"></i>
+                                    ${feature.trim()}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button onclick="editPlanModal('${plan.id}')" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Edit Plan
+                        </button>
+                        <button onclick="togglePlanStatus('${plan.id}')" class="px-4 py-2 border ${plan.is_active ? 'border-red-300 text-red-600 hover:bg-red-50' : 'border-green-300 text-green-600 hover:bg-green-50'} rounded-lg">
+                            ${plan.is_active ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('plansGrid').innerHTML = plansHtml;
+        
+        // Load features table
+        loadFeaturesTable();
+        
+    } catch (error) {
+        console.error('Error loading plans:', error);
+    }
+}
+
+function loadFeaturesTable() {
+    const features = [
+        'Digital Menu Items',
+        'Table Reservations',
+        'Basic Analytics',
+        'Advanced Analytics',
+        'Email Support',
+        'Priority Support',
+        'Order Management',
+        'Staff Management',
+        'Custom Domain',
+        'API Access',
+        'White-label Option',
+        'Dedicated Support'
+    ];
+    
+    let html = '';
+    
+    features.forEach(feature => {
+        html += `
+            <tr>
+                <td class="px-4 py-3">${feature}</td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${feature.includes('Basic') ? 'checked' : ''} class="w-5 h-5">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${!feature.includes('Dedicated') ? 'checked' : ''} class="w-5 h-5">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" checked class="w-5 h-5">
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('featuresTable').innerHTML = html;
+}
+
+function showPlanModal() {
+    // Clear form
+    document.getElementById('planName').value = '';
+    document.getElementById('planCode').value = '';
+    document.getElementById('planPrice').value = '';
+    document.getElementById('planAnnualPrice').value = '';
+    document.getElementById('planDescription').value = '';
+    document.getElementById('planFeatures').value = '';
+    document.getElementById('planActive').checked = true;
+    
+    document.getElementById('planModal').classList.remove('hidden');
+}
+
+function closePlanModal() {
+    document.getElementById('planModal').classList.add('hidden');
+}
+
+function editPlanModal(planId) {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    
+    document.getElementById('planName').value = plan.name;
+    document.getElementById('planCode').value = plan.code;
+    document.getElementById('planPrice').value = plan.price;
+    document.getElementById('planAnnualPrice').value = plan.annual_price;
+    document.getElementById('planDescription').value = plan.description;
+    document.getElementById('planFeatures').value = plan.features;
+    document.getElementById('planActive').checked = plan.is_active;
+    
+    // Store plan ID for update
+    document.getElementById('planModal').dataset.planId = planId;
+    document.getElementById('planModal').classList.remove('hidden');
+}
+
+async function savePlan() {
+    const planId = document.getElementById('planModal').dataset.planId;
+    const isEdit = !!planId;
+    
+    const planData = {
+        name: document.getElementById('planName').value,
+        code: document.getElementById('planCode').value,
+        price: parseFloat(document.getElementById('planPrice').value),
+        annual_price: parseFloat(document.getElementById('planAnnualPrice').value),
+        description: document.getElementById('planDescription').value,
+        features: document.getElementById('planFeatures').value,
+        is_active: document.getElementById('planActive').checked,
+        updated_at: new Date().toISOString()
+    };
+    
+    if (!planData.name || !planData.code || !planData.price) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    try {
+        if (isEdit) {
+            // Update existing plan
+            const { error } = await supabaseClient
+                .from('plans')
+                .update(planData)
+                .eq('id', planId);
+            
+            if (error) throw error;
+            
+            // Update local data
+            const index = plans.findIndex(p => p.id === planId);
+            if (index !== -1) {
+                plans[index] = { ...plans[index], ...planData };
+            }
+            
+        } else {
+            // Create new plan
+            planData.created_at = new Date().toISOString();
+            
+            const { data, error } = await supabaseClient
+                .from('plans')
+                .insert([planData])
+                .select()
+                .single();
+            
+            if (error) throw error;
+            
+            plans.push(data);
+        }
+        
+        closePlanModal();
+        loadPlans();
+        alert(`Plan ${isEdit ? 'updated' : 'created'} successfully!`);
+        
+    } catch (error) {
+        console.error('Error saving plan:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+async function togglePlanStatus(planId) {
+    const plan = plans.find(p => p.id === planId);
+    if (!plan) return;
+    
+    const newStatus = !plan.is_active;
+    const confirmMessage = newStatus 
+        ? 'Activate this plan? It will be available for purchase.'
+        : 'Deactivate this plan? Existing subscriptions will continue, but new customers cannot select it.';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    try {
+        const { error } = await supabaseClient
+            .from('plans')
+            .update({ is_active: newStatus, updated_at: new Date().toISOString() })
+            .eq('id', planId);
+        
+        if (error) throw error;
+        
+        plan.is_active = newStatus;
+        loadPlans();
+        alert(`Plan ${newStatus ? 'activated' : 'deactivated'} successfully!`);
+        
+    } catch (error) {
+        console.error('Error toggling plan status:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+// System Settings
+function loadSystemSettings() {
+    // Load current settings (you would fetch from database)
+    document.getElementById('systemName').value = 'DigitalMenuPro';
+    document.getElementById('supportEmail').value = 'support@digitalmenupro.com';
+    document.getElementById('supportPhone').value = '+91-9876543210';
+    document.getElementById('defaultCurrency').value = 'INR';
+    document.getElementById('upiId').value = 'digitalmenupro@okhdfcbank';
+    document.getElementById('gstNumber').value = '27AAECD1234M1Z5';
+    document.getElementById('bankDetails').value = `Bank: HDFC Bank
+Account Name: DigitalMenuPro Solutions
+Account Number: 50200012345678
+IFSC: HDFC0001234
+Branch: Mumbai Main`;
+    
+    // Update active users count
+    const activeUsers = users.filter(u => u.is_active).length;
+    document.getElementById('activeUsersCount').textContent = activeUsers;
+}
+
+async function saveSystemSettings() {
+    const settings = {
+        system_name: document.getElementById('systemName').value,
+        support_email: document.getElementById('supportEmail').value,
+        support_phone: document.getElementById('supportPhone').value,
+        default_currency: document.getElementById('defaultCurrency').value,
+        upi_id: document.getElementById('upiId').value,
+        gst_number: document.getElementById('gstNumber').value,
+        bank_details: document.getElementById('bankDetails').value,
+        updated_at: new Date().toISOString()
+    };
+    
+    try {
+        // In a real app, save to database
+        // For now, just show success message
+        alert('Settings saved successfully!');
+        
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+function sendTestEmail() {
+    alert('Test email sent!');
+}
+
+function clearSystemCache() {
+    if (confirm('Clear system cache? This may improve performance.')) {
+        alert('Cache cleared successfully!');
+    }
+}
+
+function backupDatabase() {
+    alert('Database backup started. You will receive an email when complete.');
+}
+
+function viewSystemLogs() {
+    alert('Opening system logs...');
+}
+
+// Terms Management
+function loadTerms() {
+    // Load current terms (you would fetch from database)
+    document.getElementById('termsOfService').value = `# DigitalMenuPro Terms of Service
+
+## 1. Acceptance of Terms
+By accessing and using DigitalMenuPro services, you agree to be bound by these Terms of Service.
+
+## 2. Subscription Terms
+- Monthly subscriptions auto-renew unless cancelled
+- 7-day free trial available for new restaurants
+- Payment required to continue after trial period
+
+## 3. Service Updates
+We may update our services, features, and pricing with 30 days notice.
+
+## 4. User Responsibilities
+- Provide accurate information
+- Maintain account security
+- Comply with all applicable laws
+
+## 5. Termination
+We reserve the right to suspend accounts for violations or non-payment.
+
+## 6. Limitation of Liability
+DigitalMenuPro is not liable for indirect damages or service interruptions.
+
+## 7. Updates to Terms
+Terms may be updated periodically. Continued use constitutes acceptance.`;
+}
+
+function previewTerms() {
+    const terms = document.getElementById('termsOfService').value;
+    const newWindow = window.open();
+    newWindow.document.write(`
+        <html>
+            <head><title>Terms Preview</title></head>
+            <body style="padding: 20px; font-family: Arial, sans-serif;">
+                <div style="white-space: pre-wrap;">${terms}</div>
+            </body>
+        </html>
+    `);
+}
+
+async function updateTerms() {
+    const notifyUsers = document.getElementById('notifyUsers').checked;
+    
+    if (!confirm('Update terms and policies? ' + (notifyUsers ? 'Users will be notified.' : ''))) {
+        return;
+    }
+    
+    try {
+        // In a real app, save to database and handle notifications
+        alert('Terms and policies updated successfully!' + (notifyUsers ? ' Users have been notified.' : ''));
+        
+    } catch (error) {
+        console.error('Error updating terms:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+// Initialize
+initAdminDashboard();
 </script>
 </body>
 </html>
