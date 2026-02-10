@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - DigitalMenuPro</title>
+    <title>DigitalMenuPro - Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         .sidebar {
             transition: all 0.3s ease;
@@ -25,20 +26,12 @@
             display: none;
         }
         
-        .main-content {
-            transition: all 0.3s ease;
-        }
-        
         .stat-card {
             transition: all 0.3s ease;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
-        }
-        
-        .restaurant-row:hover {
-            background-color: #f8fafc;
         }
         
         .status-badge {
@@ -80,774 +73,319 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="hidden flex min-h-screen">
-        <!-- Sidebar -->
-        <div id="sidebar" class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 flex flex-col">
-            <!-- Logo -->
-            <div class="p-6 border-b border-gray-700">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-shield-alt text-xl"></i>
-                    </div>
-                    <div class="ml-3 logo-text">
-                        <h1 class="text-xl font-bold">Admin Panel</h1>
-                        <p class="text-xs text-gray-400">DigitalMenuPro</p>
-                    </div>
-                </div>
+
+<!-- Loading Screen -->
+<div id="loadingScreen" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-8 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-gray-600">Loading dashboard...</p>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                <i class="fas fa-shield-alt text-white text-2xl"></i>
             </div>
+            <h3 class="text-2xl font-bold text-gray-800">Dashboard Login</h3>
+            <p class="text-gray-600 mt-2">Access your management panel</p>
+        </div>
+        
+        <div class="space-y-4">
+            <input type="email" id="loginEmail" placeholder="Email Address" 
+                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input type="password" id="loginPassword" placeholder="Password" 
+                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <button onclick="handleLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
+                Login
+            </button>
             
-            <!-- Navigation -->
-            <nav class="flex-1 p-4">
-                <ul class="space-y-2">
-                    <li>
-                        <a href="#" onclick="showView('dashboard')" class="flex items-center p-3 rounded-lg hover:bg-gray-700 active-nav">
-                            <i class="fas fa-tachometer-alt w-6"></i>
-                            <span class="ml-3 sidebar-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('restaurants')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-utensils w-6"></i>
-                            <span class="ml-3 sidebar-text">Restaurants</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('subscriptions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-credit-card w-6"></i>
-                            <span class="ml-3 sidebar-text">Subscriptions</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('payments')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-rupee-sign w-6"></i>
-                            <span class="ml-3 sidebar-text">Payments</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('users')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-users w-6"></i>
-                            <span class="ml-3 sidebar-text">All Users</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('plans')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-cubes w-6"></i>
-                            <span class="ml-3 sidebar-text">Plan Management</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('settings')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-cog w-6"></i>
-                            <span class="ml-3 sidebar-text">System Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="showView('terms')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-file-contract w-6"></i>
-                            <span class="ml-3 sidebar-text">Terms & Policies</span>
-                        </a>
-                    </li>
-                </ul>
-                
-                <!-- Admin Profile -->
-                <div class="mt-8 p-4 border-t border-gray-700">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="ml-3 sidebar-text">
-                            <p class="font-medium" id="adminName">Super Admin</p>
-                            <p class="text-xs text-gray-400" id="adminEmail">admin@royalkitchen.com</p>
-                        </div>
-                    </div>
+            <p class="text-sm text-gray-500 text-center mt-4">
+                <i class="fas fa-info-circle mr-1"></i>
+                Super Admin: admin@royalkitchen.com
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- SUPER ADMIN DASHBOARD -->
+<div id="adminDashboard" class="hidden flex min-h-screen">
+    <!-- Admin Sidebar -->
+    <div id="adminSidebar" class="sidebar bg-gradient-to-b from-gray-900 to-gray-800 text-white w-64 flex flex-col">
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-xl"></i>
                 </div>
-            </nav>
-            
-            <!-- Toggle Sidebar -->
-            <div class="p-4 border-t border-gray-700">
-                <button onclick="toggleSidebar()" class="flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-chevron-left"></i>
-                    <span class="ml-3 sidebar-text">Collapse Sidebar</span>
-                </button>
+                <div class="ml-3 logo-text">
+                    <h1 class="text-xl font-bold">Super Admin</h1>
+                    <p class="text-xs text-gray-400">DigitalMenuPro</p>
+                </div>
             </div>
         </div>
         
-        <!-- Main Content -->
-        <div id="mainContent" class="main-content flex-1">
-            <!-- Top Bar -->
-            <header class="bg-white shadow-sm border-b px-6 py-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800" id="viewTitle">Admin Dashboard</h2>
-                        <p class="text-sm text-gray-600" id="viewSubtitle">System Overview & Analytics</p>
+        <nav class="flex-1 p-4">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" onclick="showAdminView('dashboard')" class="flex items-center p-3 rounded-lg hover:bg-gray-700 bg-gray-700">
+                        <i class="fas fa-tachometer-alt w-6"></i>
+                        <span class="ml-3 sidebar-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAdminView('restaurants')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-utensils w-6"></i>
+                        <span class="ml-3 sidebar-text">Restaurants</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAdminView('subscriptions')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-credit-card w-6"></i>
+                        <span class="ml-3 sidebar-text">Subscriptions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAdminView('payments')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-rupee-sign w-6"></i>
+                        <span class="ml-3 sidebar-text">Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="showAdminView('users')" class="flex items-center p-3 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="ml-3 sidebar-text">All Users</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="mt-8 p-4 border-t border-gray-700">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield"></i>
                     </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <!-- Notifications -->
-                        <div class="relative">
-                            <button onclick="toggleNotifications()" class="p-2 rounded-full hover:bg-gray-100 relative">
-                                <i class="fas fa-bell text-gray-600"></i>
-                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-                            <div id="notificationsPanel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 border">
-                                <div class="p-4 border-b">
-                                    <h3 class="font-bold">Notifications</h3>
-                                </div>
-                                <div class="max-h-96 overflow-y-auto">
-                                    <div id="notificationsList" class="p-4 space-y-3">
-                                        <!-- Notifications will be loaded here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Search -->
-                        <div class="relative">
-                            <input type="text" id="globalSearch" placeholder="Search..." 
-                                   class="pl-10 pr-4 py-2 border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                        
-                        <!-- Logout -->
-                        <button onclick="adminLogout()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                        </button>
+                    <div class="ml-3 sidebar-text">
+                        <p class="font-medium" id="adminName">Super Admin</p>
+                        <p class="text-xs text-gray-400" id="adminEmail">admin@royalkitchen.com</p>
                     </div>
                 </div>
-            </header>
-            
-            <!-- Content Area -->
-            <main class="p-6">
-                <!-- Dashboard View -->
-                <div id="viewDashboard" class="view space-y-6">
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm">Total Restaurants</p>
-                                    <p class="text-3xl font-bold" id="totalRestaurants">0</p>
-                                </div>
-                                <i class="fas fa-utensils text-4xl text-blue-500"></i>
+            </div>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-700">
+            <button onclick="handleLogout()" class="flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="ml-3 sidebar-text">Logout</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Admin Main Content -->
+    <div class="flex-1">
+        <header class="bg-white shadow-sm border-b px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800" id="adminViewTitle">Super Admin Dashboard</h2>
+                    <p class="text-sm text-gray-600">Manage all restaurants and system</p>
+                </div>
+            </div>
+        </header>
+        
+        <main class="p-6">
+            <!-- Admin Dashboard View -->
+            <div id="adminViewDashboard" class="admin-view">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Restaurants</p>
+                                <p class="text-3xl font-bold" id="adminTotalRestaurants">0</p>
                             </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 12%</span>
-                                    <span class="text-gray-500 ml-2">from last month</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm">Active Subscriptions</p>
-                                    <p class="text-3xl font-bold" id="activeSubscriptions">0</p>
-                                </div>
-                                <i class="fas fa-credit-card text-4xl text-green-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 8%</span>
-                                    <span class="text-gray-500 ml-2">from last month</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm">Monthly Revenue</p>
-                                    <p class="text-3xl font-bold" id="monthlyRevenue">₹0</p>
-                                </div>
-                                <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-green-600"><i class="fas fa-arrow-up mr-1"></i> 15%</span>
-                                    <span class="text-gray-500 ml-2">from last month</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card bg-white rounded-xl shadow-lg p-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-gray-600 text-sm">Pending Payments</p>
-                                    <p class="text-3xl font-bold" id="pendingPayments">0</p>
-                                </div>
-                                <i class="fas fa-clock text-4xl text-yellow-500"></i>
-                            </div>
-                            <div class="mt-4">
-                                <div class="flex text-sm">
-                                    <span class="text-red-600"><i class="fas fa-arrow-down mr-1"></i> 3%</span>
-                                    <span class="text-gray-500 ml-2">from last month</span>
-                                </div>
-                            </div>
+                            <i class="fas fa-utensils text-4xl text-blue-500"></i>
                         </div>
                     </div>
                     
-                    <!-- Charts -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Revenue Trend</h3>
-                            <div class="h-80">
-                                <canvas id="revenueChart"></canvas>
+                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Active Subscriptions</p>
+                                <p class="text-3xl font-bold" id="adminActiveSubscriptions">0</p>
                             </div>
-                        </div>
-                        
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Plan Distribution</h3>
-                            <div class="h-80">
-                                <canvas id="planChart"></canvas>
-                            </div>
+                            <i class="fas fa-credit-card text-4xl text-green-500"></i>
                         </div>
                     </div>
                     
-                    <!-- Recent Activities -->
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold">Recent Activities</h3>
-                            <button onclick="loadActivities()" class="text-sm text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-sync-alt mr-1"></i> Refresh
-                            </button>
+                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Monthly Revenue</p>
+                                <p class="text-3xl font-bold" id="adminMonthlyRevenue">₹0</p>
+                            </div>
+                            <i class="fas fa-rupee-sign text-4xl text-purple-500"></i>
                         </div>
-                        <div id="activitiesList" class="space-y-4">
-                            <!-- Activities will be loaded here -->
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Users</p>
+                                <p class="text-3xl font-bold" id="adminTotalUsers">0</p>
+                            </div>
+                            <i class="fas fa-users text-4xl text-yellow-500"></i>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Restaurants View -->
-                <div id="viewRestaurants" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">Restaurant Management</h2>
-                            <p class="text-gray-600">Manage all registered restaurants</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <input type="text" id="restaurantSearch" placeholder="Search restaurants..." 
-                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterRestaurants()">
-                            <button onclick="exportRestaurants()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-download mr-2"></i>Export
-                            </button>
-                        </div>
+                <!-- Recent Activities -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+                    <h3 class="text-lg font-bold mb-4">Recent Activities</h3>
+                    <div id="adminActivitiesList" class="space-y-4">
+                        <!-- Activities will be loaded here -->
                     </div>
-                    
-                    <!-- Filters -->
-                    <div class="bg-white rounded-lg shadow p-4 mb-6">
-                        <div class="flex flex-wrap gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select id="statusFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="suspended">Suspended</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
-                                <select id="planFilter" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Plans</option>
-                                    <option value="basic">Basic</option>
-                                    <option value="pro">Pro</option>
-                                    <option value="enterprise">Enterprise</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                                <input type="date" id="dateFrom" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                                <span class="mx-2">to</span>
-                                <input type="date" id="dateTo" onchange="filterRestaurants()" class="px-3 py-2 border rounded-lg">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Restaurants Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                </div>
+            </div>
+            
+            <!-- Admin Restaurants View -->
+            <div id="adminViewRestaurants" class="admin-view hidden">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold mb-4">All Restaurants</h3>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                                <thead>
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL Slug</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Restaurant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="restaurantsTable" class="bg-white divide-y divide-gray-200">
+                                <tbody id="adminRestaurantsTable" class="divide-y divide-gray-200">
                                     <!-- Restaurants will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
-                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-                            <div class="text-sm text-gray-500">
-                                Showing <span id="restaurantStart">0</span> to <span id="restaurantEnd">0</span> of <span id="restaurantTotal">0</span> restaurants
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="prevRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button onclick="nextRestaurantPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                
-                <!-- Subscriptions View -->
-                <div id="viewSubscriptions" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">Subscription Management</h2>
-                            <p class="text-gray-600">Manage all subscription plans and billing</p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Subscription Stats -->
-                        <div class="col-span-2 bg-white rounded-xl shadow-lg p-6">
-                            <h3 class="text-lg font-bold mb-4">Active Subscriptions</h3>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <tr>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Restaurant</th>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Plan</th>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Price</th>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Auto-Pay</th>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Next Billing</th>
-                                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="subscriptionsTable" class="divide-y divide-gray-200">
-                                        <!-- Subscriptions will be loaded here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Subscription Actions -->
-                        <div class="space-y-6">
-                            <!-- Create Manual Subscription -->
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Create Subscription</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Restaurant</label>
-                                        <select id="newSubRestaurant" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="">Select Restaurant</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Plan</label>
-                                        <select id="newSubPlan" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="basic">Basic - ₹499/month</option>
-                                            <option value="pro">Pro - ₹999/month</option>
-                                            <option value="enterprise">Enterprise - ₹1,999/month</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="flex items-center">
-                                            <input type="checkbox" id="newSubAutoPay" class="mr-2">
-                                            <span>Enable Auto-Pay</span>
-                                        </label>
-                                    </div>
-                                    <button onclick="createManualSubscription()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                        Create Subscription
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Subscription Stats -->
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Subscription Stats</h3>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Total Active</span>
-                                        <span class="font-bold" id="totalActiveSubs">0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Monthly MRR</span>
-                                        <span class="font-bold" id="monthlyMRR">₹0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Annual Projection</span>
-                                        <span class="font-bold" id="annualProjection">₹0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Churn Rate</span>
-                                        <span class="font-bold text-green-600" id="churnRate">0%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Payments View -->
-                <div id="viewPayments" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">Payment Management</h2>
-                            <p class="text-gray-600">View and manage all payment transactions</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <input type="text" id="paymentSearch" placeholder="Search payments..." 
-                                   class="px-4 py-2 border rounded-lg w-64" oninput="filterPayments()">
-                            <button onclick="exportPayments()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-download mr-2"></i>Export
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Filters -->
-                    <div class="bg-white rounded-lg shadow p-4 mb-6">
-                        <div class="flex flex-wrap gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select id="paymentStatusFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Status</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="failed">Failed</option>
-                                    <option value="refunded">Refunded</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Method</label>
-                                <select id="paymentMethodFilter" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
-                                    <option value="">All Methods</option>
-                                    <option value="upi_qr">UPI QR</option>
-                                    <option value="upi_id">UPI ID</option>
-                                    <option value="card">Card</option>
-                                    <option value="bank_transfer">Bank Transfer</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-                                <div class="flex items-center">
-                                    <input type="date" id="paymentDateFrom" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
-                                    <span class="mx-2">to</span>
-                                    <input type="date" id="paymentDateTo" onchange="filterPayments()" class="px-3 py-2 border rounded-lg">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Payments Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="paymentsTable" class="bg-white divide-y divide-gray-200">
-                                    <!-- Payments will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-                            <div class="text-sm text-gray-500">
-                                Showing <span id="paymentStart">0</span> to <span id="paymentEnd">0</span> of <span id="paymentTotal">0</span> payments
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="prevPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button onclick="nextPaymentPage()" class="px-3 py-1 border rounded-lg hover:bg-gray-50">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Payment Statistics -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Total Revenue</p>
-                                <p class="text-2xl font-bold" id="totalRevenue">₹0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Successful Payments</p>
-                                <p class="text-2xl font-bold" id="successfulPayments">0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Pending Verification</p>
-                                <p class="text-2xl font-bold" id="pendingVerifications">0</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6">
-                            <div class="text-center">
-                                <p class="text-gray-600 text-sm">Average Transaction</p>
-                                <p class="text-2xl font-bold" id="averageTransaction">₹0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- All Users View -->
-                <div id="viewUsers" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">User Management</h2>
-                            <p class="text-gray-600">Manage all system users across restaurants</p>
-                        </div>
-                        <input type="text" id="userSearch" placeholder="Search users..." 
-                               class="px-4 py-2 border rounded-lg w-64" oninput="filterUsers()">
-                    </div>
-                    
-                    <!-- Users Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restaurant</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTable" class="bg-white divide-y divide-gray-200">
-                                    <!-- Users will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Plan Management View -->
-                <div id="viewPlans" class="view hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold">Plan Management</h2>
-                            <p class="text-gray-600">Configure subscription plans and pricing</p>
-                        </div>
-                        <button onclick="showPlanModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                            <i class="fas fa-plus mr-2"></i>Add New Plan
-                        </button>
-                    </div>
-                    
-                    <!-- Plans Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plansGrid">
-                        <!-- Plans will be loaded here -->
-                    </div>
-                </div>
-                
-                <!-- System Settings View -->
-                <div id="viewSettings" class="view hidden">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold">System Settings</h2>
-                        <p class="text-gray-600">Configure system-wide settings and preferences</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- General Settings -->
-                        <div class="col-span-2 space-y-6">
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">General Settings</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">System Name</label>
-                                        <input type="text" id="systemName" value="DigitalMenuPro" class="w-full px-3 py-2 border rounded-lg">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Email</label>
-                                        <input type="email" id="supportEmail" value="support@digitalmenupro.com" class="w-full px-3 py-2 border rounded-lg">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Support Phone</label>
-                                        <input type="tel" id="supportPhone" value="+91-9876543210" class="w-full px-3 py-2 border rounded-lg">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
-                                        <select id="defaultCurrency" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="INR" selected>Indian Rupee (₹)</option>
-                                            <option value="USD">US Dollar ($)</option>
-                                            <option value="EUR">Euro (€)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Settings -->
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Payment Settings</h3>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
-                                        <input type="text" id="upiId" value="digitalmenupro@okhdfcbank" class="w-full px-3 py-2 border rounded-lg">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
-                                        <input type="text" id="gstNumber" value="27AAECD1234M1Z5" class="w-full px-3 py-2 border rounded-lg">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Quick Actions -->
-                        <div class="space-y-6">
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-                                <div class="space-y-3">
-                                    <button onclick="sendTestEmail()" class="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 text-left">
-                                        <i class="fas fa-envelope mr-2"></i>Send Test Email
-                                    </button>
-                                    <button onclick="clearSystemCache()" class="w-full px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 text-left">
-                                        <i class="fas fa-broom mr-2"></i>Clear System Cache
-                                    </button>
-                                    <button onclick="backupDatabase()" class="w-full px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-left">
-                                        <i class="fas fa-database mr-2"></i>Backup Database
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- System Status -->
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <h3 class="text-lg font-bold mb-4">System Status</h3>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Database</span>
-                                        <span class="text-green-600 font-medium">Online</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Storage</span>
-                                        <span class="text-green-600 font-medium">2.4 GB / 10 GB</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Active Users</span>
-                                        <span class="font-medium" id="activeUsersCount">0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">System Uptime</span>
-                                        <span class="font-medium">99.8%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Save Settings -->
-                            <div class="bg-white rounded-xl shadow-lg p-6">
-                                <button onclick="saveSystemSettings()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                                    <i class="fas fa-save mr-2"></i>Save All Settings
-                                </button>
-                                <p class="text-xs text-gray-500 mt-2 text-center">
-                                    Changes may take up to 5 minutes to propagate
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Terms & Policies View -->
-                <div id="viewTerms" class="view hidden">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Terms & Policies Management</h2>
-                        <p class="text-gray-600">Update system terms, conditions, and policies</p>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <div class="space-y-6">
-                            <!-- Terms of Service -->
-                            <div>
-                                <h3 class="text-lg font-bold mb-3">Terms of Service</h3>
-                                <textarea id="termsOfService" rows="12" class="w-full px-4 py-3 border rounded-lg font-mono text-sm">
-# DigitalMenuPro Terms of Service
-
-## 1. Acceptance of Terms
-By accessing and using DigitalMenuPro services, you agree to be bound by these Terms of Service.
-
-## 2. Subscription Terms
-- Monthly subscriptions auto-renew unless cancelled
-- 7-day free trial available for new restaurants
-- Payment required to continue after trial period
-
-## 3. Service Updates
-We may update our services, features, and pricing with 30 days notice.
-
-## 4. User Responsibilities
-- Provide accurate information
-- Maintain account security
-- Comply with all applicable laws
-
-## 5. Termination
-We reserve the right to suspend accounts for violations or non-payment.
-                                </textarea>
-                            </div>
-                            
-                            <!-- Update Actions -->
-                            <div class="flex justify-between pt-6 border-t">
-                                <div>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" id="notifyUsers" class="mr-2">
-                                        <span>Notify all users about terms update</span>
-                                    </label>
-                                </div>
-                                <div class="space-x-3">
-                                    <button onclick="previewTerms()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                                        Preview
-                                    </button>
-                                    <button onclick="updateTerms()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                        Update Policies
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-    
-    <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                    <i class="fas fa-shield-alt text-white text-2xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-800">Admin Login</h3>
-                <p class="text-gray-600 mt-2">DigitalMenuPro Control Panel</p>
             </div>
             
-            <div class="space-y-4">
-                <input type="email" id="adminEmailInput" placeholder="Admin Email" 
-                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <input type="password" id="adminPasswordInput" placeholder="Password" 
-                       class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <button onclick="handleAdminLogin()" class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700">
-                    Login as Admin
+            <!-- Other admin views... -->
+            <div id="adminViewSubscriptions" class="admin-view hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold">Subscriptions Management</h3>
+                    <p class="text-gray-600 mt-2">Manage all subscription plans</p>
+                </div>
+            </div>
+            
+            <div id="adminViewPayments" class="admin-view hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold">Payments Management</h3>
+                    <p class="text-gray-600 mt-2">View and verify all payments</p>
+                </div>
+            </div>
+            
+            <div id="adminViewUsers" class="admin-view hidden">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold">Users Management</h3>
+                    <p class="text-gray-600 mt-2">Manage all staff users across restaurants</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- STAFF DASHBOARD -->
+<div id="staffDashboard" class="hidden min-h-screen">
+    <header class="bg-gradient-to-r from-red-700 to-amber-700 text-white py-4 shadow-xl sticky top-0 z-40">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 mr-3 bg-white rounded-full flex items-center justify-center">
+                    <i class="fas fa-utensils text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold" id="staffRestaurantName">Restaurant Dashboard</h1>
+                    <p class="text-sm text-red-100"><span id="staffUserName"></span> • <span id="staffUserRole"></span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-sm">
+                    <i class="fas fa-user-circle mr-1"></i>
+                    <span id="staffUserEmail"></span>
+                </div>
+                <button onclick="handleLogout()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
                 </button>
-                
-                <p class="text-sm text-gray-500 text-center mt-4">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Super Admin: admin@royalkitchen.com
-                </p>
             </div>
         </div>
-    </div>
+    </header>
+
+    <nav class="bg-white shadow sticky top-16 z-30">
+        <div class="container mx-auto px-4 py-3 flex gap-2 overflow-x-auto" id="staffNavMenu"></div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Staff Dashboard View -->
+        <div id="staffViewDashboard" class="staff-view">
+            <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-gray-600 text-sm">Users</p><p class="text-3xl font-bold" id="statUsers">0</p></div>
+                        <i class="fas fa-users text-4xl text-blue-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-gray-600 text-sm">Dishes</p><p class="text-3xl font-bold" id="statDishes">0</p></div>
+                        <i class="fas fa-utensils text-4xl text-green-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-gray-600 text-sm">Orders</p><p class="text-3xl font-bold" id="statOrders">0</p></div>
+                        <i class="fas fa-receipt text-4xl text-purple-500"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-gray-600 text-sm">Revenue</p><p class="text-3xl font-bold" id="statRevenue">₹0</p></div>
+                        <i class="fas fa-rupee-sign text-4xl text-amber-500"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Dishes View -->
+        <div id="staffViewDishes" class="staff-view hidden">
+            <div class="flex justify-between mb-6">
+                <h2 class="text-2xl font-bold">Menu Management</h2>
+                <button onclick="showModal('dish')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fas fa-plus mr-2"></i>Add Dish
+                </button>
+            </div>
+            <div id="dishesList" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Staff Reservations View -->
+        <div id="staffViewReservations" class="staff-view hidden">
+            <div class="flex justify-between mb-6">
+                <h2 class="text-2xl font-bold">Reservations</h2>
+            </div>
+            <div id="reservationsList" class="space-y-4"></div>
+        </div>
+
+        <!-- Staff Orders View -->
+        <div id="staffViewOrders" class="staff-view hidden">
+            <div class="flex justify-between mb-6">
+                <h2 class="text-2xl font-bold">Orders</h2>
+            </div>
+            <div id="ordersList" class="space-y-4"></div>
+        </div>
+    </main>
+</div>
 
 <script>
 // Configuration
@@ -865,74 +403,61 @@ try {
 }
 
 // Global variables
-let currentAdmin = null;
+let currentUser = null;
+let currentRestaurant = null;
 let restaurants = [];
 let subscriptions = [];
 let payments = [];
 let users = [];
-let plans = [];
-let currentRestaurantPage = 1;
-let currentPaymentPage = 1;
-const itemsPerPage = 10;
+let dishes = [];
+let orders = [];
+let reservations = [];
 
-// Chart instances
-let revenueChart = null;
-let planChart = null;
-
-// Initialize admin dashboard
-async function initAdminDashboard() {
+// Initialize the system
+async function init() {
     try {
-        // Check if admin is already logged in
+        console.log('🚀 Initializing system...');
+        
+        // Check if user is already logged in
         const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user && user.email === SUPER_ADMIN_EMAIL) {
-            currentAdmin = {
-                email: user.email,
-                name: 'Super Admin',
-                role: 'super_admin'
-            };
-            
-            document.getElementById('adminLoginModal').style.display = 'none';
-            document.getElementById('adminDashboard').classList.remove('hidden');
-            document.getElementById('adminName').textContent = 'Super Admin';
-            document.getElementById('adminEmail').textContent = user.email;
-            
-            // Load initial data
-            await loadAdminData();
-            setupCharts();
-            loadNotifications();
-            loadActivities();
-            
-            console.log('✓ Admin dashboard initialized');
+        
+        if (user) {
+            console.log('✓ Found logged in user:', user.email);
+            await handleSession(user);
         } else {
-            showAdminLogin();
+            console.log('⚠ No user logged in');
+            showLoginModal();
         }
+        
     } catch (error) {
-        console.error('❌ Admin initialization error:', error);
-        showAdminLogin();
+        console.error('❌ Initialization error:', error);
+        showLoginModal();
+    } finally {
+        hideLoadingScreen();
     }
 }
 
-function showAdminLogin() {
-    document.getElementById('adminLoginModal').style.display = 'flex';
-    document.getElementById('adminDashboard').classList.add('hidden');
+function showLoginModal() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginModal').classList.remove('hidden');
 }
 
-async function handleAdminLogin() {
-    const email = document.getElementById('adminEmailInput').value.trim();
-    const password = document.getElementById('adminPasswordInput').value;
+function hideLoadingScreen() {
+    document.getElementById('loadingScreen').style.display = 'none';
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
     
     if (!email || !password) {
         alert('Please enter email and password');
         return;
     }
     
-    // Check if email is super admin
-    if (email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-        alert('Access denied. Only super admin (admin@royalkitchen.com) can access this panel.');
-        return;
-    }
-    
     try {
+        console.log('🔐 Attempting login for:', email);
+        
         const { data, error } = await supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
@@ -940,38 +465,125 @@ async function handleAdminLogin() {
         
         if (error) throw error;
         
-        currentAdmin = {
-            email: data.user.email,
-            name: 'Super Admin',
-            role: 'super_admin'
-        };
-        
-        document.getElementById('adminLoginModal').style.display = 'none';
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        document.getElementById('adminName').textContent = 'Super Admin';
-        document.getElementById('adminEmail').textContent = data.user.email;
-        
-        // Load data
-        await loadAdminData();
-        setupCharts();
-        loadNotifications();
-        loadActivities();
-        
-        alert('✓ Admin login successful!');
+        console.log('✓ Login successful');
+        await handleSession(data.user);
         
     } catch (error) {
-        console.error('Admin login error:', error);
+        console.error('❌ Login error:', error);
         alert('Login failed: ' + error.message);
     }
 }
 
-async function adminLogout() {
+async function handleSession(user) {
     try {
-        await supabaseClient.auth.signOut();
-        currentAdmin = null;
-        showAdminLogin();
+        console.log('👤 Processing session for:', user.email);
+        
+        // Check if super admin
+        if (user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+            console.log('🛡️ Super admin detected');
+            await setupSuperAdminDashboard(user);
+        } else {
+            console.log('👨‍💼 Regular staff user detected');
+            await setupStaffDashboard(user);
+        }
+        
+        // Hide login modal
+        document.getElementById('loginModal').classList.add('hidden');
+        
     } catch (error) {
-        console.error('Logout error:', error);
+        console.error('❌ Session handling error:', error);
+        alert('Error loading dashboard: ' + error.message);
+        await handleLogout();
+    }
+}
+
+async function setupSuperAdminDashboard(user) {
+    try {
+        console.log('📊 Setting up super admin dashboard...');
+        
+        currentUser = {
+            email: user.email,
+            name: 'Super Admin',
+            role: 'super_admin'
+        };
+        
+        // Load ALL data
+        await loadAdminData();
+        
+        // Show admin dashboard
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        document.getElementById('staffDashboard').classList.add('hidden');
+        
+        document.getElementById('adminName').textContent = 'Super Admin';
+        document.getElementById('adminEmail').textContent = user.email;
+        
+        // Update stats
+        updateAdminStats();
+        
+        console.log('✓ Super admin dashboard ready');
+        
+    } catch (error) {
+        console.error('❌ Error setting up admin dashboard:', error);
+        throw error;
+    }
+}
+
+async function setupStaffDashboard(user) {
+    try {
+        console.log('👨‍💼 Setting up staff dashboard...');
+        
+        // Get staff user data
+        const { data: staffUser, error: staffError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .eq('email', user.email)
+            .single();
+        
+        if (staffError || !staffUser) {
+            throw new Error('Staff account not found. Please contact administrator.');
+        }
+        
+        if (!staffUser.is_active) {
+            throw new Error('This account is disabled. Please contact administrator.');
+        }
+        
+        // Get restaurant data
+        const { data: restaurant, error: restError } = await supabaseClient
+            .from('restaurants')
+            .select('*')
+            .eq('id', staffUser.restaurant_id)
+            .single();
+        
+        if (restError || !restaurant) {
+            throw new Error('Restaurant not found. Please contact administrator.');
+        }
+        
+        currentUser = staffUser;
+        currentRestaurant = restaurant;
+        
+        // Load restaurant data
+        await loadStaffData();
+        
+        // Show staff dashboard
+        document.getElementById('staffDashboard').classList.remove('hidden');
+        document.getElementById('adminDashboard').classList.add('hidden');
+        
+        document.getElementById('staffRestaurantName').textContent = restaurant.name;
+        document.getElementById('staffUserName').textContent = staffUser.name;
+        document.getElementById('staffUserRole').textContent = staffUser.role.toUpperCase();
+        document.getElementById('staffUserEmail').textContent = staffUser.email;
+        
+        // Setup navigation based on permissions
+        setupStaffNav();
+        
+        // Update stats
+        updateStaffStats();
+        
+        console.log('✓ Staff dashboard ready for:', restaurant.name);
+        
+    } catch (error) {
+        console.error('❌ Error setting up staff dashboard:', error);
+        throw error;
     }
 }
 
@@ -979,7 +591,7 @@ async function loadAdminData() {
     try {
         console.log('📊 Loading admin data...');
         
-        // Load ALL restaurants (super admin can see all)
+        // Load ALL restaurants
         const { data: restaurantsData, error: resError } = await supabaseClient
             .from('restaurants')
             .select('*')
@@ -993,7 +605,7 @@ async function loadAdminData() {
         // Load subscriptions
         const { data: subsData, error: subsError } = await supabaseClient
             .from('subscriptions')
-            .select('*, restaurants(name)')
+            .select('*')
             .order('created_at', { ascending: false });
         
         if (!subsError) subscriptions = subsData || [];
@@ -1001,21 +613,18 @@ async function loadAdminData() {
         // Load payments
         const { data: paymentsData, error: payError } = await supabaseClient
             .from('payments')
-            .select('*, restaurants(name)')
+            .select('*')
             .order('created_at', { ascending: false });
         
         if (!payError) payments = paymentsData || [];
         
-        // Load all users across all restaurants
+        // Load all users
         const { data: usersData, error: usersError } = await supabaseClient
             .from('staff_users')
             .select('*')
-            .order('created_at', { ascending: false});
+            .order('created_at', { ascending: false });
         
         if (!usersError) users = usersData || [];
-        
-        // Update dashboard stats
-        updateDashboardStats();
         
         console.log('✓ Admin data loaded');
         
@@ -1024,418 +633,281 @@ async function loadAdminData() {
     }
 }
 
-function updateDashboardStats() {
-    // Total restaurants
-    document.getElementById('totalRestaurants').textContent = restaurants.length;
-    
-    // Active subscriptions
-    const activeSubs = subscriptions.filter(s => s.status === 'active').length;
-    document.getElementById('activeSubscriptions').textContent = activeSubs;
-    
-    // Monthly revenue (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+async function loadStaffData() {
+    try {
+        console.log('📊 Loading staff data...');
+        
+        // Load dishes for this restaurant
+        const { data: dishesData, error: dishesError } = await supabaseClient
+            .from('dishes')
+            .select('*')
+            .eq('restaurant_id', currentRestaurant.id)
+            .eq('is_active', true);
+        
+        if (!dishesError) dishes = dishesData || [];
+        
+        // Load orders
+        const { data: ordersData, error: ordersError } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('restaurant_id', currentRestaurant.id);
+        
+        if (!ordersError) orders = ordersData || [];
+        
+        // Load reservations
+        const { data: reservationsData, error: resError } = await supabaseClient
+            .from('reservations')
+            .select('*')
+            .eq('restaurant_id', currentRestaurant.id);
+        
+        if (!resError) reservations = reservationsData || [];
+        
+        // Load staff users for this restaurant
+        const { data: usersData, error: usersError } = await supabaseClient
+            .from('staff_users')
+            .select('*')
+            .eq('restaurant_id', currentRestaurant.id);
+        
+        if (!usersError) users = usersData || [];
+        
+        console.log('✓ Staff data loaded');
+        
+    } catch (error) {
+        console.error('❌ Error loading staff data:', error);
+    }
+}
+
+function updateAdminStats() {
+    document.getElementById('adminTotalRestaurants').textContent = restaurants.length;
+    document.getElementById('adminActiveSubscriptions').textContent = subscriptions.filter(s => s.status === 'active').length;
     
     const monthlyRevenue = payments
-        .filter(p => p.status === 'completed' && new Date(p.created_at) >= thirtyDaysAgo)
-        .reduce((sum, p) => sum + (p.amount || 0), 0);
-    document.getElementById('monthlyRevenue').textContent = `₹${monthlyRevenue}`;
-    
-    // Pending payments
-    const pending = payments.filter(p => p.status === 'pending').length;
-    document.getElementById('pendingPayments').textContent = pending;
-    
-    // For subscription view
-    document.getElementById('totalActiveSubs').textContent = activeSubs;
-    document.getElementById('monthlyMRR').textContent = `₹${monthlyRevenue}`;
-    document.getElementById('annualProjection').textContent = `₹${monthlyRevenue * 12}`;
-    
-    // For payments view
-    const totalRevenue = payments
         .filter(p => p.status === 'completed')
         .reduce((sum, p) => sum + (p.amount || 0), 0);
-    document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
+    document.getElementById('adminMonthlyRevenue').textContent = `₹${monthlyRevenue}`;
     
-    const successfulPayments = payments.filter(p => p.status === 'completed').length;
-    document.getElementById('successfulPayments').textContent = successfulPayments;
+    document.getElementById('adminTotalUsers').textContent = users.length;
     
-    document.getElementById('pendingVerifications').textContent = pending;
+    // Load restaurants table
+    loadAdminRestaurantsTable();
     
-    const avgTransaction = successfulPayments > 0 ? totalRevenue / successfulPayments : 0;
-    document.getElementById('averageTransaction').textContent = `₹${Math.round(avgTransaction)}`;
+    // Load activities
+    loadAdminActivities();
 }
 
-function setupCharts() {
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    const last6Months = getLast6Months();
+function loadAdminRestaurantsTable() {
+    let html = '';
     
-    if (revenueChart) revenueChart.destroy();
-    
-    revenueChart = new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: last6Months,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: generateRevenueData(last6Months),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
+    restaurants.slice(0, 10).forEach(restaurant => {
+        html += `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="font-medium text-gray-900">${restaurant.name}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${restaurant.owner_email}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <code class="px-2 py-1 bg-gray-100 rounded">${restaurant.url_slug}</code>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
+                        ${restaurant.status.toUpperCase()}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${new Date(restaurant.created_at).toLocaleDateString()}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-2">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                    <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
     });
     
-    // Plan Distribution Chart
-    const planCtx = document.getElementById('planChart').getContext('2d');
+    document.getElementById('adminRestaurantsTable').innerHTML = html || `
+        <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                No restaurants found
+            </td>
+        </tr>
+    `;
+}
+
+function loadAdminActivities() {
+    let html = '';
     
-    if (planChart) planChart.destroy();
-    
-    const planCounts = {
-        basic: subscriptions.filter(s => s.plan === 'basic').length,
-        pro: subscriptions.filter(s => s.plan === 'pro').length,
-        enterprise: subscriptions.filter(s => s.plan === 'enterprise').length
-    };
-    
-    planChart = new Chart(planCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Basic', 'Pro', 'Enterprise'],
-            datasets: [{
-                data: [planCounts.basic, planCounts.pro, planCounts.enterprise],
-                backgroundColor: [
-                    'rgb(34, 197, 94)',
-                    'rgb(59, 130, 246)',
-                    'rgb(139, 92, 246)'
-                ],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
+    const recentRestaurants = restaurants.slice(0, 5);
+    recentRestaurants.forEach(restaurant => {
+        const date = new Date(restaurant.created_at).toLocaleDateString();
+        
+        html += `
+            <div class="flex items-start">
+                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-utensils text-sm"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${restaurant.name}</p>
+                    <p class="text-sm text-gray-600">New restaurant registered</p>
+                    <p class="text-xs text-gray-500">${date} • Slug: ${restaurant.url_slug}</p>
+                </div>
+            </div>
+        `;
     });
-}
-
-function getLast6Months() {
-    const months = [];
-    const now = new Date();
     
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        months.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+    document.getElementById('adminActivitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
+}
+
+function updateStaffStats() {
+    document.getElementById('statUsers').textContent = users.length;
+    document.getElementById('statDishes').textContent = dishes.length;
+    document.getElementById('statOrders').textContent = orders.length;
+    
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+    document.getElementById('statRevenue').textContent = `₹${totalRevenue}`;
+}
+
+function setupStaffNav() {
+    const permissions = currentUser.permissions || {};
+    let nav = '<button onclick="showStaffView(\'dashboard\')" class="px-4 py-2 rounded-lg hover:bg-gray-100 bg-gray-100"><i class="fas fa-home mr-2"></i>Dashboard</button>';
+    
+    if (permissions.addDish || permissions.editDish || permissions.deleteDish) {
+        nav += '<button onclick="showStaffView(\'dishes\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-utensils mr-2"></i>Dishes</button>';
     }
     
-    return months;
-}
-
-function generateRevenueData(months) {
-    return months.map(() => Math.floor(Math.random() * 50000) + 10000);
-}
-
-async function loadNotifications() {
-    try {
-        const pendingPayments = payments.filter(p => p.status === 'pending').length;
-        const pendingRestaurants = restaurants.filter(r => r.status === 'pending').length;
-        
-        let html = '';
-        
-        if (pendingPayments > 0) {
-            html += `
-                <div class="flex items-start p-3 bg-yellow-50 rounded-lg">
-                    <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
-                    <div>
-                        <p class="font-medium">${pendingPayments} pending payment${pendingPayments > 1 ? 's' : ''}</p>
-                        <p class="text-sm text-gray-600">Require verification</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        if (pendingRestaurants > 0) {
-            html += `
-                <div class="flex items-start p-3 bg-blue-50 rounded-lg">
-                    <i class="fas fa-clock text-blue-600 mt-1 mr-3"></i>
-                    <div>
-                        <p class="font-medium">${pendingRestaurants} restaurant${pendingRestaurants > 1 ? 's' : ''} pending</p>
-                        <p class="text-sm text-gray-600">Awaiting activation</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        if (!html) {
-            html = '<p class="text-gray-500 text-center py-4">No notifications</p>';
-        }
-        
-        document.getElementById('notificationsList').innerHTML = html;
-        
-    } catch (error) {
-        console.error('Error loading notifications:', error);
+    if (permissions.reserveTable) {
+        nav += '<button onclick="showStaffView(\'reservations\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-calendar mr-2"></i>Reservations</button>';
     }
-}
-
-async function loadActivities() {
-    try {
-        let html = '';
-        
-        const recentPayments = payments.slice(0, 5);
-        recentPayments.forEach(payment => {
-            const date = new Date(payment.created_at).toLocaleDateString();
-            const time = new Date(payment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            html += `
-                <div class="flex items-start">
-                    <div class="w-8 h-8 rounded-full ${payment.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center mr-3">
-                        <i class="fas fa-rupee-sign text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium">${payment.restaurants?.name || 'Unknown Restaurant'}</p>
-                        <p class="text-sm text-gray-600">Payment of ₹${payment.amount} ${payment.status}</p>
-                        <p class="text-xs text-gray-500">${date} at ${time}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        const recentRestaurants = restaurants.slice(0, 3);
-        recentRestaurants.forEach(restaurant => {
-            const date = new Date(restaurant.created_at).toLocaleDateString();
-            
-            html += `
-                <div class="flex items-start">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
-                        <i class="fas fa-utensils text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-medium">${restaurant.name}</p>
-                        <p class="text-sm text-gray-600">New restaurant registered</p>
-                        <p class="text-xs text-gray-500">${date}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        document.getElementById('activitiesList').innerHTML = html || '<p class="text-gray-500 text-center py-4">No recent activities</p>';
-        
-    } catch (error) {
-        console.error('Error loading activities:', error);
+    
+    if (permissions.viewTableOrders) {
+        nav += '<button onclick="showStaffView(\'orders\')" class="px-4 py-2 rounded-lg hover:bg-gray-100"><i class="fas fa-clipboard-list mr-2"></i>Orders</button>';
     }
+    
+    document.getElementById('staffNavMenu').innerHTML = nav;
 }
 
-// View Navigation
-function showView(viewName) {
-    document.querySelectorAll('.view').forEach(view => {
+function showAdminView(viewName) {
+    document.querySelectorAll('.admin-view').forEach(view => {
         view.classList.add('hidden');
     });
     
-    document.querySelectorAll('nav a').forEach(navItem => {
-        navItem.classList.remove('active-nav', 'bg-gray-700');
+    document.querySelectorAll('#adminSidebar a').forEach(link => {
+        link.classList.remove('bg-gray-700');
     });
     
-    const activeNav = document.querySelector(`nav a[onclick="showView('${viewName}')"]`);
-    if (activeNav) {
-        activeNav.classList.add('active-nav', 'bg-gray-700');
-    }
-    
-    const viewElement = document.getElementById(`view${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
+    const viewElement = document.getElementById(`adminView${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
     if (viewElement) {
         viewElement.classList.remove('hidden');
     }
     
-    updateViewTitle(viewName);
-    
-    switch(viewName) {
-        case 'restaurants':
-            loadRestaurantsTable();
-            break;
-        case 'subscriptions':
-            loadSubscriptionsTable();
-            loadRestaurantDropdown();
-            break;
-        case 'payments':
-            loadPaymentsTable();
-            break;
-        case 'users':
-            loadUsersTable();
-            break;
-        case 'plans':
-            loadPlans();
-            break;
-        case 'settings':
-            loadSystemSettings();
-            break;
+    const activeLink = document.querySelector(`#adminSidebar a[onclick="showAdminView('${viewName}')"]`);
+    if (activeLink) {
+        activeLink.classList.add('bg-gray-700');
     }
 }
 
-function updateViewTitle(viewName) {
-    const titles = {
-        'dashboard': { title: 'Admin Dashboard', subtitle: 'System Overview & Analytics' },
-        'restaurants': { title: 'Restaurant Management', subtitle: 'Manage all registered restaurants' },
-        'subscriptions': { title: 'Subscription Management', subtitle: 'Manage all subscription plans and billing' },
-        'payments': { title: 'Payment Management', subtitle: 'View and manage all payment transactions' },
-        'users': { title: 'User Management', subtitle: 'Manage all system users across restaurants' },
-        'plans': { title: 'Plan Management', subtitle: 'Configure subscription plans and pricing' },
-        'settings': { title: 'System Settings', subtitle: 'Configure system-wide settings and preferences' },
-        'terms': { title: 'Terms & Policies Management', subtitle: 'Update system terms, conditions, and policies' }
-    };
+function showStaffView(viewName) {
+    document.querySelectorAll('.staff-view').forEach(view => {
+        view.classList.add('hidden');
+    });
     
-    const viewInfo = titles[viewName] || titles.dashboard;
-    document.getElementById('viewTitle').textContent = viewInfo.title;
-    document.getElementById('viewSubtitle').textContent = viewInfo.subtitle;
-}
-
-// Sidebar Toggle
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const toggleBtn = document.querySelector('[onclick="toggleSidebar()"] i');
+    document.querySelectorAll('#staffNavMenu button').forEach(btn => {
+        btn.classList.remove('bg-gray-100');
+    });
     
-    sidebar.classList.toggle('collapsed');
+    const viewElement = document.getElementById(`staffView${viewName.charAt(0).toUpperCase() + viewName.slice(1)}`);
+    if (viewElement) {
+        viewElement.classList.remove('hidden');
+    }
     
-    if (sidebar.classList.contains('collapsed')) {
-        toggleBtn.classList.remove('fa-chevron-left');
-        toggleBtn.classList.add('fa-chevron-right');
-    } else {
-        toggleBtn.classList.remove('fa-chevron-right');
-        toggleBtn.classList.add('fa-chevron-left');
+    const activeBtn = document.querySelector(`#staffNavMenu button[onclick="showStaffView('${viewName}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('bg-gray-100');
+    }
+    
+    // Load view data
+    if (viewName === 'dishes') {
+        renderDishes();
+    } else if (viewName === 'reservations') {
+        renderReservations();
+    } else if (viewName === 'orders') {
+        renderOrders();
     }
 }
 
-// Notifications Toggle
-function toggleNotifications() {
-    const panel = document.getElementById('notificationsPanel');
-    panel.classList.toggle('hidden');
-}
-
-// Restaurant Management
-async function loadRestaurantsTable() {
-    try {
-        let html = '';
-        const startIndex = (currentRestaurantPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageRestaurants = restaurants.slice(startIndex, endIndex);
-        
-        pageRestaurants.forEach(restaurant => {
-            const subscription = subscriptions.find(s => s.restaurant_id === restaurant.id);
-            
-            html += `
-                <tr class="restaurant-row hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-utensils text-blue-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium text-gray-900">${restaurant.name}</div>
-                                <div class="text-sm text-gray-500">${restaurant.owner_email}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${restaurant.owner_email}</div>
-                        <div class="text-sm text-gray-500">${restaurant.owner_phone || 'Not provided'}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 text-xs font-medium rounded-full ${subscription?.plan === 'pro' ? 'bg-blue-100 text-blue-800' : subscription?.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
-                            ${subscription?.plan ? subscription.plan.toUpperCase() : 'No Plan'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="status-badge ${restaurant.status === 'active' ? 'status-active' : restaurant.status === 'pending' ? 'status-pending' : 'status-suspended'}">
-                            ${restaurant.status.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${restaurant.url_slug}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${new Date(restaurant.created_at).toLocaleDateString()}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="viewRestaurantDetails('${restaurant.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button onclick="toggleRestaurantStatus('${restaurant.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button onclick="deleteRestaurant('${restaurant.id}')" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        document.getElementById('restaurantsTable').innerHTML = html || `
-            <tr>
-                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                    No restaurants found
-                </td>
-            </tr>
+function renderDishes() {
+    let html = '';
+    
+    dishes.forEach(dish => {
+        html += `
+            <div class="bg-white rounded-xl shadow overflow-hidden">
+                <img src="${dish.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${dish.name}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="font-bold text-lg">${dish.name}</h3>
+                    <p class="text-gray-600 text-sm">${dish.description || ''}</p>
+                    <div class="flex justify-between mt-4">
+                        <span class="font-bold text-lg">₹${dish.price}</span>
+                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">${dish.category}</span>
+                    </div>
+                </div>
+            </div>
         `;
-        
-        document.getElementById('restaurantStart').textContent = restaurants.length > 0 ? startIndex + 1 : 0;
-        document.getElementById('restaurantEnd').textContent = Math.min(endIndex, restaurants.length);
-        document.getElementById('restaurantTotal').textContent = restaurants.length;
-        
-    } catch (error) {
-        console.error('Error loading restaurants table:', error);
-    }
+    });
+    
+    document.getElementById('dishesList').innerHTML = html || '<p class="text-gray-500 text-center py-8 col-span-3">No dishes available.</p>';
 }
 
-function filterRestaurants() {
-    loadRestaurantsTable();
+function renderReservations() {
+    let html = '';
+    
+    reservations.forEach(res => {
+        html += `
+            <div class="bg-white p-4 rounded-xl shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold">${res.customer_name}</h3>
+                        <p class="text-gray-600 text-sm">Table ${res.table_number} • ${res.guest_count} guests</p>
+                        <p class="text-gray-600 text-sm">${res.date} at ${res.time}</p>
+                    </div>
+                    <span class="px-3 py-1 ${res.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded">
+                        ${res.status}
+                    </span>
+                </div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('reservationsList').innerHTML = html || '<p class="text-gray-500 text-center py-8">No reservations found.</p>';
 }
 
-function prevRestaurantPage() {
-    if (currentRestaurantPage > 1) {
-        currentRestaurantPage--;
-        loadRestaurantsTable();
-    }
-}
-
-function nextRestaurantPage() {
-    const totalPages = Math.ceil(restaurants.length / itemsPerPage);
-    if (currentRestaurantPage < totalPages) {
-        currentRestaurantPage++;
-        loadRestaurantsTable();
-    }
-}
-
-function viewRestaurantDetails(restaurantId) {
-    const restaurant = restaurants.find(r => r.id === restaurantId);
-    if (restaurant) {
-        alert(`Restaurant Details:
-        
-Name: ${restaurant.name}
-Owner: ${restaurant.owner_email}
-Status: ${restaurant.status}
-URL Slug: ${restaurant.url_slug}
-Created: ${new Date(restaurant.created_at).toLocaleDateString()}`);
-    }
+function renderOrders() {
+    let html = '';
+    
+    orders.forEach(order => {
+        html += `
+            <div class="bg-white p-4 rounded-xl shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold">Table ${order.table_number}</h3>
+                        <p class="text-gray-600 text-sm">${order.customer_name || 'Guest'}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-lg">₹${order.total || 0}</p>
+                        <span class="px-3 py-1 ${order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} rounded text-sm">
+                            ${order.status}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('ordersList').innerHTML = html || '<p class="text-gray-500 text-center py-8">No orders found</p>';
 }
 
 async function toggleRestaurantStatus(restaurantId) {
@@ -1444,7 +916,7 @@ async function toggleRestaurantStatus(restaurantId) {
     
     const newStatus = restaurant.status === 'active' ? 'suspended' : 'active';
     
-    if (!confirm(`Are you sure you want to ${newStatus === 'suspended' ? 'suspend' : 'activate'} this restaurant?`)) {
+    if (!confirm(`${newStatus === 'suspended' ? 'Suspend' : 'Activate'} this restaurant?`)) {
         return;
     }
     
@@ -1457,7 +929,7 @@ async function toggleRestaurantStatus(restaurantId) {
         if (error) throw error;
         
         restaurant.status = newStatus;
-        loadRestaurantsTable();
+        loadAdminRestaurantsTable();
         alert(`Restaurant ${newStatus}!`);
         
     } catch (error) {
@@ -1467,9 +939,7 @@ async function toggleRestaurantStatus(restaurantId) {
 }
 
 async function deleteRestaurant(restaurantId) {
-    if (!confirm('WARNING: This will permanently delete the restaurant and all data. Continue?')) {
-        return;
-    }
+    if (!confirm('WARNING: Delete this restaurant permanently?')) return;
     
     try {
         const { error } = await supabaseClient
@@ -1480,8 +950,8 @@ async function deleteRestaurant(restaurantId) {
         if (error) throw error;
         
         restaurants = restaurants.filter(r => r.id !== restaurantId);
-        loadRestaurantsTable();
-        updateDashboardStats();
+        loadAdminRestaurantsTable();
+        updateAdminStats();
         alert('Restaurant deleted!');
         
     } catch (error) {
@@ -1490,412 +960,28 @@ async function deleteRestaurant(restaurantId) {
     }
 }
 
-function exportRestaurants() {
-    let csv = 'Restaurant Name,Owner Email,Status,URL Slug,Created\n';
-    
-    restaurants.forEach(r => {
-        csv += `"${r.name}","${r.owner_email}","${r.status}","${r.url_slug}","${new Date(r.created_at).toLocaleDateString()}"\n`;
-    });
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `restaurants_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+function showModal(type) {
+    alert('Modal for ' + type + ' - Coming soon!');
 }
 
-// Subscription Management
-async function loadSubscriptionsTable() {
+async function handleLogout() {
     try {
-        let html = '';
-        const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
+        await supabaseClient.auth.signOut();
+        currentUser = null;
+        currentRestaurant = null;
         
-        activeSubscriptions.slice(0, 10).forEach(sub => {
-            html += `
-                <tr>
-                    <td class="px-4 py-3">${sub.restaurants?.name || 'Unknown'}</td>
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs rounded ${sub.plan === 'pro' ? 'bg-blue-100 text-blue-800' : sub.plan === 'enterprise' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
-                            ${sub.plan.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3">₹${sub.price}/month</td>
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 text-xs rounded ${sub.auto_pay ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                            ${sub.auto_pay ? 'Enabled' : 'Manual'}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3">${sub.next_billing_date ? new Date(sub.next_billing_date).toLocaleDateString() : 'Not scheduled'}</td>
-                    <td class="px-4 py-3">
-                        <button onclick="cancelSubscription('${sub.id}')" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-ban"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
+        document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('staffDashboard').classList.add('hidden');
         
-        document.getElementById('subscriptionsTable').innerHTML = html || `
-            <tr>
-                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                    No active subscriptions
-                </td>
-            </tr>
-        `;
+        showLoginModal();
         
     } catch (error) {
-        console.error('Error loading subscriptions:', error);
+        console.error('Logout error:', error);
     }
 }
 
-async function loadRestaurantDropdown() {
-    const select = document.getElementById('newSubRestaurant');
-    let html = '<option value="">Select Restaurant</option>';
-    
-    restaurants.forEach(restaurant => {
-        const hasActiveSub = subscriptions.some(s => s.restaurant_id === restaurant.id && s.status === 'active');
-        if (!hasActiveSub) {
-            html += `<option value="${restaurant.id}">${restaurant.name} (${restaurant.owner_email})</option>`;
-        }
-    });
-    
-    select.innerHTML = html;
-}
-
-async function createManualSubscription() {
-    const restaurantId = document.getElementById('newSubRestaurant').value;
-    const plan = document.getElementById('newSubPlan').value;
-    const autoPay = document.getElementById('newSubAutoPay').checked;
-    
-    if (!restaurantId) {
-        alert('Please select a restaurant');
-        return;
-    }
-    
-    const planPrices = { 'basic': 499, 'pro': 999, 'enterprise': 1999 };
-    const price = planPrices[plan] || 499;
-    
-    try {
-        const subscription = {
-            restaurant_id: restaurantId,
-            plan: plan,
-            price: price,
-            auto_pay: autoPay,
-            status: 'active',
-            billing_cycle: 'monthly',
-            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        };
-        
-        const { data, error } = await supabaseClient
-            .from('subscriptions')
-            .insert([subscription])
-            .select()
-            .single();
-        
-        if (error) throw error;
-        
-        subscriptions.push(data);
-        
-        loadSubscriptionsTable();
-        loadRestaurantDropdown();
-        updateDashboardStats();
-        
-        alert('Subscription created successfully!');
-        
-    } catch (error) {
-        console.error('Error creating subscription:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-async function cancelSubscription(subscriptionId) {
-    if (!confirm('Cancel this subscription?')) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('subscriptions')
-            .update({ status: 'cancelled' })
-            .eq('id', subscriptionId);
-        
-        if (error) throw error;
-        
-        const sub = subscriptions.find(s => s.id === subscriptionId);
-        if (sub) sub.status = 'cancelled';
-        
-        loadSubscriptionsTable();
-        updateDashboardStats();
-        alert('Subscription cancelled!');
-        
-    } catch (error) {
-        console.error('Error cancelling subscription:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-// Payment Management
-async function loadPaymentsTable() {
-    try {
-        const startIndex = (currentPaymentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pagePayments = payments.slice(startIndex, endIndex);
-        
-        let html = '';
-        
-        pagePayments.forEach(payment => {
-            html += `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.id.substring(0, 8)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.restaurants?.name || 'Unknown'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">₹${payment.amount}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${payment.method || 'UPI'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="payment-status-${payment.status} px-2 py-1 rounded text-xs">
-                            ${payment.status.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(payment.created_at).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        ${payment.status === 'pending' ? `
-                            <button onclick="verifyPayment('${payment.id}')" class="text-green-600 hover:text-green-900">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        ` : ''}
-                    </td>
-                </tr>
-            `;
-        });
-        
-        document.getElementById('paymentsTable').innerHTML = html || `
-            <tr>
-                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                    No payments found
-                </td>
-            </tr>
-        `;
-        
-        document.getElementById('paymentStart').textContent = payments.length > 0 ? startIndex + 1 : 0;
-        document.getElementById('paymentEnd').textContent = Math.min(endIndex, payments.length);
-        document.getElementById('paymentTotal').textContent = payments.length;
-        
-    } catch (error) {
-        console.error('Error loading payments:', error);
-    }
-}
-
-function filterPayments() {
-    loadPaymentsTable();
-}
-
-function prevPaymentPage() {
-    if (currentPaymentPage > 1) {
-        currentPaymentPage--;
-        loadPaymentsTable();
-    }
-}
-
-function nextPaymentPage() {
-    const totalPages = Math.ceil(payments.length / itemsPerPage);
-    if (currentPaymentPage < totalPages) {
-        currentPaymentPage++;
-        loadPaymentsTable();
-    }
-}
-
-async function verifyPayment(paymentId) {
-    if (!confirm('Verify this payment?')) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('payments')
-            .update({ status: 'completed' })
-            .eq('id', paymentId);
-        
-        if (error) throw error;
-        
-        const payment = payments.find(p => p.id === paymentId);
-        if (payment) payment.status = 'completed';
-        
-        loadPaymentsTable();
-        updateDashboardStats();
-        alert('Payment verified!');
-        
-    } catch (error) {
-        console.error('Error verifying payment:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-function exportPayments() {
-    let csv = 'Payment ID,Restaurant,Amount,Method,Status,Date\n';
-    
-    payments.forEach(p => {
-        csv += `"${p.id.substring(0, 8)}","${p.restaurants?.name || 'Unknown'}","₹${p.amount}","${p.method || 'UPI'}","${p.status}","${new Date(p.created_at).toLocaleDateString()}"\n`;
-    });
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `payments_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-}
-
-// User Management
-async function loadUsersTable() {
-    try {
-        let html = '';
-        
-        users.forEach(user => {
-            html += `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                                <i class="fas fa-user text-blue-600"></i>
-                            </div>
-                            <div>
-                                <div class="font-medium">${user.name}</div>
-                                <div class="text-sm text-gray-500">${user.email}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${user.restaurant_id || 'No Restaurant'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded ${user.role === 'manager' ? 'bg-purple-100 text-purple-800' : user.role === 'chef' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'}">
-                            ${user.role.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs rounded ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                            ${user.is_active ? 'ACTIVE' : 'INACTIVE'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(user.created_at).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <button onclick="toggleUserStatus('${user.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        document.getElementById('usersTable').innerHTML = html || `
-            <tr>
-                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                    No users found
-                </td>
-            </tr>
-        `;
-        
-    } catch (error) {
-        console.error('Error loading users:', error);
-    }
-}
-
-function filterUsers() {
-    loadUsersTable();
-}
-
-async function toggleUserStatus(userId) {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-    
-    const newStatus = !user.is_active;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('staff_users')
-            .update({ is_active: newStatus })
-            .eq('id', userId);
-        
-        if (error) throw error;
-        
-        user.is_active = newStatus;
-        loadUsersTable();
-        alert(`User ${newStatus ? 'activated' : 'deactivated'}!`);
-        
-    } catch (error) {
-        console.error('Error toggling user status:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-async function deleteUser(userId) {
-    if (!confirm('Delete this user?')) return;
-    
-    try {
-        const { error } = await supabaseClient
-            .from('staff_users')
-            .delete()
-            .eq('id', userId);
-        
-        if (error) throw error;
-        
-        users = users.filter(u => u.id !== userId);
-        loadUsersTable();
-        alert('User deleted!');
-        
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        alert('Error: ' + error.message);
-    }
-}
-
-// Plan Management
-function loadPlans() {
-    alert('Plan management - Coming soon!');
-}
-
-function showPlanModal() {
-    alert('Add new plan - Coming soon!');
-}
-
-// System Settings
-function loadSystemSettings() {
-    const activeUsers = users.filter(u => u.is_active).length;
-    document.getElementById('activeUsersCount').textContent = activeUsers;
-}
-
-function saveSystemSettings() {
-    alert('Settings saved!');
-}
-
-function sendTestEmail() {
-    alert('Test email sent!');
-}
-
-function clearSystemCache() {
-    alert('Cache cleared!');
-}
-
-function backupDatabase() {
-    alert('Backup started!');
-}
-
-// Terms
-function previewTerms() {
-    const terms = document.getElementById('termsOfService').value;
-    const newWindow = window.open();
-    newWindow.document.write(`<html><body style="padding:20px;"><pre>${terms}</pre></body></html>`);
-}
-
-function updateTerms() {
-    alert('Terms updated!');
-}
-
-// Initialize
-initAdminDashboard();
+// Initialize on page load
+window.addEventListener('load', init);
 </script>
 </body>
 </html>
