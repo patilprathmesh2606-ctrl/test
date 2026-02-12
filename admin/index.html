@@ -663,7 +663,7 @@ function renderDishes() {
         `;
     } else {
         dishes.forEach(dish => {
-            const typeIcon = dish.type === 'veg' ? '🟢' : dish.type === 'non_veg' ? '🔴' : '🟡';
+            //const typeIcon = dish.type === 'veg' ? '🟢' : dish.type === 'non_veg' ? '🔴' : '🟡';
             const defaultImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f3f4f6" width="300" height="200"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="18" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
             
             html += `
@@ -713,9 +713,9 @@ function filterDishes() {
             dish.name.toLowerCase().includes(search) || 
             (dish.description && dish.description.toLowerCase().includes(search));
         const matchesCategory = !category || dish.category === category;
-        const matchesType = !type || dish.type === type;
+        //const matchesType = !type || dish.type === type;
         
-        return matchesSearch && matchesCategory && matchesType;
+        return matchesSearch && matchesCategory;
     });
     
     renderDishes();
@@ -755,7 +755,7 @@ async function editDish(dishId) {
     document.getElementById('dishId').value = dish.id;
     document.getElementById('dishName').value = dish.name;
     document.getElementById('dishCategory').value = dish.category;
-    document.getElementById('dishType').value = dish.type;
+    <!--document.getElementById('dishType').value = dish.type;-->
     document.getElementById('dishPrice').value = dish.price;
     document.getElementById('dishDescription').value = dish.description || '';
     document.getElementById('dishImageUrl').value = dish.image_url || '';
@@ -781,7 +781,7 @@ async function saveDish() {
     const imageUrl = document.getElementById('selectedImageUrl').value;
     const is_active = document.getElementById('dishAvailable').checked;
     
-    if (!name || !category || !type || !price) {
+    if (!name || !category || !price) {
         alert('Please fill all required fields');
         return;
     }
@@ -790,7 +790,7 @@ async function saveDish() {
         restaurant_id: currentRestaurant.id,
         name: name,
         category: category,
-        type: type,
+        //type: type,
         price: price,
         description: description,
         image_url: imageUrl || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect fill="%23f3f4f6" width="300" height="200"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="18" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E',
@@ -1013,7 +1013,7 @@ async function editDish(dishId) {
     document.getElementById('dishId').value = dish.id;
     document.getElementById('dishName').value = dish.name;
     document.getElementById('dishCategory').value = dish.category;
-    document.getElementById('dishType').value = dish.type || '';
+    <!-- document.getElementById('dishType').value = dish.type || ''; -->
     document.getElementById('dishPrice').value = dish.price;
     document.getElementById('dishDescription').value = dish.description || '';
     document.getElementById('dishAvailable').checked = dish.is_active;
