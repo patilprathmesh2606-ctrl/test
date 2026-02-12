@@ -706,7 +706,7 @@ function renderDishes() {
 function filterDishes() {
     const search = document.getElementById('dishSearchInput').value.toLowerCase();
     const category = document.getElementById('categoryFilter').value;
-    const type = document.getElementById('typeFilter').value;
+    <!--const type = document.getElementById('typeFilter').value; -->
     
     dishes = allDishes.filter(dish => {
         const matchesSearch = !search || 
@@ -775,7 +775,7 @@ async function saveDish() {
     
     const name = document.getElementById('dishName').value;
     const category = document.getElementById('dishCategory').value;
-    const type = document.getElementById('dishType').value;
+    <!-- const type = document.getElementById('dishType').value; -->
     const price = parseFloat(document.getElementById('dishPrice').value);
     const description = document.getElementById('dishDescription').value;
     const imageUrl = document.getElementById('selectedImageUrl').value;
