@@ -278,25 +278,15 @@ async function loadMenu() {
         return;
     }
 
-    console.log('🔍 Loading menu for slug:', urlSlug);
+    console.log('🔍 Loading menu for:', urlSlug);
 
     try {
-        // DEBUG: First, let's see what restaurants exist
-        const { data: allRestaurants, error: debugError } = await supabaseClient
-            .from('restaurants')
-            .select('id, name, url_slug, status');
-        
-        console.log('📋 All restaurants in database:', allRestaurants);
-        
-        // Fetch restaurant by slug
+        // Fetch restaurant
         const { data: restaurant, error: restaurantError } = await supabaseClient
             .from('restaurants')
             .select('*')
             .eq('url_slug', urlSlug)
             .maybeSingle();
-
-        console.log('🔍 Query result for slug "' + urlSlug + '":', restaurant);
-        console.log('❓ Query error:', restaurantError);
 
         if (restaurantError) {
             console.error('❌ Database error:', restaurantError);
@@ -305,14 +295,12 @@ async function loadMenu() {
         }
 
         if (!restaurant) {
-            console.error('❌ Restaurant not found for slug:', urlSlug);
-            console.log('💡 Available slugs:', allRestaurants ? allRestaurants.map(r => r.url_slug).join(', ') : 'none');
-            showError(`Restaurant "${urlSlug}" not found. Available restaurants: ${allRestaurants ? allRestaurants.map(r => r.name + ' (' + r.url_slug + ')').join(', ') : 'none'}`);
+            console.error('❌ Restaurant not found:', urlSlug);
+            showError(`Restaurant "${urlSlug}" not found.`);
             return;
         }
 
         if (restaurant.status !== 'active') {
-            console.error('❌ Restaurant is not active. Status:', restaurant.status);
             showError('This restaurant is currently inactive.');
             return;
         }
