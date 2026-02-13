@@ -1329,12 +1329,34 @@ function openAddStaffModal() {
 
 async function handleLogout() {
     try {
+        console.log('👋 Logging out...');
+        
+        // Get restaurant slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const restaurantSlug = urlParams.get('restaurant');
+        
         await supabaseClient.auth.signOut();
         currentUser = null;
         currentRestaurant = null;
-        window.location.href = '/';
+        
+        // Redirect back to menu with slug
+        if (restaurantSlug) {
+            // Go back to parent directory (remove /admin/)
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            const pathname = window.location.pathname;
+            const basePath = pathname.substring(0, pathname.lastIndexOf('/admin'));
+            
+            window.location.href = `${protocol}//${host}${basePath}/menu-dynamic.html?slug=${restaurantSlug}`;
+        } else {
+            // Fallback: go to parent directory
+            window.location.href = '../menu-dynamic.html';
+        }
+        
+        console.log('✓ Logout successful');
     } catch (error) {
-        console.error('Logout error:', error);
+        console.error('❌ Logout error:', error);
+        alert('Error logging out. Please try again.');
     }
 }
 
