@@ -467,12 +467,13 @@ async function handleStaffLogin(email, password) {
 
         console.log('✅ Auth successful');
 
-        // Check if user is staff for this restaurant
+        // Check if user is staff
+        // Super admin has restaurant_id = NULL (access to all restaurants)
+        // Regular staff has specific restaurant_id
         const { data: staffData, error: staffError } = await supabaseClient
             .from('staff_users')
             .select('*')
             .eq('email', email)
-            .eq('restaurant_id', currentRestaurantId)
             .eq('is_active', true)
             .maybeSingle();
 
@@ -484,13 +485,24 @@ async function handleStaffLogin(email, password) {
         }
 
         if (!staffData) {
-            console.error('❌ User is not staff for this restaurant');
+            console.error('❌ User is not a staff member');
+            showStaffError('You are not authorized to access the staff portal.');
+            await supabaseClient.auth.signOut();
+            return false;
+        }
+
+        // Check if super admin or staff for this restaurant
+        const isSuperAdmin = staffData.role === 'admin' && staffData.restaurant_id === null;
+        const isRestaurantStaff = staffData.restaurant_id === currentRestaurantId;
+
+        if (!isSuperAdmin && !isRestaurantStaff) {
+            console.error('❌ User is staff for a different restaurant');
             showStaffError('You are not authorized to manage this restaurant.');
             await supabaseClient.auth.signOut();
             return false;
         }
 
-        console.log('✅ Staff verified:', staffData.role);
+        console.log('✅ Staff verified:', staffData.role, isSuperAdmin ? '(Super Admin)' : '(Restaurant Staff)');
         showStaffSuccess('✅ Login successful! Redirecting to dashboard...');
 
         // Build redirect URL
