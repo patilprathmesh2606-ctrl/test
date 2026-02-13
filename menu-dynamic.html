@@ -278,15 +278,25 @@ async function loadMenu() {
         return;
     }
 
-    console.log('🔍 Loading menu for:', urlSlug);
+    console.log('🔍 Loading menu for slug:', urlSlug);
 
     try {
-        // Fetch restaurant
+        // DEBUG: First, let's see what restaurants exist
+        const { data: allRestaurants, error: debugError } = await supabaseClient
+            .from('restaurants')
+            .select('id, name, url_slug, status');
+        
+        console.log('📋 All restaurants in database:', allRestaurants);
+        
+        // Fetch restaurant by slug
         const { data: restaurant, error: restaurantError } = await supabaseClient
             .from('restaurants')
             .select('*')
             .eq('url_slug', urlSlug)
             .maybeSingle();
+
+        console.log('🔍 Query result for slug "' + urlSlug + '":', restaurant);
+        console.log('❓ Query error:', restaurantError);
 
         if (restaurantError) {
             console.error('❌ Database error:', restaurantError);
@@ -295,12 +305,14 @@ async function loadMenu() {
         }
 
         if (!restaurant) {
-            console.error('❌ Restaurant not found:', urlSlug);
-            showError(`Restaurant "${urlSlug}" not found.`);
+            console.error('❌ Restaurant not found for slug:', urlSlug);
+            console.log('💡 Available slugs:', allRestaurants ? allRestaurants.map(r => r.url_slug).join(', ') : 'none');
+            showError(`Restaurant "${urlSlug}" not found. Available restaurants: ${allRestaurants ? allRestaurants.map(r => r.name + ' (' + r.url_slug + ')').join(', ') : 'none'}`);
             return;
         }
 
         if (restaurant.status !== 'active') {
+            console.error('❌ Restaurant is not active. Status:', restaurant.status);
             showError('This restaurant is currently inactive.');
             return;
         }
@@ -481,11 +493,25 @@ async function handleStaffLogin(email, password) {
         console.log('✅ Staff verified:', staffData.role);
         showStaffSuccess('✅ Login successful! Redirecting to dashboard...');
 
-        // Redirect to staff dashboard
+        // Build redirect URL
         setTimeout(() => {
-            const currentUrl = window.location.href;
-            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-            window.location.href = `${baseUrl}/complete-staff-dashboard.html?restaurant=${currentRestaurantSlug}`;
+            // Get current location info
+            const protocol = window.location.protocol;
+            const host = window.location.host;
+            const pathname = window.location.pathname;
+            
+            // Get the base path (remove filename)
+            let basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+            
+            // If we're in a subdirectory like /test/, keep it
+            // pathname might be: /test/menu-dynamic.html
+            // basePath will be: /test
+            
+            // Construct the admin panel URL
+            const adminUrl = `${protocol}//${host}${basePath}/admin/index.html?restaurant=${currentRestaurantSlug}&staff=true`;
+            
+            console.log('🔄 Redirecting to:', adminUrl);
+            window.location.href = adminUrl;
         }, 1500);
 
         return true;
